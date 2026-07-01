@@ -28,6 +28,12 @@ def packs() -> list[str]:
     return sorted(p.parent.name for p in ASSETS.glob("*/dictionary.jsonl"))
 
 
+def allowed_guesses() -> set[str]:
+    """The full set of valid 5-letter words a player may guess (union across packs)."""
+    f = ASSETS / "allowed_guesses_all.txt"
+    return set(read_lines(f)) if f.exists() else set()
+
+
 def load_tiers(pack: str) -> dict:
     tf = ASSETS / pack / "tiers.json"
     return json.loads(tf.read_text(encoding="utf-8")).get("tiers", {}) if tf.exists() else {}
