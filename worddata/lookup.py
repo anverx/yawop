@@ -58,7 +58,8 @@ def lookup_entry(word: str, pack: str | None = None) -> dict | None:
 def format_entry(entry: dict, color: bool = True) -> str:
     b, d, i, r = (BOLD, DIM, ITAL, RESET) if color else ("", "", "", "")
     out = [f"\n{b}{entry['word'].upper()}{r}"]
-    packs_str = ", ".join(f"{p['pack']}{f' ({p['tier']})' if p['tier'] else ''}" for p in entry["packs"])
+    labels = [p["pack"] + (f" ({p['tier']})" if p["tier"] else "") for p in entry["packs"]]
+    packs_str = ", ".join(labels)
     out.append(f"{d}in packs: {packs_str}{r}\n")
 
     if entry["senses"]:
