@@ -1,4 +1,4 @@
-# yawod
+# yawop
 
 A cross-platform word puzzle game (Kivy). This repo separates the **game**, which
 ships with its dictionaries built in, from the **build-time tooling** that produces
