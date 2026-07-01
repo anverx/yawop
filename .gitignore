@@ -1,0 +1,9 @@
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+
+# Build-time working data is regenerable; the game ships assets/dictionaries/ instead.
+/pipeline/data/*
+# ...but keep the expensive API caches so rebuilds don't re-hit the network.
+!/pipeline/data/cache/
