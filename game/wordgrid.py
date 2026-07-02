@@ -22,10 +22,12 @@ from kivy.uix.widget import Widget
 
 from kivyshell.uikit import BackButton, RoundedButton, get_theme
 
+from worddata.paths import app_root
+
 from . import theme as T
 from .wordgame import MAX_GUESSES, WORD_LEN, Mark, WordGame
 
-_ENTER_ICON = os.path.join(os.path.dirname(os.path.abspath(__file__)), "assets", "enter-icon.png")
+_ENTER_ICON = os.path.join(str(app_root()), "game", "assets", "enter-icon.png")
 _MARK_COLOR = {Mark.CORRECT: T.TILE_CORRECT, Mark.PRESENT: T.TILE_PRESENT, Mark.ABSENT: T.TILE_ABSENT}
 _KEY_ROWS = ["qwertyuiop", "asdfghjkl", "zxcvbnm"]
 _CURSOR = (0.2, 0.5, 0.85, 1)

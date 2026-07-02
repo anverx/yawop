@@ -6,8 +6,10 @@ import os
 
 from kivyshell.uikit import Theme
 
-_HERE = os.path.dirname(os.path.abspath(__file__))
-_ROOT = os.path.dirname(_HERE)  # yawop repo root
+from worddata.paths import app_root
+
+_ROOT = str(app_root())            # repo root, or the PyInstaller bundle root
+_HERE = os.path.join(_ROOT, "game")  # game/ package assets live under here
 
 # Wordle-ish tile colors, exposed for the game panel.
 TILE_CORRECT = (0.42, 0.67, 0.39, 1)   # green

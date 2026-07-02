@@ -12,3 +12,7 @@ __pycache__/
 /.buildozer/
 /bin/
 *.keystore
+
+# Desktop build (PyInstaller)
+/build/
+/dist/

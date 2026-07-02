@@ -10,8 +10,10 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
-# assets/dictionaries/ lives next to this package at the repo root.
-ASSETS = Path(__file__).resolve().parent.parent / "assets" / "dictionaries"
+from .paths import app_root
+
+# assets/dictionaries/ lives at the app root (repo root, or the PyInstaller bundle).
+ASSETS = app_root() / "assets" / "dictionaries"
 TIER_ORDER = ("easy", "medium", "hard")
 
 
