@@ -34,6 +34,17 @@ def allowed_guesses() -> set[str]:
     return set(read_lines(f)) if f.exists() else set()
 
 
+def solution_blocklist() -> set[str]:
+    """Vulgar/anatomical words kept as valid guesses but excluded from puzzle
+    SOLUTIONS by default. Applied at pick time unless the player opts in. (Slurs
+    are removed from the shipped data entirely, so they never reach this list.)"""
+    f = ASSETS / "blocklist_solutions.txt"
+    if not f.exists():
+        return set()
+    return {ln.strip().lower() for ln in f.read_text(encoding="utf-8").splitlines()
+            if ln.strip() and not ln.startswith("#")}
+
+
 def load_tiers(pack: str) -> dict:
     tf = ASSETS / pack / "tiers.json"
     return json.loads(tf.read_text(encoding="utf-8")).get("tiers", {}) if tf.exists() else {}

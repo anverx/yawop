@@ -9,8 +9,11 @@ completions are persisted with kivyshell's SqliteStore.
 from __future__ import annotations
 
 import datetime
+import json
+import os
 from typing import Any
 
+from kivy.clock import Clock
 from kivy.core.window import Window
 from kivy.utils import platform
 
@@ -47,9 +50,35 @@ class WordApp(GameShellApp):
         self.store.open(self.user_data_dir)
         self._play_id: int | None = None
         self._last_random = {"pack": DEFAULT_PACK, "difficulty": "medium"}
+        self._allow_mature = bool(self._load_pref("allow_mature", False))
 
     def close_storage(self) -> None:
         self.store.close()
+
+    # --- simple JSON prefs in user_data_dir (survives restarts) ---
+    def _prefs_path(self) -> str:
+        return os.path.join(self.user_data_dir, "settings.json")
+
+    def _load_pref(self, key: str, default: Any) -> Any:
+        try:
+            with open(self._prefs_path(), encoding="utf-8") as f:
+                return json.load(f).get(key, default)
+        except (OSError, ValueError):
+            return default
+
+    def _save_pref(self, key: str, value: Any) -> None:
+        data = {}
+        try:
+            with open(self._prefs_path(), encoding="utf-8") as f:
+                data = json.load(f)
+        except (OSError, ValueError):
+            pass
+        data[key] = value
+        try:
+            with open(self._prefs_path(), "w", encoding="utf-8") as f:
+                json.dump(data, f)
+        except OSError:
+            pass  # prefs are best-effort; a lost toggle just reverts to default
 
     def create_screens(self) -> list:
         self.menu_screen = WordMenuScreen(self, name="menu")
@@ -58,6 +87,15 @@ class WordApp(GameShellApp):
         self.logbook_screen = WordLogbookScreen(self, name="logbook")
         return [SplashScreen(name="splash"), self.menu_screen, self.game_screen,
                 self.calendar_screen, self.logbook_screen]
+
+    def on_build(self) -> None:
+        # Show the word policy once, after the splash hands off to the menu.
+        if not os.path.exists(self._policy_flag):
+            Clock.schedule_once(lambda _dt: self.show_policy(mark_seen=True), self.splash_delay + 0.3)
+
+    @property
+    def _policy_flag(self) -> str:
+        return os.path.join(self.user_data_dir, ".policy_seen")
 
     # --- menu data ---
     def streak_text(self) -> str:
@@ -74,7 +112,10 @@ class WordApp(GameShellApp):
 
     def start_random(self, instance: Any = None) -> None:
         """Open the Random Game options popup: difficulty + word pack."""
+        from kivy.metrics import dp
         from kivy.uix.boxlayout import BoxLayout
+        from kivy.uix.checkbox import CheckBox
+        from kivy.uix.label import Label
         from kivy.uix.widget import Widget
 
         from kivyshell.uikit import (
@@ -87,6 +128,7 @@ class WordApp(GameShellApp):
             SubtitleLabel,
             TitleLabel,
             get_styles,
+            get_theme,
             styled,
         )
 
@@ -112,6 +154,25 @@ class WordApp(GameShellApp):
             pack_row.add_widget(b)
         content.add_widget(pack_row)
 
+        # Global toggle: allow vulgar/anatomical words to be served as answers.
+        # (Slurs are never eligible regardless.) Persists across restarts and
+        # applies to daily games too.
+        content.add_widget(SubtitleLabel("Answers"))
+        mature_row = BoxLayout(size_hint_y=None, height=dp(40), spacing=dp(8))
+        cb = CheckBox(active=self._allow_mature, size_hint=(None, 1), width=dp(36))
+
+        def _toggle_mature(_c: Any, val: bool) -> None:
+            self._allow_mature = val
+            self._save_pref("allow_mature", val)
+
+        cb.bind(active=_toggle_mature)
+        lbl = Label(text="Allow mature words as answers", font_name=get_theme().font_name,
+                    font_size="14sp", color=get_theme().text_dark, halign="left", valign="middle")
+        lbl.bind(size=lambda i, _v: setattr(i, "text_size", i.size))
+        mature_row.add_widget(cb)
+        mature_row.add_widget(lbl)
+        content.add_widget(mature_row)
+
         content.add_widget(styled(Widget, "spacer_sm"))
         holder: list = []
 
@@ -127,7 +188,7 @@ class WordApp(GameShellApp):
         cancel = FixedGrayRoundedButton(text="Cancel")
         content.add_widget(cancel)
 
-        popup = Popup(content, height=360, width_hint=0.85)
+        popup = Popup(content, height=440, width_hint=0.85)
         holder.append(popup)
         cancel.bind(on_press=popup.dismiss)
         popup.open()
@@ -158,7 +219,7 @@ class WordApp(GameShellApp):
         popup.open()
 
     def _start(self, pack: str, difficulty: str, day: str | None, subtitle: str) -> None:
-        answer = worddata.pick_word(pack, difficulty, seed=day)
+        answer = worddata.pick_word(pack, difficulty, seed=day, allow_mature=self._allow_mature)
         self._current = (pack, difficulty, answer)
         self._play_id = self.store.start(difficulty, day, answer)
         self.game_screen.set_game(WordGame(answer), self._allowed, subtitle,
@@ -232,13 +293,67 @@ class WordApp(GameShellApp):
         close.bind(on_press=popup.dismiss)
         popup.open()
 
+    def show_policy(self, instance: Any = None, mark_seen: bool = False) -> None:
+        """A human, one-time explanation of how we choose (and don't choose) words."""
+        from kivy.metrics import dp
+        from kivy.uix.boxlayout import BoxLayout
+        from kivy.uix.label import Label
+        from kivy.uix.scrollview import ScrollView
+
+        from kivyshell.uikit import FixedRoundedButton, Popup, PopupContent, SubtitleLabel, TitleLabel, get_theme
+
+        theme = get_theme()
+
+        def para(text: str, size: str = "14sp", color=None) -> Label:
+            lbl = Label(text=text, font_name=theme.font_name, font_size=size,
+                        color=color or theme.text_dark, size_hint_y=None, halign="left", valign="top")
+            lbl.bind(width=lambda i, w: setattr(i, "text_size", (w, None)),
+                     texture_size=lambda i, s: setattr(i, "height", s[1] + dp(4)))
+            return lbl
+
+        content = PopupContent()
+        content.add_widget(TitleLabel("About the words"))
+
+        body = BoxLayout(orientation="vertical", size_hint_y=None, spacing=dp(6), padding=[dp(4), dp(4)])
+        body.bind(minimum_height=body.setter("height"))
+        body.add_widget(para("yawop pulls its answers from real language: subtitles, books, "
+                             "the official Wordle list. So every now and then a word turns up "
+                             "that's crude or anatomical. Here's the honest deal."))
+        body.add_widget(SubtitleLabel("Slurs are out, completely.", color=theme.text_header))
+        body.add_widget(para("You'll never see one as an answer, and the game won't even accept "
+                             "one as a guess."))
+        body.add_widget(SubtitleLabel("Real words stay real.", color=theme.text_header))
+        body.add_widget(para("Crude or anatomical words are still fair game as guesses: we're not "
+                             "here to police the language. By default we just won't serve one up as "
+                             "the answer of the day, because a puzzle shouldn't put an awkward word "
+                             "on your screen when you didn't ask for it."))
+        body.add_widget(para("Prefer the unfiltered language? Flip \"Allow mature words as answers\" "
+                             "in Random Game, and they're in play as solutions too."))
+
+        scroll = ScrollView(size_hint=(1, 1))
+        scroll.add_widget(body)
+        content.add_widget(scroll)
+        btn = FixedRoundedButton(text="Got it")
+        content.add_widget(btn)
+        popup = Popup(content, height=440)
+        btn.bind(on_press=popup.dismiss)
+        if mark_seen:
+            try:
+                open(self._policy_flag, "w").close()
+            except OSError:
+                pass  # first-launch flag is best-effort; a re-show next time is harmless
+        popup.open()
+
     def show_about(self, instance: Any = None) -> None:
-        from kivyshell.uikit import FixedGrayRoundedButton, Popup, PopupContent, SubtitleLabel, TitleLabel
+        from kivyshell.uikit import FixedGrayRoundedButton, FixedRoundedButton, Popup, PopupContent, SubtitleLabel, TitleLabel
         content = PopupContent()
         content.add_widget(TitleLabel("yawop"))
         content.add_widget(SubtitleLabel("Yet Another WOrd Puzzle"))
+        policy = FixedRoundedButton(text="About the words")
+        content.add_widget(policy)
         close = FixedGrayRoundedButton(text="Close")
         content.add_widget(close)
-        popup = Popup(content, height=220)
+        popup = Popup(content, height=280)
+        policy.bind(on_press=lambda *_: (popup.dismiss(), self.show_policy()))
         close.bind(on_press=popup.dismiss)
         popup.open()

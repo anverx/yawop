@@ -57,7 +57,8 @@ publish: all
 	@mkdir -p $(ASSETS)/surprise
 	@cp data/surprise/dictionary.jsonl data/surprise/words.txt $(ASSETS)/surprise/
 	@cp data/allowed_guesses_all.txt $(ASSETS)/
-	$(PY) scripts/apply_blocklist.py --assets $(ASSETS) --slurs blocklist_slurs.txt --solutions blocklist_solutions.txt
+	$(PY) scripts/apply_blocklist.py --assets $(ASSETS) --slurs blocklist_slurs.txt
+	@cp blocklist_solutions.txt $(ASSETS)/   # runtime filter: excluded from solutions unless the player opts in
 	@echo "published shipping dictionaries -> $(ASSETS)"
 
 all: subtlex-us subtlex-uk wordle surprise arcane guesses
