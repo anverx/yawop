@@ -12,9 +12,10 @@ from typing import Any
 
 from kivy.graphics import Color, Line, RoundedRectangle
 from kivy.metrics import dp
+from kivy.uix.anchorlayout import AnchorLayout
 from kivy.uix.boxlayout import BoxLayout
-from kivy.uix.gridlayout import GridLayout
 from kivy.uix.label import Label
+from kivy.uix.widget import Widget
 
 from kivyshell.uikit import RoundedButton, get_theme
 
@@ -59,27 +60,43 @@ class WordGridPanel(BoxLayout):
     """Renders a WordGame and drives play. on_finish(won: bool, duration_ms: int)."""
 
     def __init__(self, game: WordGame, allowed: set[str],
-                 on_finish: Callable[[bool, int, int], None] | None = None, **kwargs: Any) -> None:
+                 on_finish: Callable[[bool, int, int], None] | None = None,
+                 on_info: Callable[[str], None] | None = None, **kwargs: Any) -> None:
         super().__init__(orientation="vertical", spacing=dp(8), **kwargs)
         self.game = game
         self.allowed = allowed
         self.on_finish = on_finish
+        self.on_info = on_info
         self._started = time.monotonic()
         self._flash = ""
 
-        # Grid of tiles
-        grid = GridLayout(cols=WORD_LEN, rows=MAX_GUESSES, spacing=dp(6),
-                          size_hint=(None, None))
-        grid.bind(minimum_width=grid.setter("width"), minimum_height=grid.setter("height"))
+        # Grid: one horizontal row per guess = leading spacer + 5 tiles + a '?' button.
+        # The spacer mirrors the button width so the tiles stay centered.
+        tile, btn = dp(52), dp(40)
+        grid_col = BoxLayout(orientation="vertical", spacing=dp(6), size_hint=(None, None))
+        grid_col.bind(minimum_width=grid_col.setter("width"), minimum_height=grid_col.setter("height"))
         self._tiles: list[list[Tile]] = []
-        for _ in range(MAX_GUESSES):
-            row = []
+        self._info_btns: list[RoundedButton] = []
+        for r in range(MAX_GUESSES):
+            row = BoxLayout(orientation="horizontal", spacing=dp(6), size_hint=(None, None), height=tile)
+            row.bind(minimum_width=row.setter("width"))
+            row.add_widget(Widget(size_hint=(None, None), size=(btn, tile)))  # leading spacer
+            tiles = []
             for _ in range(WORD_LEN):
-                t = Tile(size_hint=(None, None), size=(dp(52), dp(52)))
-                grid.add_widget(t)
-                row.append(t)
-            self._tiles.append(row)
-        anchor = BoxLayout(); anchor.add_widget(BoxLayout()); anchor.add_widget(grid); anchor.add_widget(BoxLayout())
+                t = Tile(size_hint=(None, None), size=(tile, tile))
+                row.add_widget(t)
+                tiles.append(t)
+            self._tiles.append(tiles)
+            info = RoundedButton(text="?", font_size="18sp", bg_color=T.KEY_DEFAULT,
+                                 color=(0.1, 0.1, 0.1, 1), size_hint=(None, None), size=(btn, tile))
+            info.opacity = 0
+            info.disabled = True
+            info.bind(on_press=lambda _x, rr=r: self._info(rr))
+            row.add_widget(info)
+            self._info_btns.append(info)
+            grid_col.add_widget(row)
+        anchor = AnchorLayout(anchor_x="center")
+        anchor.add_widget(grid_col)
         self.add_widget(anchor)
 
         # Status / message line
@@ -137,6 +154,10 @@ class WordGridPanel(BoxLayout):
         if g.finished and self.on_finish:
             self.on_finish(g.won, int((time.monotonic() - self._started) * 1000), g.attempts)
 
+    def _info(self, r: int) -> None:
+        if self.on_info and r < len(self.game.guesses):
+            self.on_info(self.game.guesses[r])
+
     def on_key_text(self, text: str) -> None:
         """Forwarded hardware-keyboard input (a letter)."""
         if text and text.isalpha():
@@ -159,6 +180,9 @@ class WordGridPanel(BoxLayout):
             else:
                 for c in range(WORD_LEN):
                     self._tiles[r][c].set("", None)
+            shown = r < len(g.guesses)          # '?' appears once a guess is accepted
+            self._info_btns[r].opacity = 1 if shown else 0
+            self._info_btns[r].disabled = not shown
 
         states = g.letter_states()
         for ch, btn in self._keys.items():

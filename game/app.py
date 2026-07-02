@@ -161,7 +161,8 @@ class WordApp(GameShellApp):
         answer = worddata.pick_word(pack, difficulty, seed=day)
         self._current = (pack, difficulty, answer)
         self._play_id = self.store.start(difficulty, day, answer)
-        self.game_screen.set_game(WordGame(answer), self._allowed, subtitle, self._on_finish)
+        self.game_screen.set_game(WordGame(answer), self._allowed, subtitle,
+                                  self._on_finish, self.show_word_info)
         self.sm.current = "game"
 
     def _on_finish(self, won: bool, duration_ms: int, attempts: int) -> None:
@@ -172,6 +173,64 @@ class WordApp(GameShellApp):
         entry = worddata.lookup_entry(answer)
         definition = entry["senses"][0]["definition"] if entry and entry.get("senses") else ""
         self.game_screen.show_reveal(f"{answer.upper()} — {definition}" if definition else answer.upper())
+
+    def show_word_info(self, word: str) -> None:
+        """Popup: formatted definitions + usage examples for a guessed word."""
+        from kivy.metrics import dp
+        from kivy.uix.boxlayout import BoxLayout
+        from kivy.uix.label import Label
+        from kivy.uix.scrollview import ScrollView
+
+        from kivyshell.uikit import (
+            CaptionLabel,
+            FixedGrayRoundedButton,
+            Popup,
+            PopupContent,
+            SubtitleLabel,
+            TitleLabel,
+            get_theme,
+        )
+
+        theme = get_theme()
+
+        def para(text: str, size: str = "14sp", color=None) -> Label:
+            lbl = Label(text=text, font_name=theme.font_name, font_size=size,
+                        color=color or theme.text_dark, size_hint_y=None, halign="left", valign="top")
+            lbl.bind(width=lambda i, w: setattr(i, "text_size", (w, None)),
+                     texture_size=lambda i, s: setattr(i, "height", s[1] + dp(4)))
+            return lbl
+
+        entry = worddata.lookup_entry(word)
+        content = PopupContent()
+        content.add_widget(TitleLabel(word.upper()))
+
+        body = BoxLayout(orientation="vertical", size_hint_y=None, spacing=dp(6), padding=[dp(4), dp(4)])
+        body.bind(minimum_height=body.setter("height"))
+        if not entry or (not entry["senses"] and not entry["examples"]):
+            body.add_widget(para("No dictionary entry available for this word."))
+        else:
+            if entry["senses"]:
+                body.add_widget(SubtitleLabel("Definitions", color=theme.text_header))
+                for s in entry["senses"]:
+                    pos = f"({s.get('pos_label', '')}) " if s.get("pos_label") else ""
+                    body.add_widget(para(f"{pos}{s.get('definition', '')}"))
+            if entry["examples"]:
+                body.add_widget(para(" ", size="6sp"))
+                body.add_widget(SubtitleLabel("Usage", color=theme.text_header))
+                for ex in entry["examples"]:
+                    body.add_widget(para(f"“{ex.get('text', '')}”", color=theme.text_dark))
+                    who = " — ".join(x for x in (ex.get("author"), ex.get("work")) if x)
+                    if who:
+                        body.add_widget(para(who, size="12sp", color=theme.text_medium))
+
+        scroll = ScrollView(size_hint=(1, 1))
+        scroll.add_widget(body)
+        content.add_widget(scroll)
+        close = FixedGrayRoundedButton(text="Close")
+        content.add_widget(close)
+        popup = Popup(content, height=460)
+        close.bind(on_press=popup.dismiss)
+        popup.open()
 
     def show_about(self, instance: Any = None) -> None:
         from kivyshell.uikit import FixedGrayRoundedButton, Popup, PopupContent, SubtitleLabel, TitleLabel

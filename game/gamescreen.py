@@ -33,13 +33,14 @@ class WordGameScreen(BackgroundedScreen):
         self._on_finish: Callable[[bool, int, int], None] | None = None
 
     def set_game(self, game: WordGame, allowed: set[str], subtitle: str,
-                 on_finish: Callable[[bool, int, int], None]) -> None:
+                 on_finish: Callable[[bool, int, int], None],
+                 on_info: Callable[[str], None]) -> None:
         self.title.text = subtitle
         self.reveal.text = ""
         self.reveal.height = 0
         self._on_finish = on_finish
         self._host.clear_widgets()
-        self._panel = WordGridPanel(game, allowed, on_finish=self._finished)
+        self._panel = WordGridPanel(game, allowed, on_finish=self._finished, on_info=on_info)
         self._host.add_widget(self._panel)
 
     def _finished(self, won: bool, duration_ms: int, attempts: int) -> None:
