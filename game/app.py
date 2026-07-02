@@ -219,7 +219,11 @@ class WordApp(GameShellApp):
         popup.open()
 
     def _start(self, pack: str, difficulty: str, day: str | None, subtitle: str) -> None:
-        answer = worddata.pick_word(pack, difficulty, seed=day, allow_mature=self._allow_mature)
+        # The mature toggle applies to random games only. Dated games (daily and
+        # calendar dates, seed=day) must be identical for every player, so they
+        # always draw from the standard filtered pool regardless of the setting.
+        allow_mature = self._allow_mature and day is None
+        answer = worddata.pick_word(pack, difficulty, seed=day, allow_mature=allow_mature)
         self._current = (pack, difficulty, answer)
         self._play_id = self.store.start(difficulty, day, answer)
         self.game_screen.set_game(WordGame(answer), self._allowed, subtitle,
