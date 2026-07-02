@@ -1,4 +1,8 @@
-"""Wordle-style game logic (pure Python, no kivy)."""
+"""Wordle-style game logic (pure Python, no kivy).
+
+The current guess is a list of 5 slots with a movable cursor, so letters can be
+entered out of order (tap a box to move the cursor there).
+"""
 
 from __future__ import annotations
 
@@ -34,40 +38,69 @@ def score_guess(guess: str, answer: str) -> list[Mark]:
 
 
 class WordGame:
-    """Holds the answer, submitted guesses, and the in-progress guess."""
+    """Answer + submitted guesses + the in-progress guess (slots + cursor)."""
 
     def __init__(self, answer: str, max_guesses: int = MAX_GUESSES) -> None:
         self.answer = answer.lower()
         self.max_guesses = max_guesses
         self.guesses: list[str] = []
         self.marks: list[list[Mark]] = []
-        self.current = ""
+        self.slots: list[str] = [""] * WORD_LEN
+        self.cursor = 0
         self.won = False
         self.finished = False
 
+    @property
+    def current(self) -> str:
+        return "".join(self.slots)
+
+    def is_complete(self) -> bool:
+        return all(self.slots)
+
+    def _next_empty(self, start: int) -> int | None:
+        for i in list(range(start + 1, WORD_LEN)) + list(range(0, start + 1)):
+            if not self.slots[i]:
+                return i
+        return None
+
+    def set_cursor(self, i: int) -> None:
+        if not self.finished and 0 <= i < WORD_LEN:
+            self.cursor = i
+
     def add_letter(self, ch: str) -> None:
-        if not self.finished and len(self.current) < WORD_LEN and ch.isalpha():
-            self.current += ch.lower()
+        if self.finished or not ch.isalpha():
+            return
+        self.slots[self.cursor] = ch.lower()
+        nxt = self._next_empty(self.cursor)   # jump to the next empty slot (wraps)
+        if nxt is not None:
+            self.cursor = nxt
 
     def backspace(self) -> None:
-        self.current = self.current[:-1]
+        if self.finished:
+            return
+        if self.slots[self.cursor]:
+            self.slots[self.cursor] = ""
+        elif self.cursor > 0:
+            self.cursor -= 1
+            self.slots[self.cursor] = ""
 
     def submit(self) -> bool:
-        """Score and record the current guess (assumed valid). True if accepted."""
-        if self.finished or len(self.current) != WORD_LEN:
+        """Score and record the current guess (assumed complete + valid)."""
+        if self.finished or not self.is_complete():
             return False
-        self.marks.append(score_guess(self.current, self.answer))
-        self.guesses.append(self.current)
-        if self.current == self.answer:
+        guess = self.current
+        self.marks.append(score_guess(guess, self.answer))
+        self.guesses.append(guess)
+        if guess == self.answer:
             self.won = self.finished = True
         elif len(self.guesses) >= self.max_guesses:
             self.finished = True
-        self.current = ""
+        self.slots = [""] * WORD_LEN
+        self.cursor = 0
         return True
 
     @property
     def attempts(self) -> int:
-        """Number of guesses submitted."""
         return len(self.guesses)
 
     def letter_states(self) -> dict[str, Mark]:
