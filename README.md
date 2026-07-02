@@ -71,3 +71,15 @@ make publish    # copy the shippable subset into ../assets/dictionaries/
 python3 -m unittest discover -s tests        # game-runtime (worddata)
 make -C pipeline test                        # build-time pipeline
 ```
+
+## License
+
+Copyright (C) 2026 yawop contributors.
+
+yawop is free software licensed under the **GNU Affero General Public License v3.0
+or later** (AGPL-3.0-or-later); see [LICENSE](LICENSE). Any distributed fork or
+network-served version must make its complete source available under the same
+license.
+
+The shared UI library [kivyshell](https://github.com/anverx/kivyshell) (vendored
+at `libs/kivyshell`) is separately licensed under the MIT License.
