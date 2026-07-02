@@ -7,3 +7,8 @@ __pycache__/
 /pipeline/data/*
 # ...but keep the expensive API caches so rebuilds don't re-hit the network.
 !/pipeline/data/cache/
+
+# Android build (buildozer / python-for-android)
+/.buildozer/
+/bin/
+*.keystore

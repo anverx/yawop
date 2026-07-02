@@ -1,0 +1,434 @@
+name: Build Android
+
+on:
+  push:
+    tags:
+      - 'v*'
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    if: ${{ !startsWith(github.ref, 'refs/tags/') }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+
+      - name: Install system dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            python3-pip \
+            build-essential \
+            git \
+            zip \
+            unzip \
+            openjdk-17-jdk \
+            autoconf \
+            libtool \
+            pkg-config \
+            zlib1g-dev \
+            libncurses-dev \
+            libncursesw5-dev \
+            cmake \
+            libffi-dev \
+            libssl-dev \
+            automake \
+            gettext \
+            libltdl-dev \
+            lld \
+            llvm
+          # Create symlink for libtinfo if needed (for older NDK compatibility)
+          if [ ! -f /usr/lib/x86_64-linux-gnu/libtinfo.so.5 ]; then
+            sudo ln -sf /usr/lib/x86_64-linux-gnu/libtinfo.so.6 /usr/lib/x86_64-linux-gnu/libtinfo.so.5 || true
+          fi
+
+      - name: Install buildozer and dependencies
+        run: |
+          pip install --upgrade pip
+          pip install 'cython==3.0.12' buildozer virtualenv
+
+      - name: Cache buildozer
+        uses: actions/cache@v4
+        with:
+          path: |
+            .buildozer
+            ~/.buildozer
+          key: ${{ runner.os }}-buildozer-v4-${{ hashFiles('buildozer.spec') }}
+          restore-keys: |
+            ${{ runner.os }}-buildozer-v4-
+
+      - name: Cache Gradle
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+          restore-keys: |
+            ${{ runner.os }}-gradle-
+
+      - name: Restore debug keystore
+        env:
+          DEBUG_KEYSTORE: ${{ secrets.DEBUG_KEYSTORE }}
+        run: |
+          if [ -n "$DEBUG_KEYSTORE" ]; then
+            echo "$DEBUG_KEYSTORE" | base64 -d > debug.keystore
+            echo "Debug keystore restored from secrets"
+            # Place it where gradle actually looks for debug keystores
+            # Gradle may use ~/.android/ or ~/.config/.android/ (XDG path)
+            mkdir -p ~/.android ~/.config/.android
+            cp debug.keystore ~/.android/debug.keystore
+            cp debug.keystore ~/.config/.android/debug.keystore
+            echo "Copied to ~/.android/ and ~/.config/.android/"
+            # Verify the keystore
+            keytool -list -keystore debug.keystore -storepass android -alias androiddebugkey
+          else
+            echo "No DEBUG_KEYSTORE secret found, will generate one during build"
+          fi
+
+      - name: Build APK
+        env:
+          PIP_CONSTRAINT: ${{ github.workspace }}/pip-constraints.txt
+        run: |
+          echo "Cython==3.0.12" > pip-constraints.txt
+          pip install --user 'cython==3.0.12'
+
+          # Generate debug keystore if not provided via secrets
+          if [ ! -f debug.keystore ]; then
+            echo "Generating new debug keystore..."
+            keytool -genkey -v -keystore debug.keystore -alias androiddebugkey \
+              -keyalg RSA -keysize 2048 -validity 10000 \
+              -storepass android -keypass android \
+              -dname "CN=Debug, OU=Debug, O=Debug, L=Debug, ST=Debug, C=US"
+          fi
+
+          # Auto-increment version code using GitHub run number
+          # This ensures each build has a higher version code
+          VERSION_CODE=${{ github.run_number }}
+          echo "Setting android.numeric_version to $VERSION_CODE"
+          sed -i "s/^android.numeric_version = .*/android.numeric_version = $VERSION_CODE/" buildozer.spec
+
+          # Overwrite any cached keystore that buildozer/gradle may have stored
+          cp debug.keystore ~/.android/debug.keystore 2>/dev/null || true
+          cp debug.keystore ~/.config/.android/debug.keystore 2>/dev/null || true
+
+          yes | buildozer android debug 2>&1 | tee build.log || true
+          # Check if APK was created
+          if [ -f bin/*.apk ]; then
+            echo "APK built successfully"
+          else
+            echo "Build failed, showing last 100 lines of log:"
+            tail -100 build.log
+            exit 1
+          fi
+
+          # Debug: find all keystore files and print their fingerprints
+          echo "=== All keystore files on system ==="
+          find / -name "*.keystore" -o -name "debug.keystore" 2>/dev/null | while read ks; do
+            echo "--- $ks ---"
+            keytool -list -keystore "$ks" -storepass android 2>/dev/null | head -5 || echo "(could not read)"
+          done
+
+      - name: Verify APK signing
+        run: |
+          APK=$(ls bin/*.apk | head -1)
+          echo "=== APK: $APK ==="
+
+          # Print signing certificate fingerprint
+          # This MUST match between builds for updates to work
+          if command -v apksigner &> /dev/null; then
+            apksigner verify --print-certs "$APK"
+          else
+            # Fall back to build-tools apksigner
+            APKSIGNER=$(find ~/.buildozer $ANDROID_HOME -name "apksigner" -type f 2>/dev/null | head -1)
+            if [ -n "$APKSIGNER" ]; then
+              "$APKSIGNER" verify --print-certs "$APK"
+            else
+              echo "apksigner not found, using keytool on debug.keystore instead:"
+              keytool -list -v -keystore debug.keystore -storepass android -alias androiddebugkey 2>/dev/null | grep -A1 "Certificate fingerprints" || true
+              keytool -list -v -keystore debug.keystore -storepass android -alias androiddebugkey 2>/dev/null | grep "SHA256:" || true
+            fi
+          fi
+
+          # Also show version info from the APK
+          if command -v aapt &> /dev/null; then
+            aapt dump badging "$APK" | grep -E "versionCode|versionName|package:" || true
+          else
+            AAPT=$(find ~/.buildozer $ANDROID_HOME -name "aapt" -type f 2>/dev/null | head -1)
+            if [ -n "$AAPT" ]; then
+              "$AAPT" dump badging "$APK" | grep -E "versionCode|versionName|package:" || true
+            fi
+          fi
+
+      - name: Upload APK artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: yawop-apk
+          path: bin/*.apk
+          retention-days: 30
+
+      - name: Upload build log
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-log
+          path: build.log
+          retention-days: 7
+
+  build-release:
+    runs-on: ubuntu-latest
+    if: startsWith(github.ref, 'refs/tags/v')
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+
+      - name: Install system dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            python3-pip \
+            build-essential \
+            git \
+            zip \
+            unzip \
+            openjdk-17-jdk \
+            autoconf \
+            libtool \
+            pkg-config \
+            zlib1g-dev \
+            libncurses-dev \
+            libncursesw5-dev \
+            cmake \
+            libffi-dev \
+            libssl-dev \
+            automake \
+            gettext \
+            libltdl-dev \
+            lld \
+            llvm
+          if [ ! -f /usr/lib/x86_64-linux-gnu/libtinfo.so.5 ]; then
+            sudo ln -sf /usr/lib/x86_64-linux-gnu/libtinfo.so.6 /usr/lib/x86_64-linux-gnu/libtinfo.so.5 || true
+          fi
+
+      - name: Install buildozer and dependencies
+        run: |
+          pip install --upgrade pip
+          pip install 'cython<3' buildozer virtualenv
+
+      - name: Cache buildozer
+        uses: actions/cache@v4
+        with:
+          path: |
+            .buildozer
+            ~/.buildozer
+          key: ${{ runner.os }}-buildozer-release-v2-${{ hashFiles('buildozer.spec') }}
+          restore-keys: |
+            ${{ runner.os }}-buildozer-release-v2-
+
+      - name: Cache Gradle
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+          restore-keys: |
+            ${{ runner.os }}-gradle-
+
+      - name: Restore release keystore
+        env:
+          RELEASE_KEYSTORE: ${{ secrets.RELEASE_KEYSTORE }}
+          RELEASE_KEYSTORE_PASSWD: ${{ secrets.RELEASE_KEYSTORE_PASSWD }}
+          RELEASE_KEY_ALIAS: ${{ secrets.RELEASE_KEY_ALIAS }}
+        run: |
+          if [ -z "$RELEASE_KEYSTORE" ]; then
+            echo "::error::RELEASE_KEYSTORE secret is required for release builds"
+            exit 1
+          fi
+          echo "$RELEASE_KEYSTORE" | base64 -d > release.keystore
+          echo "Release keystore restored"
+          keytool -list -keystore release.keystore -storepass "$RELEASE_KEYSTORE_PASSWD" -alias "$RELEASE_KEY_ALIAS"
+
+      - name: Build AAB
+        env:
+          PIP_CONSTRAINT: ${{ github.workspace }}/pip-constraints.txt
+          P4A_RELEASE_KEYSTORE: ${{ github.workspace }}/release.keystore
+          P4A_RELEASE_KEYALIAS: ${{ secrets.RELEASE_KEY_ALIAS }}
+          P4A_RELEASE_KEYSTORE_PASSWD: ${{ secrets.RELEASE_KEYSTORE_PASSWD }}
+          P4A_RELEASE_KEYALIAS_PASSWD: ${{ secrets.RELEASE_KEYSTORE_PASSWD }}
+        run: |
+          echo "Cython==3.0.12" > pip-constraints.txt
+          pip install --user 'cython==3.0.12'
+
+          # Set version code from GitHub run number
+          VERSION_CODE=${{ github.run_number }}
+          echo "Setting android.numeric_version to $VERSION_CODE"
+          sed -i "s/^android.numeric_version = .*/android.numeric_version = $VERSION_CODE/" buildozer.spec
+
+          # Configure for release AAB
+          sed -i "s/^# *android.release_artifact.*/android.release_artifact = aab/" buildozer.spec
+          if ! grep -q "^android.release_artifact" buildozer.spec; then
+            echo "android.release_artifact = aab" >> buildozer.spec
+          fi
+
+          yes | buildozer android release 2>&1 | tee build-release.log || true
+
+          # Check if AAB was created
+          if ls bin/*.aab 1>/dev/null 2>&1; then
+            echo "AAB built successfully"
+          else
+            echo "AAB build failed, showing last 100 lines of log:"
+            tail -100 build-release.log
+            exit 1
+          fi
+
+      - name: Verify AAB
+        run: |
+          AAB=$(ls bin/*.aab | head -1)
+          echo "=== AAB: $AAB ==="
+          echo "Size: $(du -h "$AAB" | cut -f1)"
+
+          # Verify AAB is signed
+          JARSIGNER=$(which jarsigner 2>/dev/null || echo "")
+          if [ -n "$JARSIGNER" ]; then
+            echo "=== Signature verification ==="
+            jarsigner -verify -verbose -certs "$AAB" 2>&1 | head -20
+          fi
+
+          # Extract and verify targetSdkVersion from the AAB manifest
+          # AAB is a zip; extract base/manifest/AndroidManifest.xml and decode it
+          BUNDLETOOL=$(find ~/.buildozer -name "bundletool*.jar" -type f 2>/dev/null | head -1)
+          AAPT2=$(find ~/.buildozer $ANDROID_HOME -name "aapt2" -type f 2>/dev/null | head -1)
+
+          # Try extracting AndroidManifest.xml from the AAB (it's a zip)
+          mkdir -p /tmp/aab-check
+          unzip -o "$AAB" base/manifest/AndroidManifest.xml -d /tmp/aab-check 2>/dev/null || true
+
+          if [ -n "$AAPT2" ] && [ -f /tmp/aab-check/base/manifest/AndroidManifest.xml ]; then
+            echo "=== AndroidManifest.xml ==="
+            "$AAPT2" dump xmltree --file AndroidManifest.xml /tmp/aab-check/base/manifest/AndroidManifest.xml 2>/dev/null || true
+            # Extract targetSdkVersion
+            TARGET_SDK=$("$AAPT2" dump xmltree --file AndroidManifest.xml /tmp/aab-check/base/manifest/AndroidManifest.xml 2>/dev/null | sed -n 's/.*targetSdkVersion.*=\([0-9]*\).*/\1/p' | head -1)
+          fi
+
+          # Fallback: check the gradle output in the build directory
+          if [ -z "$TARGET_SDK" ]; then
+            TARGET_SDK=$(grep -r "targetSdkVersion" .buildozer/android/platform/build-*/dists/*/build.gradle 2>/dev/null | sed -n 's/.*targetSdkVersion \([0-9]*\).*/\1/p' | head -1)
+          fi
+
+          echo "Target SDK: ${TARGET_SDK:-not found}"
+          if [ -n "$TARGET_SDK" ] && [ "$TARGET_SDK" != "35" ]; then
+            echo "::error::Expected targetSdkVersion=35 but got $TARGET_SDK"
+            exit 1
+          fi
+          if [ -z "$TARGET_SDK" ]; then
+            echo "::warning::Could not determine targetSdkVersion from AAB"
+          fi
+
+      - name: Package native debug symbols
+        run: |
+          # Find unstripped .so files from the p4a build
+          # They live in the build directory before stripping
+          LIBS_DIR=$(find .buildozer -path "*/build/libs_collections/*/lib" -type d 2>/dev/null | head -1)
+          OBJ_DIR=$(find .buildozer -path "*/python-installs/*" -type d 2>/dev/null | head -1)
+
+          echo "=== Looking for native libraries ==="
+          mkdir -p native-debug-symbols
+
+          # Find all .so files with debug symbols in the build tree
+          for arch in arm64-v8a armeabi-v7a; do
+            mkdir -p "native-debug-symbols/$arch"
+            # p4a keeps unstripped libs in the obj directory
+            find .buildozer -path "*/$arch/*.so" -name "*.so" 2>/dev/null | while read so; do
+              # Check if file has debug info
+              if file "$so" | grep -q "not stripped"; then
+                cp "$so" "native-debug-symbols/$arch/"
+                echo "Found unstripped: $so"
+              fi
+            done
+          done
+
+          # If no unstripped .so found, grab all .so files (stripped is better than nothing)
+          if [ -z "$(find native-debug-symbols -name '*.so' 2>/dev/null)" ]; then
+            echo "No unstripped .so found, collecting all .so files..."
+            for arch in arm64-v8a armeabi-v7a; do
+              mkdir -p "native-debug-symbols/$arch"
+              find .buildozer -path "*/$arch/*.so" -name "*.so" 2>/dev/null | while read so; do
+                cp "$so" "native-debug-symbols/$arch/" 2>/dev/null || true
+              done
+            done
+          fi
+
+          # Create zip in the format Play Console expects
+          cd native-debug-symbols
+          zip -r ../native-debug-symbols.zip . || echo "No symbols to package"
+          cd ..
+          echo "=== Symbols package ==="
+          ls -lh native-debug-symbols.zip 2>/dev/null || echo "No symbols zip created"
+
+      - name: Upload AAB artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: yawop-aab
+          path: bin/*.aab
+          retention-days: 90
+
+      - name: Upload native debug symbols
+        if: ${{ hashFiles('native-debug-symbols.zip') != '' }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: yawop-native-debug-symbols
+          path: native-debug-symbols.zip
+          retention-days: 90
+
+      - name: Upload release build log
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-release-log
+          path: build-release.log
+          retention-days: 7
+
+  release:
+    needs: [build-release]
+    runs-on: ubuntu-latest
+    if: startsWith(github.ref, 'refs/tags/v')
+
+    steps:
+      - name: Download AAB
+        uses: actions/download-artifact@v4
+        with:
+          name: yawop-aab
+          path: artifacts
+
+      - name: Download native debug symbols
+        uses: actions/download-artifact@v4
+        with:
+          name: yawop-native-debug-symbols
+          path: artifacts
+        continue-on-error: true
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: artifacts/*
+          generate_release_notes: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
