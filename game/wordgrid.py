@@ -239,8 +239,13 @@ class WordGridPanel(BoxLayout):
             self.on_guess(list(g.guesses))
 
     def _info(self, r: int) -> None:
-        if self.on_info and r < len(self.game.guesses):
-            self.on_info(self.game.guesses[r])
+        if not self.on_info:
+            return
+        guesses = self.game.guesses
+        if r < len(guesses):
+            self.on_info(guesses[r])
+        elif r == len(guesses) and self.game.is_complete():
+            self.on_info(self.game.current)  # peek the typed-but-unsubmitted word
 
     def on_key_text(self, text: str) -> None:
         if text and text.isalpha():
@@ -266,7 +271,11 @@ class WordGridPanel(BoxLayout):
             else:
                 for c in range(WORD_LEN):
                     self._tiles[r][c].set("", None)
-            shown = r < active
+            # '?' shows for submitted rows, and on the active row as soon as a valid
+            # word is typed (Enter green) so you can look it up before committing.
+            shown = r < active or (
+                r == active and not g.finished and g.is_complete()
+                and (g.current == g.answer or g.current in self.allowed))
             self._info_btns[r].opacity = 1 if shown else 0
             self._info_btns[r].disabled = not shown
 
