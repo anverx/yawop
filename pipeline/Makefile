@@ -173,8 +173,12 @@ data/surprise/dictionary.jsonl data/surprise/words.txt &: data/subtlex-us/dictio
 	$(PY) scripts/combine_surprise.py --dicts $^ \
 	  --out-dict data/surprise/dictionary.jsonl --out-words data/surprise/words.txt
 
-# ---- Allowed-guess validation set (union of every valid word) ----------------
-data/allowed_guesses_all.txt: data/subtlex-us/words_ranked.txt data/subtlex-uk/words_ranked.txt data/wordle/allowed_guesses.txt data/gutenberg/words_ranked.txt
+# ---- Allowed-guess validation set --------------------------------------------
+# Union of the DEFINED pack words (puzzle_words, post def-prune) plus Wordle's
+# curated allowed-guess list. Deliberately NOT the raw words_ranked lists: those
+# subtitle/OCR corpora carry proper nouns and junk (e.g. 'malet', a surname) that
+# are never real playable words. 'palet' etc. survive via Wordle's curated list.
+data/allowed_guesses_all.txt: data/subtlex-us/puzzle_words.txt data/subtlex-uk/puzzle_words.txt data/arcane/puzzle_words.txt data/wordle/allowed_guesses.txt
 	sort -u $^ > $@
 
 clean:
