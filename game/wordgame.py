@@ -99,6 +99,15 @@ class WordGame:
         self.cursor = 0
         return True
 
+    def restore(self, guesses: list[str]) -> None:
+        """Replay previously-saved guesses to rebuild state (for resuming a game)."""
+        for g in guesses:
+            if self.finished or len(g) != WORD_LEN:
+                break
+            self.slots = list(g.lower())
+            self.cursor = 0
+            self.submit()
+
     @property
     def attempts(self) -> int:
         return len(self.guesses)

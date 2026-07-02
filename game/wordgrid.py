@@ -8,7 +8,6 @@ order (tap a box to move the cursor there).
 from __future__ import annotations
 
 import os
-import time
 from collections.abc import Callable
 from typing import Any
 
@@ -111,15 +110,16 @@ class WordGridPanel(BoxLayout):
     """
 
     def __init__(self, game: WordGame, allowed: set[str], subtitle: str = "",
-                 on_finish: Callable[[bool, int, int], None] | None = None,
+                 on_finish: Callable[[bool, int], None] | None = None,
                  on_info: Callable[[str], None] | None = None,
-                 on_back: Callable[[], None] | None = None, **kwargs: Any) -> None:
+                 on_back: Callable[[], None] | None = None,
+                 on_guess: Callable[[list[str]], None] | None = None, **kwargs: Any) -> None:
         super().__init__(orientation="vertical", spacing=dp(4), **kwargs)
         self.game = game
         self.allowed = allowed
         self.on_finish = on_finish
         self.on_info = on_info
-        self._started = time.monotonic()
+        self.on_guess = on_guess   # persist in-progress guesses (screen owns elapsed time)
         self._flash = ""
         theme = get_theme()
 
@@ -232,8 +232,11 @@ class WordGridPanel(BoxLayout):
             return  # the red 'Not a word' button already signals this
         g.submit()
         self.render()
-        if g.finished and self.on_finish:
-            self.on_finish(g.won, int((time.monotonic() - self._started) * 1000), g.attempts)
+        if g.finished:
+            if self.on_finish:
+                self.on_finish(g.won, g.attempts)
+        elif self.on_guess:
+            self.on_guess(list(g.guesses))
 
     def _info(self, r: int) -> None:
         if self.on_info and r < len(self.game.guesses):

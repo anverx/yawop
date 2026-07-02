@@ -225,10 +225,21 @@ class WordApp(GameShellApp):
         allow_mature = self._allow_mature and day is None
         answer = worddata.pick_word(pack, difficulty, seed=day, allow_mature=allow_mature)
         self._current = (pack, difficulty, answer)
-        self._play_id = self.store.start(difficulty, day, answer)
-        self.game_screen.set_game(WordGame(answer), self._allowed, subtitle,
-                                  self._on_finish, self.show_word_info)
+        resume = self.store.start(difficulty, day, answer)  # resumes an unfinished daily
+        self._play_id = resume.play_id
+        game = WordGame(answer)
+        if resume.guesses:
+            game.restore(resume.guesses)
+        # Only dated (daily/calendar) games are resumable; random games don't persist.
+        on_progress = self._on_progress if day is not None else None
+        self.game_screen.set_game(game, self._allowed, subtitle, self._on_finish,
+                                  self.show_word_info, on_progress=on_progress,
+                                  elapsed_ms=resume.elapsed_ms)
         self.sm.current = "game"
+
+    def _on_progress(self, guesses: list, elapsed_ms: int) -> None:
+        if self._play_id is not None:
+            self.store.save_progress(self._play_id, elapsed_ms, guesses)
 
     def _on_finish(self, won: bool, duration_ms: int, attempts: int) -> None:
         _, _, answer = self._current
