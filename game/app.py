@@ -239,61 +239,131 @@ class WordApp(GameShellApp):
         definition = entry["senses"][0]["definition"] if entry and entry.get("senses") else ""
         self.game_screen.show_reveal(f"{answer.upper()} — {definition}" if definition else answer.upper())
 
+    # Part-of-speech chip colors for the definition popup (foreground accents).
+    _POS_COLORS = {
+        "nou": (0.30, 0.52, 0.82, 1),   # noun  - blue
+        "ver": (0.42, 0.67, 0.39, 1),   # verb  - green
+        "adj": (0.86, 0.63, 0.24, 1),   # adjective - amber
+        "adv": (0.55, 0.45, 0.80, 1),   # adverb - violet
+    }
+    _POS_DEFAULT = (0.47, 0.48, 0.50, 1)
+    _ACCENT = (0.24, 0.47, 0.78, 1)      # section headers / quote bar
+    _ACCENT_DARK = (0.16, 0.34, 0.62, 1)  # word title
+
     def show_word_info(self, word: str) -> None:
-        """Popup: formatted definitions + usage examples for a guessed word."""
+        """Popup: nicely structured, colorful definitions + usage examples."""
+        from kivy.graphics import Color, Rectangle, RoundedRectangle
         from kivy.metrics import dp
+        from kivy.uix.anchorlayout import AnchorLayout
         from kivy.uix.boxlayout import BoxLayout
         from kivy.uix.label import Label
         from kivy.uix.scrollview import ScrollView
+        from kivy.uix.widget import Widget
 
-        from kivyshell.uikit import (
-            CaptionLabel,
-            FixedGrayRoundedButton,
-            Popup,
-            PopupContent,
-            SubtitleLabel,
-            TitleLabel,
-            get_theme,
-        )
+        from kivyshell.uikit import FixedGrayRoundedButton, Popup, PopupContent, get_theme
 
         theme = get_theme()
 
-        def para(text: str, size: str = "14sp", color=None) -> Label:
-            lbl = Label(text=text, font_name=theme.font_name, font_size=size,
+        def para(text, size="14sp", color=None, bold=False):
+            lbl = Label(text=text, font_name=theme.font_name, font_size=size, bold=bold,
                         color=color or theme.text_dark, size_hint_y=None, halign="left", valign="top")
             lbl.bind(width=lambda i, w: setattr(i, "text_size", (w, None)),
                      texture_size=lambda i, s: setattr(i, "height", s[1] + dp(4)))
             return lbl
 
+        def pos_color(label):
+            return self._POS_COLORS.get((label or "")[:3].lower(), self._POS_DEFAULT)
+
+        def chip(label, color):
+            c = Label(text=label or "—", font_name=theme.font_name, font_size="11sp", bold=True,
+                      color=(1, 1, 1, 1), size_hint=(None, None), halign="center", valign="middle")
+            c.bind(texture_size=lambda i, s: setattr(i, "size", (s[0] + dp(14), s[1] + dp(6))))
+
+            def draw(*_a):
+                c.canvas.before.clear()
+                with c.canvas.before:
+                    Color(*color)
+                    RoundedRectangle(pos=c.pos, size=c.size, radius=[dp(9)])
+            c.bind(pos=draw, size=draw)
+            return c
+
+        def header(text):
+            h = Label(text=text.upper(), font_name=theme.font_name, font_size="13sp", bold=True,
+                      color=self._ACCENT, size_hint_y=None, height=dp(22), halign="left", valign="middle")
+            h.bind(size=lambda i, _v: setattr(i, "text_size", i.size))
+            return h
+
+        def sense_row(pos_label, definition):
+            row = BoxLayout(orientation="horizontal", size_hint_y=None, spacing=dp(8), height=dp(26))
+            holder = AnchorLayout(anchor_x="left", anchor_y="top", size_hint=(None, 1), width=dp(66))
+            holder.add_widget(chip(pos_label, pos_color(pos_label)))
+            d = para(definition)
+            d.bind(height=lambda i, h: setattr(row, "height", max(h, dp(26))))
+            row.add_widget(holder)
+            row.add_widget(d)
+            return row
+
+        def example_row(quote, who):
+            row = BoxLayout(orientation="horizontal", size_hint_y=None, spacing=dp(8), height=dp(24))
+            bar = Widget(size_hint=(None, 1), width=dp(3))
+
+            def barbg(*_a):
+                bar.canvas.before.clear()
+                with bar.canvas.before:
+                    Color(*self._ACCENT)
+                    Rectangle(pos=bar.pos, size=bar.size)
+            bar.bind(pos=barbg, size=barbg)
+            col = BoxLayout(orientation="vertical", size_hint_y=None, spacing=dp(1))
+            col.bind(minimum_height=col.setter("height"),
+                     height=lambda i, h: setattr(row, "height", max(h, dp(24))))
+            col.add_widget(para(f"“{quote}”", size="13sp"))
+            if who:
+                col.add_widget(para(who, size="11sp", color=theme.text_medium))
+            row.add_widget(bar)
+            row.add_widget(col)
+            return row
+
         entry = worddata.lookup_entry(word)
         content = PopupContent()
-        content.add_widget(TitleLabel(word.upper()))
 
-        body = BoxLayout(orientation="vertical", size_hint_y=None, spacing=dp(6), padding=[dp(4), dp(4)])
+        # Colored word title + accent divider.
+        title = Label(text=word.upper(), font_name=theme.font_name, font_size="30sp", bold=True,
+                      color=self._ACCENT_DARK, size_hint_y=None, height=dp(44), halign="center", valign="middle")
+        title.bind(size=lambda i, _v: setattr(i, "text_size", i.size))
+        content.add_widget(title)
+        divider = Widget(size_hint_y=None, height=dp(2))
+
+        def div_bg(*_a):
+            divider.canvas.before.clear()
+            with divider.canvas.before:
+                Color(self._ACCENT[0], self._ACCENT[1], self._ACCENT[2], 0.35)
+                Rectangle(pos=divider.pos, size=divider.size)
+        divider.bind(pos=div_bg, size=div_bg)
+        content.add_widget(divider)
+
+        body = BoxLayout(orientation="vertical", size_hint_y=None, spacing=dp(7), padding=[dp(2), dp(6)])
         body.bind(minimum_height=body.setter("height"))
         if not entry or (not entry["senses"] and not entry["examples"]):
-            body.add_widget(para("No dictionary entry available for this word."))
+            body.add_widget(para("No dictionary entry available for this word.",
+                                 color=theme.text_medium))
         else:
             if entry["senses"]:
-                body.add_widget(SubtitleLabel("Definitions", color=theme.text_header))
+                body.add_widget(header("Definitions"))
                 for s in entry["senses"]:
-                    pos = f"({s.get('pos_label', '')}) " if s.get("pos_label") else ""
-                    body.add_widget(para(f"{pos}{s.get('definition', '')}"))
+                    body.add_widget(sense_row(s.get("pos_label", ""), s.get("definition", "")))
             if entry["examples"]:
-                body.add_widget(para(" ", size="6sp"))
-                body.add_widget(SubtitleLabel("Usage", color=theme.text_header))
+                body.add_widget(Widget(size_hint_y=None, height=dp(4)))
+                body.add_widget(header("Usage"))
                 for ex in entry["examples"]:
-                    body.add_widget(para(f"“{ex.get('text', '')}”", color=theme.text_dark))
                     who = " — ".join(x for x in (ex.get("author"), ex.get("work")) if x)
-                    if who:
-                        body.add_widget(para(who, size="12sp", color=theme.text_medium))
+                    body.add_widget(example_row(ex.get("text", ""), who))
 
         scroll = ScrollView(size_hint=(1, 1))
         scroll.add_widget(body)
         content.add_widget(scroll)
         close = FixedGrayRoundedButton(text="Close")
         content.add_widget(close)
-        popup = Popup(content, height=460)
+        popup = Popup(content, height=480)
         close.bind(on_press=popup.dismiss)
         popup.open()
 
