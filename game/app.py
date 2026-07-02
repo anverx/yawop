@@ -9,7 +9,6 @@ completions are persisted with kivyshell's SqliteStore.
 from __future__ import annotations
 
 import datetime
-import random
 from typing import Any
 
 from kivy.core.window import Window
@@ -31,7 +30,10 @@ from .wordgame import WordGame
 from worddata.store import allowed_guesses
 
 DEFAULT_PACK = "subtlex-us"
-RANDOM_PACKS = ["subtlex-us", "subtlex-uk", "wordle", "arcane"]
+# (pack_id, short label) shown in the Random Game options popup.
+PACKS = [("subtlex-us", "US"), ("subtlex-uk", "UK"), ("wordle", "Official"), ("arcane", "Arcane")]
+PACK_LABEL = dict(PACKS)
+DIFFICULTIES = ["easy", "medium", "hard"]
 
 if platform not in ("android", "ios"):
     Window.size = (400, 720)
@@ -44,6 +46,7 @@ class WordApp(GameShellApp):
         self.store = WordStore()
         self.store.open(self.user_data_dir)
         self._play_id: int | None = None
+        self._last_random = {"pack": DEFAULT_PACK, "difficulty": "medium"}
 
     def close_storage(self) -> None:
         self.store.close()
@@ -70,9 +73,64 @@ class WordApp(GameShellApp):
         self._start(DEFAULT_PACK, difficulty, today, f"Daily · {difficulty.title()}")
 
     def start_random(self, instance: Any = None) -> None:
-        pack = random.choice(RANDOM_PACKS)
-        difficulty = random.choice(["easy", "medium", "hard"])
-        self._start(pack, difficulty, None, f"Random · {pack} · {difficulty}")
+        """Open the Random Game options popup: difficulty + word pack."""
+        from kivy.uix.boxlayout import BoxLayout
+        from kivy.uix.widget import Widget
+
+        from kivyshell.uikit import (
+            FixedGrayRoundedButton,
+            FixedRoundedButton,
+            Popup,
+            PopupContent,
+            SelectableButton,
+            SelectableButtonGroup,
+            SubtitleLabel,
+            TitleLabel,
+            get_styles,
+            styled,
+        )
+
+        sel = dict(self._last_random)
+        content = PopupContent()
+        content.add_widget(TitleLabel("Random Game"))
+
+        content.add_widget(SubtitleLabel("Difficulty"))
+        diff_row = styled(BoxLayout, "selection_row")
+        diff_group = SelectableButtonGroup(on_select=lambda v: sel.__setitem__("difficulty", v))
+        for d in DIFFICULTIES:
+            b = SelectableButton(text=d.title(), selected=(d == sel["difficulty"]), **get_styles()["selection_btn"])
+            diff_group.add(d, b)
+            diff_row.add_widget(b)
+        content.add_widget(diff_row)
+
+        content.add_widget(SubtitleLabel("Word Pack"))
+        pack_row = styled(BoxLayout, "selection_row")
+        pack_group = SelectableButtonGroup(on_select=lambda v: sel.__setitem__("pack", v))
+        for pid, label in PACKS:
+            b = SelectableButton(text=label, selected=(pid == sel["pack"]), **get_styles()["selection_btn"])
+            pack_group.add(pid, b)
+            pack_row.add_widget(b)
+        content.add_widget(pack_row)
+
+        content.add_widget(styled(Widget, "spacer_sm"))
+        holder: list = []
+
+        def on_play(_x: Any) -> None:
+            self._last_random = dict(sel)
+            holder[0].dismiss()
+            self._start(sel["pack"], sel["difficulty"], None,
+                        f"{PACK_LABEL[sel['pack']]} · {sel['difficulty'].title()}")
+
+        play = FixedRoundedButton(text="Play")
+        play.bind(on_press=on_play)
+        content.add_widget(play)
+        cancel = FixedGrayRoundedButton(text="Cancel")
+        content.add_widget(cancel)
+
+        popup = Popup(content, height=360, width_hint=0.85)
+        holder.append(popup)
+        cancel.bind(on_press=popup.dismiss)
+        popup.open()
 
     def play_date(self, d: datetime.date) -> None:
         """Tapping a calendar day: choose a difficulty, then play that day's word."""
