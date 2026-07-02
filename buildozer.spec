@@ -25,13 +25,10 @@ version = 0.1.0
 # Numeric version code for Android (must increment for updates!)
 android.numeric_version = 1
 
-# Application requirements.
-# NOTE: kivyshell (the shared UI lib) is a pip/git dependency in requirements.txt,
-# but python-for-android's requirements list below is a RECIPE list, not pip, and
-# cannot take a git+ URL. Wiring kivyshell into the Android build needs one of:
-# publish kivyshell to PyPI (then add 'kivyshell' here), write a p4a recipe, or
-# vendor the package into this repo. Until then the APK builds but can't import
-# kivyshell at runtime. (Same open item as yaque.)
+# Application requirements (this is a p4a RECIPE list, not pip — no git URLs).
+# kivyshell (the shared UI lib) is pure Python and is vendored as a git submodule
+# at libs/kivyshell; game/__init__.py puts it on sys.path, so it bundles as plain
+# source and needs no entry here. CI must checkout with submodules: recursive.
 requirements = python3,kivy,pillow,cython==3.0.12
 
 # Supported orientations (portrait, landscape, all)
