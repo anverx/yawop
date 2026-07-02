@@ -369,47 +369,87 @@ class WordApp(GameShellApp):
 
     def show_policy(self, instance: Any = None, mark_seen: bool = False) -> None:
         """A human, one-time explanation of how we choose (and don't choose) words."""
+        from kivy.graphics import Color, RoundedRectangle
         from kivy.metrics import dp
         from kivy.uix.boxlayout import BoxLayout
         from kivy.uix.label import Label
         from kivy.uix.scrollview import ScrollView
+        from kivy.uix.widget import Widget
 
-        from kivyshell.uikit import FixedRoundedButton, Popup, PopupContent, SubtitleLabel, TitleLabel, get_theme
+        from kivyshell.uikit import FixedRoundedButton, Popup, PopupContent, get_theme
 
         theme = get_theme()
+        RED = (0.80, 0.29, 0.29, 1)     # the hard block
+        GREEN = (0.36, 0.60, 0.36, 1)   # what's allowed
 
-        def para(text: str, size: str = "14sp", color=None) -> Label:
+        def para(text, size="14sp", color=None):
             lbl = Label(text=text, font_name=theme.font_name, font_size=size,
                         color=color or theme.text_dark, size_hint_y=None, halign="left", valign="top")
             lbl.bind(width=lambda i, w: setattr(i, "text_size", (w, None)),
                      texture_size=lambda i, s: setattr(i, "height", s[1] + dp(4)))
             return lbl
 
-        content = PopupContent()
-        content.add_widget(TitleLabel("About the words"))
+        def block(bar_color, heading, text):
+            row = BoxLayout(orientation="horizontal", size_hint_y=None, spacing=dp(10), height=dp(40))
+            bar = Widget(size_hint=(None, 1), width=dp(4))
 
-        body = BoxLayout(orientation="vertical", size_hint_y=None, spacing=dp(6), padding=[dp(4), dp(4)])
+            def barbg(*_a):
+                bar.canvas.before.clear()
+                with bar.canvas.before:
+                    Color(*bar_color)
+                    RoundedRectangle(pos=bar.pos, size=bar.size, radius=[dp(2)])
+            bar.bind(pos=barbg, size=barbg)
+            col = BoxLayout(orientation="vertical", size_hint_y=None, spacing=dp(2))
+            col.bind(minimum_height=col.setter("height"),
+                     height=lambda i, h: setattr(row, "height", max(h, dp(40))))
+            hd = Label(text=heading, font_name=theme.font_name, font_size="15sp", bold=True,
+                       color=bar_color, size_hint_y=None, halign="left", valign="middle")
+            hd.bind(width=lambda i, w: setattr(i, "text_size", (w, None)),
+                    texture_size=lambda i, s: setattr(i, "height", s[1] + dp(2)))
+            col.add_widget(hd)
+            col.add_widget(para(text))
+            row.add_widget(bar)
+            row.add_widget(col)
+            return row
+
+        content = PopupContent()
+        title = Label(text="About the words", font_name=theme.font_name, font_size="24sp", bold=True,
+                      color=self._ACCENT_DARK, size_hint_y=None, height=dp(40), halign="center", valign="middle")
+        title.bind(size=lambda i, _v: setattr(i, "text_size", i.size))
+        content.add_widget(title)
+        divider = Widget(size_hint_y=None, height=dp(2))
+
+        def div_bg(*_a):
+            divider.canvas.before.clear()
+            with divider.canvas.before:
+                Color(self._ACCENT[0], self._ACCENT[1], self._ACCENT[2], 0.35)
+                RoundedRectangle(pos=divider.pos, size=divider.size, radius=[dp(1)])
+        divider.bind(pos=div_bg, size=div_bg)
+        content.add_widget(divider)
+
+        body = BoxLayout(orientation="vertical", size_hint_y=None, spacing=dp(12), padding=[dp(2), dp(6)])
         body.bind(minimum_height=body.setter("height"))
         body.add_widget(para("yawop pulls its answers from real language: subtitles, books, "
                              "the official Wordle list. So every now and then a word turns up "
                              "that's crude or anatomical. Here's the honest deal."))
-        body.add_widget(SubtitleLabel("Slurs are out, completely.", color=theme.text_header))
-        body.add_widget(para("You'll never see one as an answer, and the game won't even accept "
-                             "one as a guess."))
-        body.add_widget(SubtitleLabel("Real words stay real.", color=theme.text_header))
-        body.add_widget(para("Crude or anatomical words are still fair game as guesses: we're not "
-                             "here to police the language. By default we just won't serve one up as "
-                             "the answer of the day, because a puzzle shouldn't put an awkward word "
-                             "on your screen when you didn't ask for it."))
-        body.add_widget(para("Prefer the unfiltered language? Flip \"Allow mature words as answers\" "
-                             "in Random Game, and they're in play as solutions too."))
+        body.add_widget(block(RED, "Slurs are out, completely.",
+                              "You'll never see one as an answer, and the game won't even accept "
+                              "one as a guess."))
+        body.add_widget(block(GREEN, "Real words stay real.",
+                              "Crude or anatomical words are still fair game as guesses: we're not "
+                              "here to police the language. By default we just won't serve one up as "
+                              "the answer of the day, because a puzzle shouldn't put an awkward word "
+                              "on your screen when you didn't ask for it."))
+        body.add_widget(block(self._ACCENT, "Want the unfiltered language?",
+                              "Flip \"Allow mature words as answers\" in Random Game, and they're in "
+                              "play as solutions too."))
 
         scroll = ScrollView(size_hint=(1, 1))
         scroll.add_widget(body)
         content.add_widget(scroll)
         btn = FixedRoundedButton(text="Got it")
         content.add_widget(btn)
-        popup = Popup(content, height=440)
+        popup = Popup(content, height=470)
         btn.bind(on_press=popup.dismiss)
         if mark_seen:
             try:
