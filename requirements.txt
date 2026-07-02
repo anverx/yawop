@@ -1,4 +1,4 @@
 # yawop game runtime. (The dictionary pipeline has its own deps; see pipeline/.)
 kivy>=2.3.0
 # Shared UI library, pinned to a tagged release.
-kivyshell @ git+https://github.com/anverx/kivyshell@v0.1.2
+kivyshell @ git+https://github.com/anverx/kivyshell@v0.1.3
