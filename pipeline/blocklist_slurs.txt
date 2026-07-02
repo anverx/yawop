@@ -1,0 +1,6 @@
+# Slurs: removed EVERYWHERE. Never served as a solution, never accepted as a
+# guess, no lookup entry. Ethnic/racial slurs only. One lowercase word per line;
+# blank lines and '#'-comments ignored. Applied by scripts/apply_blocklist.py.
+coons
+negro
+pikey

@@ -572,7 +572,6 @@ birds
 biros
 birth
 bison
-bitch
 biter
 bites
 bitey
@@ -677,7 +676,6 @@ bombs
 bonce
 bonds
 boned
-boner
 bones
 boney
 bongo
@@ -686,7 +684,6 @@ bonks
 bonne
 bonny
 bonus
-boobs
 booby
 booed
 books
@@ -877,7 +874,6 @@ buses
 bushs
 bushy
 busts
-busty
 butat
 butch
 butte
@@ -1195,7 +1191,6 @@ coble
 cobol
 cobra
 cocci
-cocks
 cocky
 cocoa
 cocos
@@ -1256,7 +1251,6 @@ cooks
 cooky
 cools
 cooly
-coons
 coops
 coots
 coped
@@ -1582,7 +1576,6 @@ digit
 diing
 dijon
 dikes
-dildo
 dills
 dilly
 dimer
@@ -2030,7 +2023,6 @@ fazes
 fears
 feast
 feats
-fecal
 feces
 feeds
 feels
@@ -2572,7 +2564,6 @@ groat
 groin
 groks
 groom
-grope
 gross
 grosz
 grots
@@ -2844,7 +2835,6 @@ hopes
 horde
 horne
 horns
-horny
 horse
 horst
 horsy
@@ -3185,7 +3175,6 @@ kinds
 kines
 kings
 kinks
-kinky
 kinos
 kiosk
 kiowa
@@ -4037,7 +4026,6 @@ neddy
 needs
 needy
 negev
-negro
 negus
 nehru
 neigh
@@ -4315,7 +4303,6 @@ panic
 pansy
 panto
 pants
-panty
 papal
 papas
 papaw
@@ -4397,7 +4384,6 @@ pelts
 penal
 pence
 pengo
-penis
 penne
 penni
 penny
@@ -4600,7 +4586,6 @@ pores
 porgy
 porks
 porky
-porno
 porta
 porte
 porto
@@ -4684,7 +4669,6 @@ psalm
 pseud
 pshaw
 psych
-pubes
 pubic
 pubis
 pucka
@@ -4729,7 +4713,6 @@ pusey
 pushs
 pushy
 pusss
-pussy
 puted
 putin
 putts
@@ -5275,7 +5258,6 @@ selfs
 sells
 selma
 selva
-semen
 semis
 sends
 senna
@@ -5461,7 +5443,6 @@ sizes
 skags
 skank
 skate
-skeet
 skein
 skell
 skeps
@@ -5738,7 +5719,6 @@ sprog
 sprue
 spuds
 spume
-spunk
 spurn
 spurs
 spurt
@@ -5861,7 +5841,6 @@ stupa
 stupe
 style
 suave
-sucks
 sucre
 sudan
 sudra
@@ -6183,7 +6162,6 @@ titch
 tithe
 title
 titre
-titty
 titus
 tizzy
 toads
@@ -6354,7 +6332,6 @@ turin
 turks
 turns
 turps
-tushy
 tusks
 tutee
 tutor
@@ -6374,7 +6351,6 @@ twice
 twigs
 twill
 twine
-twink
 twins
 twirl
 twirp
@@ -6566,7 +6542,6 @@ vouch
 vowed
 vowel
 vroom
-vulva
 vying
 wacko
 wacky
@@ -6696,7 +6671,6 @@ whole
 whomp
 whoop
 whops
-whore
 whorl
 whose
 wicca

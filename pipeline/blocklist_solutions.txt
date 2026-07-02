@@ -1,0 +1,28 @@
+# Solution blocklist: vulgar / anatomical words that are REAL words (so they stay
+# valid guesses, with working definitions) but must never be served as a puzzle
+# SOLUTION. Removed from answer sources (tiers.json, words.txt) only; kept in
+# dictionary.jsonl and allowed_guesses_all.txt. One lowercase word per line.
+bitch
+boner
+boobs
+busty
+cocks
+dildo
+fecal
+grope
+horny
+kinky
+panty
+penis
+porno
+pubes
+pussy
+semen
+skeet
+spunk
+sucks
+titty
+tushy
+twink
+vulva
+whore
