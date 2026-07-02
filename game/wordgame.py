@@ -65,6 +65,11 @@ class WordGame:
         self.current = ""
         return True
 
+    @property
+    def attempts(self) -> int:
+        """Number of guesses submitted."""
+        return len(self.guesses)
+
     def letter_states(self) -> dict[str, Mark]:
         """Best-known state per letter, for keyboard coloring."""
         rank = {Mark.ABSENT: 0, Mark.PRESENT: 1, Mark.CORRECT: 2}

@@ -59,7 +59,7 @@ class WordGridPanel(BoxLayout):
     """Renders a WordGame and drives play. on_finish(won: bool, duration_ms: int)."""
 
     def __init__(self, game: WordGame, allowed: set[str],
-                 on_finish: Callable[[bool, int], None] | None = None, **kwargs: Any) -> None:
+                 on_finish: Callable[[bool, int, int], None] | None = None, **kwargs: Any) -> None:
         super().__init__(orientation="vertical", spacing=dp(8), **kwargs)
         self.game = game
         self.allowed = allowed
@@ -135,7 +135,7 @@ class WordGridPanel(BoxLayout):
         g.submit()
         self.render()
         if g.finished and self.on_finish:
-            self.on_finish(g.won, int((time.monotonic() - self._started) * 1000))
+            self.on_finish(g.won, int((time.monotonic() - self._started) * 1000), g.attempts)
 
     def on_key_text(self, text: str) -> None:
         """Forwarded hardware-keyboard input (a letter)."""

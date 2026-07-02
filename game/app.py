@@ -106,10 +106,10 @@ class WordApp(GameShellApp):
         self.game_screen.set_game(WordGame(answer), self._allowed, subtitle, self._on_finish)
         self.sm.current = "game"
 
-    def _on_finish(self, won: bool, duration_ms: int) -> None:
+    def _on_finish(self, won: bool, duration_ms: int, attempts: int) -> None:
         _, _, answer = self._current
-        if won and self._play_id is not None:
-            self.store.complete(self._play_id, duration_ms)
+        if self._play_id is not None:
+            self.store.finish(self._play_id, won, duration_ms, attempts)  # record win AND lose
         self._play_id = None
         entry = worddata.lookup_entry(answer)
         definition = entry["senses"][0]["definition"] if entry and entry.get("senses") else ""

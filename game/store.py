@@ -79,8 +79,8 @@ class WordStore:
         cid = self._db.record_challenge(difficulty, day, _code(day, difficulty, answer))
         return self._db.start_play(cid)
 
-    def complete(self, play_id: int, duration_ms: int) -> None:
-        self._db.complete_play(play_id, duration_ms)
+    def finish(self, play_id: int, won: bool, duration_ms: int, attempts: int) -> None:
+        self._db.finish_play(play_id, won, duration_ms, attempts)
 
     # --- menu / calendar ---
     def today_completion(self) -> dict[str, bool]:
@@ -98,17 +98,20 @@ class WordStore:
         return self._db.all_plays(limit=limit, offset=offset)
 
     def stats_by_difficulty(self) -> dict:
-        agg = {d: {"count": 0, "completed": 0, "best": None, "total": 0} for d in DIFFICULTIES}
+        agg = {d: {"played": 0, "won": 0, "best": None, "tries_sum": 0} for d in DIFFICULTIES}
         for p in self._db.all_plays(limit=100000):
             a = agg.get(p.variant_id)
-            if a is None:
+            if a is None or p.completed_at is None:  # only finished games
                 continue
-            a["count"] += 1
+            a["played"] += 1
             if p.completed:
-                a["completed"] += 1
+                a["won"] += 1
+                if p.attempts:
+                    a["tries_sum"] += p.attempts
                 if p.duration_ms:
-                    a["total"] += p.duration_ms
                     a["best"] = p.duration_ms if a["best"] is None else min(a["best"], p.duration_ms)
+        for a in agg.values():
+            a["avg_tries"] = round(a["tries_sum"] / a["won"], 1) if a["won"] else None
         return agg
 
     def games_per_day(self, days: int = 30) -> list[tuple[str, dict[str, int]]]:

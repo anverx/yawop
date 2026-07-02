@@ -30,10 +30,10 @@ class WordGameScreen(BackgroundedScreen):
         self.content_layout.add_widget(self.reveal)
         self.add_back_button()
         self._panel: WordGridPanel | None = None
-        self._on_finish: Callable[[bool, int], None] | None = None
+        self._on_finish: Callable[[bool, int, int], None] | None = None
 
     def set_game(self, game: WordGame, allowed: set[str], subtitle: str,
-                 on_finish: Callable[[bool, int], None]) -> None:
+                 on_finish: Callable[[bool, int, int], None]) -> None:
         self.title.text = subtitle
         self.reveal.text = ""
         self.reveal.height = 0
@@ -42,9 +42,9 @@ class WordGameScreen(BackgroundedScreen):
         self._panel = WordGridPanel(game, allowed, on_finish=self._finished)
         self._host.add_widget(self._panel)
 
-    def _finished(self, won: bool, duration_ms: int) -> None:
+    def _finished(self, won: bool, duration_ms: int, attempts: int) -> None:
         if self._on_finish:
-            self._on_finish(won, duration_ms)
+            self._on_finish(won, duration_ms, attempts)
 
     def show_reveal(self, text: str) -> None:
         from kivy.metrics import dp

@@ -57,17 +57,17 @@ class WordLogbookScreen(_LogbookScreen):
 
     def _refresh_games(self) -> None:
         self._games_list.clear_widgets()
-        plays = self.app.store.all_plays(limit=200)
+        plays = [p for p in self.app.store.all_plays(limit=200) if p.completed_at]  # finished only
         if not plays:
             self._games_list.add_widget(SubtitleLabel("No games played yet", size_hint_y=None, height=dp(36)))
             return
         header = styled(BoxLayout, "table_header_row")
-        for col in ("Word", "Level", "Time", "Result", "When"):
+        for col in ("Word", "Level", "Tries", "Time", "Result", "When"):
             header.add_widget(TableHeaderLabel(col))
         self._games_list.add_widget(header)
         cur_date = None
         for p in plays:
-            d = (p.started_at or "")[:10]
+            d = (p.completed_at or p.started_at or "")[:10]
             if d != cur_date:
                 cur_date = d
                 self._games_list.add_widget(DateSeparator(self._nice_date(d)))
@@ -76,13 +76,14 @@ class WordLogbookScreen(_LogbookScreen):
     def _row(self, p: Any) -> BoxLayout:
         row = styled(BoxLayout, "logbook_row")
         try:
-            when = datetime.fromisoformat(p.started_at).strftime("%H:%M")
+            when = datetime.fromisoformat(p.completed_at or p.started_at).strftime("%H:%M")
         except (ValueError, TypeError):
             when = "?"
         row.add_widget(TableCellLabel(answer_of(p.code).upper()))
         row.add_widget(TableCellLabel(p.variant_id.title()))
+        row.add_widget(TableCellLabel(f"{p.attempts}/6" if p.attempts else "-"))
         row.add_widget(TableCellLabel(_fmt_ms(p.duration_ms)))
-        row.add_widget(TableCellLabel("Won" if p.completed else "-"))
+        row.add_widget(TableCellLabel("Won" if p.completed else "Lost"))
         row.add_widget(TableCellLabel(when))
         return row
 
@@ -91,15 +92,16 @@ class WordLogbookScreen(_LogbookScreen):
         agg = self.app.store.stats_by_difficulty()
         self._stats_box.add_widget(SubtitleLabel("By difficulty", color=(1, 1, 1, 1)))
         header = StatRow()
-        for col in ("Level", "Played", "Won", "Best"):
+        for col in ("Level", "Played", "Won", "Avg tries", "Best"):
             header.add_widget(TableHeaderLabel(col))
         self._stats_box.add_widget(header)
         for diff in DIFFICULTIES:
             a = agg[diff]
             r = StatRow()
             r.add_widget(TableCellLabel(diff.title()))
-            r.add_widget(TableCellLabel(str(a["count"])))
-            r.add_widget(TableCellLabel(str(a["completed"])))
+            r.add_widget(TableCellLabel(str(a["played"])))
+            r.add_widget(TableCellLabel(str(a["won"])))
+            r.add_widget(TableCellLabel(str(a["avg_tries"]) if a["avg_tries"] else "-"))
             r.add_widget(TableCellLabel(_fmt_ms(a["best"])))
             self._stats_box.add_widget(r)
 
