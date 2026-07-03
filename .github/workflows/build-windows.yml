@@ -11,6 +11,13 @@ on:
 jobs:
   build:
     runs-on: windows-latest
+    timeout-minutes: 30
+    # Kivy gets imported during the PyInstaller build; on a headless runner it would
+    # try to create a real GL context (only GDI Generic / OpenGL 1.1 is available)
+    # and hang. A mock GL backend avoids that. Build-only: the shipped .exe uses real
+    # GL on the user's machine (this env is not baked into the binary).
+    env:
+      KIVY_GL_BACKEND: mock
 
     steps:
       - name: Checkout code
