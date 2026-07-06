@@ -273,7 +273,6 @@ arses
 arson
 artsy
 aruba
-aryan
 asana
 asbos
 ascii
@@ -647,7 +646,6 @@ boats
 bobby
 bocce
 bocci
-boche
 bocks
 boded
 bodes
@@ -1068,7 +1066,6 @@ chimp
 china
 chine
 ching
-chink
 chino
 chins
 chips
@@ -1451,7 +1448,6 @@ daddy
 daffy
 dagga
 dagon
-dagos
 daily
 dairy
 daisy
@@ -1473,7 +1469,6 @@ dards
 dared
 dares
 darks
-darky
 darns
 darts
 datas
@@ -1801,7 +1796,6 @@ dwelt
 dyers
 dying
 dyked
-dykes
 dylan
 eager
 eagle
@@ -2408,7 +2402,6 @@ gimel
 gimme
 gimps
 gimpy
-ginzo
 gipsy
 girds
 girls
@@ -2497,7 +2490,6 @@ goody
 gooey
 goofs
 goofy
-gooks
 goons
 goony
 goops
@@ -2518,7 +2510,6 @@ gouts
 gouty
 gowns
 goyas
-goyim
 grabs
 grace
 grade
@@ -2594,7 +2585,6 @@ guess
 guest
 guffs
 guide
-guido
 guild
 guile
 guilt
@@ -2629,7 +2619,6 @@ habit
 hacks
 hacky
 hades
-hadji
 hafiz
 haifa
 haiku
@@ -2637,7 +2626,6 @@ hails
 hairs
 hairy
 haiti
-hajji
 hakim
 hakka
 halal
@@ -2721,7 +2709,6 @@ heath
 heats
 heave
 heavy
-hebes
 hecht
 hedge
 heeds
@@ -2826,7 +2813,6 @@ honed
 hones
 honey
 honks
-honky
 honor
 hooch
 hoods
@@ -2907,7 +2893,6 @@ hydro
 hyena
 hylas
 hymen
-hymie
 hymns
 hyoid
 hyped
@@ -2975,7 +2960,6 @@ infra
 inger
 ingot
 inion
-injun
 inked
 inkle
 inlay
@@ -3121,7 +3105,6 @@ jutes
 kaaba
 kabob
 kabul
-kafir
 kafka
 kales
 kalif
@@ -3173,7 +3156,6 @@ kicky
 kiddo
 kiddy
 kievs
-kikes
 kiley
 kills
 kilns
@@ -3232,7 +3214,6 @@ korma
 kraal
 kraft
 krait
-kraut
 krebs
 krill
 kriss
@@ -3424,7 +3405,6 @@ limbo
 limbs
 limed
 limes
-limey
 limit
 limos
 limps
@@ -3688,7 +3668,6 @@ masai
 maser
 masks
 mason
-massa
 masse
 masts
 matai
@@ -4068,9 +4047,7 @@ niffs
 niffy
 nifty
 niger
-nigga
 night
-nigra
 nihon
 nikes
 niles
@@ -4276,7 +4253,6 @@ pacey
 pacha
 packs
 pacts
-paddy
 padre
 padua
 paean
@@ -4573,7 +4549,6 @@ polls
 polos
 polyp
 pomes
-pommy
 pomps
 ponce
 ponds
@@ -5143,7 +5118,6 @@ salve
 salvo
 saman
 samba
-sambo
 samen
 samia
 samis
@@ -5688,8 +5662,6 @@ sperm
 spews
 spica
 spice
-spick
-spics
 spicy
 spied
 spiel
@@ -5745,7 +5717,6 @@ spyed
 squab
 squad
 squat
-squaw
 squib
 squid
 ssris
@@ -6844,7 +6815,6 @@ yeuch
 yield
 yikes
 yipes
-yobbo
 yodel
 yogic
 yogis

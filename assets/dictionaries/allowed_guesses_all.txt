@@ -620,7 +620,6 @@ arums
 arval
 arvee
 arvos
-aryan
 aryls
 asana
 asbos
@@ -1341,7 +1340,6 @@ bobos
 bocca
 bocce
 bocci
-boche
 bocks
 boded
 bodes
@@ -2091,7 +2089,6 @@ chimp
 china
 chine
 ching
-chink
 chino
 chins
 chios
@@ -2763,7 +2760,6 @@ dagda
 dagga
 daggy
 dagon
-dagos
 dahls
 daiko
 daily
@@ -2812,7 +2808,6 @@ dargs
 daric
 daris
 darks
-darky
 darns
 darpa
 darre
@@ -3472,7 +3467,6 @@ dyads
 dyers
 dying
 dyked
-dykes
 dykey
 dykon
 dylan
@@ -3834,7 +3828,6 @@ faffs
 faffy
 faggy
 fagin
-fagot
 fagus
 faiks
 fails
@@ -4667,7 +4660,6 @@ ginge
 gings
 ginks
 ginny
-ginzo
 gipon
 gippo
 gippy
@@ -4842,7 +4834,6 @@ gooey
 goofs
 goofy
 googs
-gooks
 gooky
 goold
 gools
@@ -4893,7 +4884,6 @@ gowls
 gowns
 goxes
 goyas
-goyim
 goyle
 graal
 grabs
@@ -5023,7 +5013,6 @@ guest
 guffs
 gugas
 guide
-guido
 guids
 guild
 guile
@@ -5119,7 +5108,6 @@ hacky
 hadal
 haded
 hades
-hadji
 hadst
 haems
 haets
@@ -5143,7 +5131,6 @@ haith
 haiti
 hajes
 hajis
-hajji
 hakam
 hakas
 hakea
@@ -5283,7 +5270,6 @@ heats
 heave
 heavy
 heben
-hebes
 hecht
 hecks
 heder
@@ -5484,7 +5470,6 @@ honey
 hongi
 hongs
 honks
-honky
 honor
 hooch
 hoods
@@ -5634,7 +5619,6 @@ hyleg
 hyles
 hylic
 hymen
-hymie
 hymns
 hynde
 hyoid
@@ -5762,7 +5746,6 @@ inger
 ingle
 ingot
 inion
-injun
 inked
 inker
 inkle
@@ -6077,7 +6060,6 @@ kacks
 kadai
 kades
 kadis
-kafir
 kafka
 kagos
 kagus
@@ -6264,7 +6246,6 @@ kiers
 kieve
 kievs
 kight
-kikes
 kikoi
 kiley
 kilim
@@ -6412,7 +6393,6 @@ krait
 krang
 krans
 kranz
-kraut
 krays
 krebs
 kreep
@@ -6796,7 +6776,6 @@ limby
 limed
 limen
 limes
-limey
 limit
 limma
 limns
@@ -7012,7 +6991,6 @@ luach
 luaus
 lubed
 lubes
-lubra
 lucas
 luces
 lucid
@@ -7276,7 +7254,6 @@ mases
 mashy
 masks
 mason
-massa
 masse
 massy
 masts
@@ -8053,10 +8030,8 @@ niffs
 niffy
 nifty
 niger
-nigga
 nighs
 night
-nigra
 nihil
 nihon
 nikab
@@ -8514,7 +8489,6 @@ packs
 pacos
 pacta
 pacts
-paddy
 padis
 padle
 padma
@@ -9065,7 +9039,6 @@ polyp
 polys
 pombe
 pomes
-pommy
 pomos
 pomps
 ponce
@@ -10239,7 +10212,6 @@ salvo
 saman
 samas
 samba
-sambo
 samek
 samel
 samen
@@ -11317,8 +11289,6 @@ spewy
 spial
 spica
 spice
-spick
-spics
 spicy
 spide
 spied
@@ -11401,7 +11371,6 @@ spyre
 squab
 squad
 squat
-squaw
 squeg
 squib
 squid
@@ -13673,7 +13642,6 @@ ylike
 ylkes
 ymolt
 ympes
-yobbo
 yobby
 yocks
 yodel

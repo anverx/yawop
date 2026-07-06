@@ -7,7 +7,7 @@
   "counts": {
     "easy": 151,
     "medium": 253,
-    "hard": 605
+    "hard": 600
   },
   "tiers": {
     "easy": [
@@ -661,11 +661,9 @@
       "avian",
       "befog",
       "gimel",
-      "lubra",
       "mires",
       "pinny",
       "gnarl",
-      "hadji",
       "hants",
       "zambo",
       "appel",
@@ -746,7 +744,6 @@
       "trant",
       "vomer",
       "apert",
-      "fagot",
       "motte",
       "nappe",
       "nixie",
@@ -775,7 +772,6 @@
       "abled",
       "boxen",
       "dunch",
-      "injun",
       "marae",
       "prole",
       "topee",
@@ -836,7 +832,6 @@
       "rajab",
       "sexed",
       "bluet",
-      "kafir",
       "lades",
       "mansi",
       "oread",

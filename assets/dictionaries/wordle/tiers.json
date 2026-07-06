@@ -7,7 +7,7 @@
   "counts": {
     "easy": 346,
     "medium": 578,
-    "hard": 1385
+    "hard": 1384
   },
   "tiers": {
     "easy": [
@@ -1119,7 +1119,6 @@
       "tacky",
       "windy",
       "adapt",
-      "paddy",
       "racer",
       "amuse",
       "patio",
