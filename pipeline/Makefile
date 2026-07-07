@@ -59,6 +59,7 @@ publish: all
 	@cp data/allowed_guesses_all.txt $(ASSETS)/
 	$(PY) scripts/apply_blocklist.py --assets $(ASSETS) --slurs blocklist_slurs.txt
 	@cp blocklist_solutions.txt $(ASSETS)/   # runtime filter: excluded from solutions unless the player opts in
+	$(PY) scripts/enrich_wordnet.py --allowed $(ASSETS)/allowed_guesses_all.txt --assets $(ASSETS) --out $(ASSETS)/extra_defs.jsonl
 	@echo "published shipping dictionaries -> $(ASSETS)"
 
 all: subtlex-us subtlex-uk wordle surprise arcane guesses

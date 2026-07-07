@@ -335,6 +335,7 @@ class WordApp(GameShellApp):
             return row
 
         entry = worddata.lookup_entry(word)
+        sources = worddata.word_sources(word, entry)
         content = PopupContent()
 
         # Colored word title + accent divider.
@@ -352,11 +353,18 @@ class WordApp(GameShellApp):
         divider.bind(pos=div_bg, size=div_bg)
         content.add_widget(divider)
 
+        if sources:  # provenance: where this valid word comes from
+            src = Label(text="Appears in: " + "  ·  ".join(sources), font_name=theme.font_name,
+                        font_size="12sp", color=self._ACCENT, size_hint_y=None, height=dp(20),
+                        halign="center", valign="middle")
+            src.bind(size=lambda i, _v: setattr(i, "text_size", i.size))
+            content.add_widget(src)
+
         body = BoxLayout(orientation="vertical", size_hint_y=None, spacing=dp(7), padding=[dp(2), dp(6)])
         body.bind(minimum_height=body.setter("height"))
         if not entry or (not entry["senses"] and not entry["examples"]):
-            body.add_widget(para("No dictionary entry available for this word.",
-                                 color=theme.text_medium))
+            body.add_widget(para("No definition on hand for this one yet — it's a valid word "
+                                 "(see the source above), just an obscure one.", color=theme.text_medium))
         else:
             if entry["senses"]:
                 body.add_widget(header("Definitions"))
