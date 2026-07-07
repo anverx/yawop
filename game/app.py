@@ -260,6 +260,8 @@ class WordApp(GameShellApp):
     _POS_DEFAULT = (0.47, 0.48, 0.50, 1)
     _ACCENT = (0.24, 0.47, 0.78, 1)      # section headers / quote bar
     _ACCENT_DARK = (0.16, 0.34, 0.62, 1)  # word title
+    # Compact definition-source labels (dictionaryapi.dev is Wiktionary-sourced).
+    _SRC_LABEL = {"wiktionary": "Wiktionary", "dictionaryapi.dev": "Wiktionary", "wordnet": "WordNet"}
 
     def show_word_info(self, word: str) -> None:
         """Popup: nicely structured, colorful definitions + usage examples."""
@@ -376,6 +378,18 @@ class WordApp(GameShellApp):
                 for ex in entry["examples"]:
                     who = " — ".join(x for x in (ex.get("author"), ex.get("work")) if x)
                     body.add_widget(example_row(ex.get("text", ""), who))
+            # compact one-line attribution of the definition source(s)
+            srcs = []
+            for s in entry["senses"]:
+                lbl = self._SRC_LABEL.get(s.get("source"), (s.get("source") or "").title())
+                if lbl and lbl not in srcs:
+                    srcs.append(lbl)
+            if srcs:
+                credit = Label(text="via " + " · ".join(srcs), font_name=theme.font_name,
+                               font_size="10sp", color=theme.text_medium, size_hint_y=None,
+                               height=dp(16), halign="right", valign="middle")
+                credit.bind(size=lambda i, _v: setattr(i, "text_size", i.size))
+                body.add_widget(credit)
 
         scroll = ScrollView(size_hint=(1, 1))
         scroll.add_widget(body)
@@ -478,15 +492,16 @@ class WordApp(GameShellApp):
         popup.open()
 
     def show_about(self, instance: Any = None) -> None:
-        from kivyshell.uikit import FixedGrayRoundedButton, FixedRoundedButton, Popup, PopupContent, SubtitleLabel, TitleLabel
+        from kivyshell.uikit import CaptionLabel, FixedGrayRoundedButton, FixedRoundedButton, Popup, PopupContent, SubtitleLabel, TitleLabel
         content = PopupContent()
         content.add_widget(TitleLabel("yawop"))
         content.add_widget(SubtitleLabel("Yet Another WOrd Puzzle"))
+        content.add_widget(CaptionLabel("Definitions: WordNet (Princeton) · Wiktionary (CC BY-SA)"))
         policy = FixedRoundedButton(text="About the words")
         content.add_widget(policy)
         close = FixedGrayRoundedButton(text="Close")
         content.add_widget(close)
-        popup = Popup(content, height=280)
+        popup = Popup(content, height=300)
         policy.bind(on_press=lambda *_: (popup.dismiss(), self.show_policy()))
         close.bind(on_press=popup.dismiss)
         popup.open()
