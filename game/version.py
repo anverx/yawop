@@ -9,4 +9,4 @@ The Android numeric_version (integer, must increase per Play upload) is set
 automatically from the CI run number; this human version is bumped by hand here.
 """
 
-__version__ = "0.2.0"
+__version__ = "0.3.0"

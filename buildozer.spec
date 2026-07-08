@@ -60,9 +60,8 @@ android.allow_backup = True
 android.presplash_color = #F2F2F2
 presplash.filename = %(source.dir)s/assets/images/splash.jpeg
 
-# Launcher icon: none yet. Add icon.filename (and optionally the adaptive-icon
-# layers) once a yawop app icon exists; buildozer uses the default Kivy icon
-# meanwhile.
+# Launcher icon: the raven (wisdom) cut from the splash art.
+icon.filename = %(source.dir)s/game/assets/icon.png
 
 # Debug keystore (for consistent signing across builds).
 # On CI this file is restored from secrets / generated into the repo root; locally
