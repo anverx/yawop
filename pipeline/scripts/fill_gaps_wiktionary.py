@@ -37,10 +37,47 @@ def clean(html: str) -> str:
     return _WS.sub(" ", txt).strip()
 
 
-def wiktionary_senses(word, session, cache, max_retries=4, backoff=1.5):
-    """English senses list, [] if no page (404), or None on transient error.
-    [] and non-empty results are cached; None is never cached (retries later)."""
-    if word in cache:
+# Many valid Wordle/Scrabble words only have a Wiktionary entry under another
+# language (Scots especially: whaur=where, tauld=told). Prefer English, then Scots,
+# then any language, labelling non-English senses so the popup stays honest.
+LANG_NAMES = {"sco": "Scots", "la": "Latin", "fr": "French", "it": "Italian",
+              "es": "Spanish", "de": "German", "nl": "Dutch", "ca": "Catalan",
+              "cy": "Welsh", "ga": "Irish", "gd": "Scottish Gaelic", "gv": "Manx",
+              "nrm": "Norman", "fur": "Friulian", "et": "Estonian", "tl": "Tagalog",
+              "ceb": "Cebuano", "pt": "Portuguese", "ro": "Romanian", "sv": "Swedish",
+              "da": "Danish", "no": "Norwegian", "fi": "Finnish", "pl": "Polish",
+              "cs": "Czech", "hu": "Hungarian", "tr": "Turkish", "af": "Afrikaans"}
+
+
+def extract_senses(data: dict) -> list[dict]:
+    """Senses from the best available language: English, then Scots, then any."""
+    if not isinstance(data, dict):
+        return []
+    langs = [L for L, v in data.items() if isinstance(v, list) and v]  # only language->[groups]
+    pick = next((L for L in ("en", "sco") if L in langs), None) or (langs[0] if langs else None)
+    if pick is None:
+        return []
+    senses, seen = [], set()
+    for group in data[pick]:
+        pos = (group.get("partOfSpeech") or "").lower()
+        label = pos if pick == "en" else LANG_NAMES.get(pick, pick.upper())
+        for d in group.get("definitions", []):
+            text = clean(d.get("definition", ""))
+            if not text or (label, text) in seen:
+                continue
+            seen.add((label, text))
+            senses.append({"pos_label": label, "definition": text, "source": "wiktionary"})
+            if len(senses) >= _MAX_SENSES:
+                return senses
+    return senses
+
+
+def wiktionary_senses(word, session, cache, refetch_empty=False, max_retries=4, backoff=1.5):
+    """Senses (best language), [] if no page (404), or None on transient error.
+    [] and non-empty results are cached; None is never cached (retries later).
+    refetch_empty re-queries words previously cached as [] (e.g. to widen from
+    English-only to all languages)."""
+    if word in cache and (cache[word] or not refetch_empty):
         return cache[word]
     for attempt in range(max_retries):
         try:
@@ -61,19 +98,7 @@ def wiktionary_senses(word, session, cache, max_retries=4, backoff=1.5):
             data = resp.json()
         except ValueError:
             return None
-        senses, seen = [], set()
-        for group in data.get("en", []):
-            pos = (group.get("partOfSpeech") or "").lower()
-            for d in group.get("definitions", []):
-                text = clean(d.get("definition", ""))
-                if not text or (pos, text) in seen:
-                    continue
-                seen.add((pos, text))
-                senses.append({"pos_label": pos, "definition": text, "source": "wiktionary"})
-                if len(senses) >= _MAX_SENSES:
-                    break
-            if len(senses) >= _MAX_SENSES:
-                break
+        senses = extract_senses(data)
         cache[word] = senses
         return senses
     return None
@@ -96,6 +121,8 @@ def main() -> None:
     ap.add_argument("--cache", required=True)
     ap.add_argument("--limit", type=int, default=0, help="0 = all")
     ap.add_argument("--delay", type=float, default=1.0, help="seconds between network calls")
+    ap.add_argument("--refetch-empty", action="store_true",
+                    help="re-query words previously cached as no-entry (to widen to all languages)")
     args = ap.parse_args()
 
     assets = pathlib.Path(args.assets)
@@ -111,8 +138,8 @@ def main() -> None:
 
     hits = misses = errors = net = 0
     for i, word in enumerate(todo, 1):
-        cached = word in cache
-        senses = wiktionary_senses(word, session, cache)
+        cached = word in cache and (cache[word] or not args.refetch_empty)
+        senses = wiktionary_senses(word, session, cache, refetch_empty=args.refetch_empty)
         if senses is None:
             errors += 1
         elif senses:

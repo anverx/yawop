@@ -84,29 +84,32 @@ def main() -> None:
                                  formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--assets", required=True, help="dictionaries assets dir")
     ap.add_argument("--slurs", help="blocklist removed everywhere")
+    ap.add_argument("--proper-nouns", help="proper-noun list removed everywhere (names + places)")
     ap.add_argument("--solutions", help="blocklist removed from answer sources only")
     args = ap.parse_args()
 
     assets = pathlib.Path(args.assets)
     slurs = load_blocklist(pathlib.Path(args.slurs) if args.slurs else None)
+    proper = load_blocklist(pathlib.Path(args.proper_nouns) if args.proper_nouns else None)
     solutions = load_blocklist(pathlib.Path(args.solutions) if args.solutions else None)
-    if not slurs and not solutions:
-        print("both blocklists empty; nothing to do")
+    everywhere = slurs | proper  # slurs and proper nouns are purged from every list
+    if not everywhere and not solutions:
+        print("all blocklists empty; nothing to do")
         return
 
     total = 0
     for pack_dir in sorted(p for p in assets.iterdir() if p.is_dir()):
-        n = _strip_answer_sources(pack_dir, slurs | solutions)  # both barred from answers
-        n += _strip_jsonl(pack_dir / "dictionary.jsonl", slurs)  # only slurs lose lookups
+        n = _strip_answer_sources(pack_dir, everywhere | solutions)  # all barred from answers
+        n += _strip_jsonl(pack_dir / "dictionary.jsonl", everywhere)  # only everywhere lose lookups
         if n:
             print(f"  {pack_dir.name}: removed {n} occurrence(s)")
         total += n
-    n = _strip_lines(assets / "allowed_guesses_all.txt", slurs)  # only slurs barred as guesses
+    n = _strip_lines(assets / "allowed_guesses_all.txt", everywhere)  # everywhere barred as guesses
     if n:
         print(f"  allowed_guesses_all.txt: removed {n}")
     total += n
-    print(f"blocklist applied (slurs={len(slurs)}, solutions={len(solutions)}): "
-          f"{total} occurrence(s) removed")
+    print(f"blocklist applied (slurs={len(slurs)}, proper-nouns={len(proper)}, "
+          f"solutions={len(solutions)}): {total} occurrence(s) removed")
 
 
 if __name__ == "__main__":
