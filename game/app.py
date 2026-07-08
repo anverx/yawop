@@ -493,9 +493,12 @@ class WordApp(GameShellApp):
 
     def show_about(self, instance: Any = None) -> None:
         from kivyshell.uikit import CaptionLabel, FixedGrayRoundedButton, FixedRoundedButton, Popup, PopupContent, SubtitleLabel, TitleLabel
+
+        from .version import __version__
         content = PopupContent()
         content.add_widget(TitleLabel("yawop"))
         content.add_widget(SubtitleLabel("Yet Another WOrd Puzzle"))
+        content.add_widget(CaptionLabel(f"version {__version__}"))
         content.add_widget(CaptionLabel("Definitions: WordNet (Princeton) · Wiktionary (CC BY-SA)"))
         policy = FixedRoundedButton(text="About the words")
         content.add_widget(policy)

@@ -20,8 +20,10 @@ source.include_exts = py,png,jpg,jpeg,kv,atlas,json,jsonl,txt,ttf
 # Keep build/tooling trees out of the APK (pipeline data, tests, CI, caches).
 source.exclude_dirs = tests, pipeline, .github, .git, .buildozer, bin, __pycache__
 
-# Application versioning
-version = 0.1.0
+# Application versioning. Sourced from game/version.py (single source of truth,
+# also shown on the About screen) so the package version can't drift from the app.
+version.regex = __version__\s*=\s*['"]([^'"]+)['"]
+version.filename = %(source.dir)s/game/version.py
 # Numeric version code for Android (must increment for updates!)
 android.numeric_version = 1
 
