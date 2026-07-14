@@ -116,8 +116,9 @@ def defined_words(assets: pathlib.Path) -> set[str]:
 
 def main() -> None:
     ap = argparse.ArgumentParser(description=__doc__)
-    ap.add_argument("--allowed", required=True)
-    ap.add_argument("--assets", required=True)
+    ap.add_argument("--allowed", help="allowed-guess list; fetch its undefined words")
+    ap.add_argument("--assets", help="assets dir (with --allowed, to compute 'undefined')")
+    ap.add_argument("--words", help="explicit newline-delimited word list to fetch (overrides --allowed)")
     ap.add_argument("--cache", required=True)
     ap.add_argument("--limit", type=int, default=0, help="0 = all")
     ap.add_argument("--delay", type=float, default=1.0, help="seconds between network calls")
@@ -125,9 +126,11 @@ def main() -> None:
                     help="re-query words previously cached as no-entry (to widen to all languages)")
     args = ap.parse_args()
 
-    assets = pathlib.Path(args.assets)
-    allowed = {w.strip().lower() for w in pathlib.Path(args.allowed).read_text().splitlines() if w.strip()}
-    todo = sorted(allowed - defined_words(assets))
+    if args.words:
+        todo = sorted({w.strip().lower() for w in pathlib.Path(args.words).read_text().splitlines() if w.strip()})
+    else:
+        allowed = {w.strip().lower() for w in pathlib.Path(args.allowed).read_text().splitlines() if w.strip()}
+        todo = sorted(allowed - defined_words(pathlib.Path(args.assets)))
     if args.limit:
         todo = todo[:args.limit]
 

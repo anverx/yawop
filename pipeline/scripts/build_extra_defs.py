@@ -18,11 +18,22 @@ from __future__ import annotations
 import argparse
 import json
 import pathlib
+import re
 
 from nltk.corpus import wordnet as wn
 
 _POS = {"n": "noun", "v": "verb", "a": "adjective", "s": "adjective", "r": "adverb"}
 _MAX_SENSES = 4
+_PLURAL = re.compile(r"\bplural of ([a-z][a-z\-]+)", re.I)
+
+
+def base_sense(base: str, wik: dict) -> dict | None:
+    """A real (non-'plural of') sense of the base word, from the Wiktionary cache."""
+    senses = wik.get(base) or []
+    for s in senses:
+        if not _PLURAL.search(s.get("definition", "") or ""):
+            return s
+    return senses[0] if senses else None
 
 
 def defined_words(assets: pathlib.Path) -> set[str]:
@@ -79,6 +90,17 @@ def main() -> None:
                 seen.add(key)
                 senses.append(s)
         senses = senses[:_MAX_SENSES]
+        # augment 'plural of X' senses with X's own meaning, so the entry isn't a dead end
+        for s in list(senses):
+            m = _PLURAL.search(s.get("definition", "") or "")
+            if not m:
+                continue
+            bs = base_sense(m.group(1).lower(), wik)
+            key = (m.group(1).lower(), bs.get("definition")) if bs else None
+            if bs and key not in seen:
+                seen.add(key)
+                senses.append({"pos_label": m.group(1).lower(), "definition": bs["definition"],
+                               "source": bs.get("source", "wiktionary")})
         if senses:
             records.append({"word": w, "senses": senses, "examples": []})
             if any(s.get("source") == "wiktionary" for s in senses):
