@@ -393,11 +393,12 @@ class WordApp(GameShellApp):
         divider.bind(pos=div_bg, size=div_bg)
         content.add_widget(divider)
 
-        if sources:  # provenance: where this valid word comes from
+        if sources:  # provenance: where this valid word comes from (may wrap to 2 lines)
             src = Label(text="Appears in: " + "  ·  ".join(sources), font_name=theme.font_name,
-                        font_size="12sp", color=self._ACCENT, size_hint_y=None, height=dp(20),
+                        font_size="12sp", color=self._ACCENT, size_hint_y=None,
                         halign="center", valign="middle")
-            src.bind(size=lambda i, _v: setattr(i, "text_size", i.size))
+            src.bind(width=lambda i, w: setattr(i, "text_size", (w, None)),
+                     texture_size=lambda i, s: setattr(i, "height", s[1] + dp(4)))
             content.add_widget(src)
 
         body = BoxLayout(orientation="vertical", size_hint_y=None, spacing=dp(7), padding=[dp(2), dp(6)])
