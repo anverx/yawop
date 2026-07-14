@@ -8,11 +8,13 @@ from kivy.graphics import Color, RoundedRectangle
 from kivy.metrics import dp
 from kivy.uix.behaviors import ButtonBehavior
 from kivy.uix.boxlayout import BoxLayout
+from kivy.uix.image import Image
 
 from kivyshell.shell import Completion
 from kivyshell.uikit import CompletionIcon, DayLabel, get_theme
 
-from .store import DIFFICULTIES
+from .store import DIFFICULTIES, FAILED
+from .theme import FAILED_BADGE
 
 
 class WordDayCell(ButtonBehavior, BoxLayout):
@@ -31,7 +33,10 @@ class WordDayCell(ButtonBehavior, BoxLayout):
                         padding=[dp(2), 0, dp(2), dp(2)])
         for diff in DIFFICULTIES:
             st = (status or {}).get(diff, Completion.NONE)
-            row.add_widget(CompletionIcon(by_status.get(st, (0.5, 0.5, 0.5, 0.3)), fit_mode="contain"))
+            if st == FAILED:  # black upside-down crown
+                row.add_widget(Image(source=FAILED_BADGE, fit_mode="contain"))
+            else:
+                row.add_widget(CompletionIcon(by_status.get(st, (0.5, 0.5, 0.5, 0.3)), fit_mode="contain"))
         self.add_widget(row)
 
     def _update_bg(self, *a: Any) -> None:

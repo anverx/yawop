@@ -98,6 +98,14 @@ class WordGameScreen(BackgroundedScreen):
         if self._panel:
             self._panel.show_reveal(text)
 
+    def another_try(self) -> None:
+        """Reset the board for a fresh (unranked) attempt after a fail."""
+        if self._panel:
+            self._panel.game.reset()
+            self._panel.show_reveal("")
+            self._panel.render()
+            self._start_timer()
+
     # --- lifecycle: run the clock only while the screen is shown ---
     def on_enter(self, *a: Any) -> None:
         Window.bind(on_key_down=self._on_key_down)

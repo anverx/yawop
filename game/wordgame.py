@@ -99,6 +99,15 @@ class WordGame:
         self.cursor = 0
         return True
 
+    def reset(self) -> None:
+        """Clear the board for a fresh attempt at the same answer ('another try')."""
+        self.guesses = []
+        self.marks = []
+        self.slots = [""] * WORD_LEN
+        self.cursor = 0
+        self.won = False
+        self.finished = False
+
     def restore(self, guesses: list[str]) -> None:
         """Replay previously-saved guesses to rebuild state (for resuming a game)."""
         for g in guesses:

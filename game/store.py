@@ -15,6 +15,7 @@ from datetime import date, timedelta
 from kivyshell.shell import Completion, SqliteStore
 
 DIFFICULTIES = ["easy", "medium", "hard"]
+FAILED = "failed"  # calendar marker for a daily that was played but not solved
 
 
 def _code(d: str | None, difficulty: str, answer: str) -> str:
@@ -71,7 +72,18 @@ class _CalState:
 
     def fetch_data(self) -> CalData:
         ms = self._db.month_status(self.year, self.month, DIFFICULTIES)
-        return CalData(ms.month_name, ms.streak_text, ms.days, ms.month_badge, ms.protected_dates)
+        days = ms.days
+        # kivyshell month_status only reports solved days; merge in FAILED ones
+        # (a dated play that finished without a win) so the calendar can mark them.
+        like = f"{self.year:04d}-{self.month:02d}-%"
+        rows = self._db._db.execute(
+            "SELECT c.date, c.variant_id FROM plays p JOIN challenges c ON c.id=p.challenge_id "
+            "WHERE c.date LIKE ? AND p.completed=0 AND p.completed_at IS NOT NULL", (like,)).fetchall()
+        for d, diff in rows:
+            cell = days.setdefault(d, {})
+            if cell.get(diff, Completion.NONE) is Completion.NONE:  # a win wins over a failure
+                cell[diff] = FAILED
+        return CalData(ms.month_name, ms.streak_text, days, ms.month_badge, ms.protected_dates)
 
 
 class WordStore:
@@ -119,6 +131,15 @@ class WordStore:
         self._db.finish_play(play_id, won, duration_ms, attempts)
         self._conn.execute("DELETE FROM progress WHERE play_id=?", (play_id,))  # no longer resumable
         self._conn.commit()
+
+    def daily_finished(self, day: str, difficulty: str) -> bool:
+        """True if this dated puzzle was already played to a finish (won OR failed);
+        such dailies can't be retried."""
+        row = self._conn.execute(
+            "SELECT 1 FROM plays p JOIN challenges c ON c.id=p.challenge_id "
+            "WHERE c.date=? AND c.variant_id=? AND p.completed_at IS NOT NULL LIMIT 1",
+            (day, difficulty)).fetchone()
+        return row is not None
 
     # --- menu / calendar ---
     def today_completion(self) -> dict[str, bool]:

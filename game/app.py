@@ -108,6 +108,9 @@ class WordApp(GameShellApp):
     # --- game flow ---
     def start_daily(self, difficulty: str) -> None:
         today = datetime.date.today().isoformat()
+        if self.store.daily_finished(today, difficulty):  # already won or failed: no retry
+            self._show_already_played(today, difficulty)
+            return
         self._start(DEFAULT_PACK, difficulty, today, f"Daily · {difficulty.title()}")
 
     def start_random(self, instance: Any = None) -> None:
@@ -204,6 +207,9 @@ class WordApp(GameShellApp):
 
         def choose(diff: str) -> None:
             popup_holder[0].dismiss()
+            if self.store.daily_finished(d.isoformat(), diff):  # already won or failed: no retry
+                self._show_already_played(d.isoformat(), diff)
+                return
             self._start(DEFAULT_PACK, diff, d.isoformat(), f"{title} · {diff.title()}")
 
         for diff in ("easy", "medium", "hard"):
@@ -245,10 +251,42 @@ class WordApp(GameShellApp):
         _, _, answer = self._current
         if self._play_id is not None:
             self.store.finish(self._play_id, won, duration_ms, attempts)  # record win AND lose
-        self._play_id = None
+        self._play_id = None  # once recorded, 'another try' rounds don't re-record
+        if won:
+            self._reveal_answer(answer)
+        else:
+            self._show_game_failed(answer)
+
+    def _reveal_answer(self, answer: str) -> None:
         entry = worddata.lookup_entry(answer)
         definition = entry["senses"][0]["definition"] if entry and entry.get("senses") else ""
         self.game_screen.show_reveal(f"{answer.upper()} — {definition}" if definition else answer.upper())
+
+    def _show_game_failed(self, answer: str) -> None:
+        from kivyshell.uikit import FixedGrayRoundedButton, FixedRoundedButton, Popup, PopupContent, SubtitleLabel, TitleLabel
+        content = PopupContent()
+        content.add_widget(TitleLabel("Game Failed"))
+        content.add_widget(SubtitleLabel("Out of tries — counts as a loss."))
+        again = FixedRoundedButton(text="Another try")
+        content.add_widget(again)
+        reveal = FixedGrayRoundedButton(text="Reveal the word")
+        content.add_widget(reveal)
+        popup = Popup(content, height=250)
+        again.bind(on_press=lambda *_: (popup.dismiss(), self.game_screen.another_try()))
+        reveal.bind(on_press=lambda *_: (popup.dismiss(), self._reveal_answer(answer)))
+        popup.open()
+
+    def _show_already_played(self, day: str, difficulty: str) -> None:
+        from kivyshell.uikit import FixedGrayRoundedButton, Popup, PopupContent, SubtitleLabel, TitleLabel
+        answer = worddata.pick_word(DEFAULT_PACK, difficulty, seed=day)
+        content = PopupContent()
+        content.add_widget(TitleLabel("Already played"))
+        content.add_widget(SubtitleLabel(f"That day's {difficulty} word was {answer.upper()}."))
+        close = FixedGrayRoundedButton(text="Close")
+        content.add_widget(close)
+        popup = Popup(content, height=220)
+        close.bind(on_press=popup.dismiss)
+        popup.open()
 
     # Part-of-speech chip colors for the definition popup (foreground accents).
     _POS_COLORS = {

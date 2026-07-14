@@ -11,6 +11,9 @@ from worddata.paths import app_root
 _ROOT = str(app_root())            # repo root, or the PyInstaller bundle root
 _HERE = os.path.join(_ROOT, "game")  # game/ package assets live under here
 
+# Black, upside-down W badge shown on the calendar for a failed daily.
+FAILED_BADGE = os.path.join(_HERE, "assets", "failed-badge.png")
+
 # Wordle-ish tile colors, exposed for the game panel.
 TILE_CORRECT = (0.42, 0.67, 0.39, 1)   # green
 TILE_PRESENT = (0.79, 0.71, 0.34, 1)   # gold/yellow
