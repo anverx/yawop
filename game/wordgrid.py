@@ -11,6 +11,7 @@ import os
 from collections.abc import Callable
 from typing import Any
 
+from kivy.clock import Clock
 from kivy.graphics import Color, Line, RoundedRectangle
 from kivy.metrics import dp
 from kivy.uix.anchorlayout import AnchorLayout
@@ -18,6 +19,7 @@ from kivy.uix.behaviors import ButtonBehavior
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.image import Image
 from kivy.uix.label import Label
+from kivy.uix.scrollview import ScrollView
 from kivy.uix.widget import Widget
 
 from kivyshell.uikit import BackButton, RoundedButton, get_theme
@@ -25,7 +27,7 @@ from kivyshell.uikit import BackButton, RoundedButton, get_theme
 from worddata.paths import app_root
 
 from . import theme as T
-from .wordgame import MAX_GUESSES, WORD_LEN, Mark, WordGame
+from .wordgame import WORD_LEN, Mark, WordGame
 
 _ENTER_ICON = os.path.join(str(app_root()), "game", "assets", "enter-icon.png")
 _MARK_COLOR = {Mark.CORRECT: T.TILE_CORRECT, Mark.PRESENT: T.TILE_PRESENT, Mark.ABSENT: T.TILE_ABSENT}
@@ -159,34 +161,51 @@ class WordGridPanel(BoxLayout):
 
         self.render()
 
-    def _build_grid(self) -> AnchorLayout:
-        tile, btn = dp(50), dp(38)
-        grid_col = BoxLayout(orientation="vertical", spacing=dp(6), size_hint=(None, None))
-        grid_col.bind(minimum_width=grid_col.setter("width"), minimum_height=grid_col.setter("height"))
+    def _build_grid(self) -> ScrollView:
+        # Scrollable so 'another try' can append rows past the initial six.
+        self._tile_px, self._btn_px = dp(46), dp(36)
+        self._grid_col = BoxLayout(orientation="vertical", spacing=dp(5), size_hint=(None, None))
+        self._grid_col.bind(minimum_width=self._grid_col.setter("width"),
+                            minimum_height=self._grid_col.setter("height"))
         self._tiles: list[list[Tile]] = []
         self._info_btns: list[RoundedButton] = []
-        for r in range(MAX_GUESSES):
-            row = BoxLayout(orientation="horizontal", spacing=dp(6), size_hint=(None, None), height=tile)
-            row.bind(minimum_width=row.setter("width"))
-            row.add_widget(Widget(size_hint=(None, None), size=(btn, tile)))
-            tiles = []
-            for c in range(WORD_LEN):
-                t = Tile(size_hint=(None, None), size=(tile, tile))
-                t.bind(on_release=lambda _t, rr=r, cc=c: self._tap(rr, cc))
-                row.add_widget(t)
-                tiles.append(t)
-            self._tiles.append(tiles)
-            info = RoundedButton(text="?", font_size="16sp", bg_color=T.KEY_DEFAULT, color=_DARK,
-                                 size_hint=(None, None), size=(btn, tile))
-            info.opacity = 0
-            info.disabled = True
-            info.bind(on_press=lambda _x, rr=r: self._info(rr))
-            row.add_widget(info)
-            self._info_btns.append(info)
-            grid_col.add_widget(row)
-        anchor = AnchorLayout(anchor_x="center")
-        anchor.add_widget(grid_col)
-        return anchor
+        for r in range(self.game.max_guesses):
+            self._grid_col.add_widget(self._make_row(r))
+        holder = AnchorLayout(anchor_x="center", size_hint=(1, None))
+        holder.add_widget(self._grid_col)
+        self._grid_col.bind(height=lambda _i, h: setattr(holder, "height", h))
+        holder.height = self._grid_col.height
+        self._scroll = ScrollView(size_hint=(1, 1), do_scroll_x=False, bar_width=dp(2))
+        self._scroll.add_widget(holder)
+        return self._scroll
+
+    def _make_row(self, r: int) -> BoxLayout:
+        tile, btn = self._tile_px, self._btn_px
+        row = BoxLayout(orientation="horizontal", spacing=dp(5), size_hint=(None, None), height=tile)
+        row.bind(minimum_width=row.setter("width"))
+        row.add_widget(Widget(size_hint=(None, None), size=(btn, tile)))
+        tiles = []
+        for c in range(WORD_LEN):
+            t = Tile(size_hint=(None, None), size=(tile, tile))
+            t.bind(on_release=lambda _t, rr=r, cc=c: self._tap(rr, cc))
+            row.add_widget(t)
+            tiles.append(t)
+        self._tiles.append(tiles)
+        info = RoundedButton(text="?", font_size="16sp", bg_color=T.KEY_DEFAULT, color=_DARK,
+                             size_hint=(None, None), size=(btn, tile))
+        info.opacity = 0
+        info.disabled = True
+        info.bind(on_press=lambda _x, rr=r: self._info(rr))
+        row.add_widget(info)
+        self._info_btns.append(info)
+        return row
+
+    def add_attempt(self) -> None:
+        """'Another try': grow the game by one guess and append a row to the grid."""
+        self.game.extend(1)
+        self._grid_col.add_widget(self._make_row(len(self._tiles)))
+        self.render()
+        Clock.schedule_once(lambda _dt: setattr(self._scroll, "scroll_y", 0), 0)  # show newest row
 
     def _build_keyboard(self) -> BoxLayout:
         self._keys: dict[str, RoundedButton] = {}
@@ -263,7 +282,7 @@ class WordGridPanel(BoxLayout):
     def render(self) -> None:
         g = self.game
         active = len(g.guesses)
-        for r in range(MAX_GUESSES):
+        for r in range(len(self._tiles)):
             if r < active:
                 for c in range(WORD_LEN):
                     self._tiles[r][c].set(g.guesses[r][c], g.marks[r][c])

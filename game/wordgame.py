@@ -99,13 +99,10 @@ class WordGame:
         self.cursor = 0
         return True
 
-    def reset(self) -> None:
-        """Clear the board for a fresh attempt at the same answer ('another try')."""
-        self.guesses = []
-        self.marks = []
-        self.slots = [""] * WORD_LEN
-        self.cursor = 0
-        self.won = False
+    def extend(self, extra: int = 1) -> None:
+        """Grant another attempt ('another try'): add a guess row and keep playing.
+        The board is preserved; only the max guess count grows."""
+        self.max_guesses += extra
         self.finished = False
 
     def restore(self, guesses: list[str]) -> None:
