@@ -73,6 +73,30 @@ class Tile(ButtonBehavior, Label):
                 Line(rounded_rectangle=[*self.pos, *self.size, dp(4)], width=1)
 
 
+_ROW_HIGHLIGHT = (0.89, 0.93, 0.99, 0.95)  # soft band behind the active row
+
+
+class GuessRow(BoxLayout):
+    """A grid row that shows a soft background band while it's the active row."""
+
+    def __init__(self, **kwargs: Any) -> None:
+        super().__init__(**kwargs)
+        self._hl = False
+        self.bind(pos=self._redraw, size=self._redraw)
+
+    def set_highlight(self, on: bool) -> None:
+        if on != self._hl:
+            self._hl = on
+            self._redraw()
+
+    def _redraw(self, *a: Any) -> None:
+        self.canvas.before.clear()
+        if self._hl:
+            with self.canvas.before:
+                Color(*_ROW_HIGHLIGHT)
+                RoundedRectangle(pos=self.pos, size=self.size, radius=[dp(8)])
+
+
 class EnterButton(ButtonBehavior, AnchorLayout):
     """A wide rounded Enter button with an icon + label; color signals validity."""
 
@@ -169,6 +193,7 @@ class WordGridPanel(BoxLayout):
                             minimum_height=self._grid_col.setter("height"))
         self._tiles: list[list[Tile]] = []
         self._info_btns: list[RoundedButton] = []
+        self._rows: list[GuessRow] = []
         for r in range(self.game.max_guesses):
             self._grid_col.add_widget(self._make_row(r))
         holder = AnchorLayout(anchor_x="center", size_hint=(1, None))
@@ -181,8 +206,9 @@ class WordGridPanel(BoxLayout):
 
     def _make_row(self, r: int) -> BoxLayout:
         tile, btn = self._tile_px, self._btn_px
-        row = BoxLayout(orientation="horizontal", spacing=dp(5), size_hint=(None, None), height=tile)
+        row = GuessRow(orientation="horizontal", spacing=dp(5), size_hint=(None, None), height=tile)
         row.bind(minimum_width=row.setter("width"))
+        self._rows.append(row)
         row.add_widget(Widget(size_hint=(None, None), size=(btn, tile)))
         tiles = []
         for c in range(WORD_LEN):
@@ -299,6 +325,7 @@ class WordGridPanel(BoxLayout):
                 and (g.current == g.answer or g.current in self.allowed))
             self._info_btns[r].opacity = 1 if shown else 0
             self._info_btns[r].disabled = not shown
+            self._rows[r].set_highlight(r == active and not g.finished)
 
         if g.finished or not g.is_complete():
             self._enter_btn.set_state(T.KEY_DEFAULT, _DARK, "Enter", show_icon=True)
