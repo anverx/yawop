@@ -32,7 +32,8 @@ from .wordgame import WORD_LEN, Mark, WordGame
 _ENTER_ICON = os.path.join(str(app_root()), "game", "assets", "enter-icon.png")
 _MARK_COLOR = {Mark.CORRECT: T.TILE_CORRECT, Mark.PRESENT: T.TILE_PRESENT, Mark.ABSENT: T.TILE_ABSENT}
 _KEY_ROWS = ["qwertyuiop", "asdfghjkl", "zxcvbnm"]
-_CURSOR = (0.2, 0.5, 0.85, 1)
+_CURSOR = (0.10, 0.62, 1.0, 1)       # neon-blue "type here" cell
+_CURSOR_GLOW = (0.25, 0.72, 1.0)     # soft halo around it (alpha added per layer)
 _ENTER_OK = T.TILE_CORRECT
 _ENTER_BAD = (0.86, 0.30, 0.30, 1)
 _DARK, _WHITE = (0.1, 0.1, 0.1, 1), (1, 1, 1, 1)
@@ -62,15 +63,22 @@ class Tile(ButtonBehavior, Label):
 
     def _redraw(self, *a: Any) -> None:
         self.canvas.before.clear()
+        x, y = self.pos
+        w, h = self.size
         with self.canvas.before:
-            Color(*self.bg)
-            RoundedRectangle(pos=self.pos, size=self.size, radius=[dp(4)])
             if self.cursor:
+                # neon-blue "type here" cell with a soft glowing edge (layered halos)
+                for pad, alpha in ((dp(7), 0.16), (dp(4), 0.28), (dp(2), 0.5)):
+                    Color(*_CURSOR_GLOW, alpha)
+                    RoundedRectangle(pos=(x - pad, y - pad), size=(w + 2 * pad, h + 2 * pad), radius=[dp(7)])
                 Color(*_CURSOR)
-                Line(rounded_rectangle=[*self.pos, *self.size, dp(4)], width=2)
-            elif self.border:
-                Color(0.7, 0.7, 0.72, 1)
-                Line(rounded_rectangle=[*self.pos, *self.size, dp(4)], width=1)
+                RoundedRectangle(pos=self.pos, size=self.size, radius=[dp(5)])
+            else:
+                Color(*self.bg)
+                RoundedRectangle(pos=self.pos, size=self.size, radius=[dp(4)])
+                if self.border:
+                    Color(0.7, 0.7, 0.72, 1)
+                    Line(rounded_rectangle=[*self.pos, *self.size, dp(4)], width=1)
 
 
 _ROW_HIGHLIGHT = (0.89, 0.93, 0.99, 0.95)  # soft band behind the active row
@@ -187,8 +195,8 @@ class WordGridPanel(BoxLayout):
 
     def _build_grid(self) -> ScrollView:
         # Scrollable so 'another try' can append rows past the initial six.
-        self._tile_px, self._btn_px = dp(46), dp(36)
-        self._grid_col = BoxLayout(orientation="vertical", spacing=dp(5), size_hint=(None, None))
+        self._tile_px, self._btn_px = dp(42), dp(34)
+        self._grid_col = BoxLayout(orientation="vertical", spacing=dp(8), size_hint=(None, None))
         self._grid_col.bind(minimum_width=self._grid_col.setter("width"),
                             minimum_height=self._grid_col.setter("height"))
         self._tiles: list[list[Tile]] = []
@@ -206,7 +214,7 @@ class WordGridPanel(BoxLayout):
 
     def _make_row(self, r: int) -> BoxLayout:
         tile, btn = self._tile_px, self._btn_px
-        row = GuessRow(orientation="horizontal", spacing=dp(5), size_hint=(None, None), height=tile)
+        row = GuessRow(orientation="horizontal", spacing=dp(8), size_hint=(None, None), height=tile)
         row.bind(minimum_width=row.setter("width"))
         self._rows.append(row)
         row.add_widget(Widget(size_hint=(None, None), size=(btn, tile)))
