@@ -349,6 +349,6 @@ class WordGridPanel(BoxLayout):
             btn._update_bg()
 
         if g.finished:
-            self.status.text = "Solved!" if g.won else f"The word was {g.answer.upper()}"
+            self.status.text = ""  # the Success / Game Failed popups handle the end state
         else:
             self.status.text = self._flash

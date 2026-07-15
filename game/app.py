@@ -253,9 +253,45 @@ class WordApp(GameShellApp):
             self.store.finish(self._play_id, won, duration_ms, attempts)  # record win AND lose
         self._play_id = None  # once recorded, 'another try' rounds don't re-record
         if won:
-            self._reveal_answer(answer)
+            self._show_success(answer, attempts, duration_ms)
         else:
             self._show_game_failed(answer)
+
+    def _show_success(self, word: str, attempts: int, duration_ms: int) -> None:
+        from kivy.metrics import dp
+        from kivy.uix.image import Image
+        from kivy.uix.label import Label
+        from kivy.uix.widget import Widget
+
+        from kivyshell.uikit import FixedGrayRoundedButton, FixedRoundedButton, Popup, PopupContent, get_theme
+
+        theme = get_theme()
+        secs = (duration_ms or 0) // 1000
+        when = f"{secs} seconds" if secs < 60 else f"{secs // 60} min {secs % 60:02d} sec"
+        tries = f"{attempts} {'try' if attempts == 1 else 'tries'}"
+
+        content = PopupContent()
+        content.add_widget(Image(source=theme.badge_icon, size_hint_y=None, height=dp(64), fit_mode="contain"))
+
+        def centered(text, size, color, h, bold=True):
+            lbl = Label(text=text, font_name=theme.font_name, font_size=size, bold=bold, color=color,
+                        size_hint_y=None, height=dp(h), halign="center", valign="middle")
+            lbl.bind(size=lambda i, _v: setattr(i, "text_size", i.size))
+            return lbl
+
+        content.add_widget(centered("Success!", "26sp", (0.30, 0.62, 0.36, 1), 36))
+        content.add_widget(centered(word.upper(), "30sp", self._ACCENT_DARK, 42))
+        content.add_widget(centered(f"guessed in {tries} and {when}", "15sp", theme.text_dark, 26, bold=False))
+        content.add_widget(Widget(size_hint_y=None, height=dp(4)))
+
+        lookup = FixedRoundedButton(text="Look it up")
+        content.add_widget(lookup)
+        close = FixedGrayRoundedButton(text="Close")
+        content.add_widget(close)
+        popup = Popup(content, height=420)
+        lookup.bind(on_press=lambda *_: (popup.dismiss(), self.show_word_info(word)))
+        close.bind(on_press=popup.dismiss)
+        popup.open()
 
     def _reveal_answer(self, answer: str) -> None:
         entry = worddata.lookup_entry(answer)
