@@ -298,9 +298,9 @@ class WordGridPanel(BoxLayout):
             return
         guesses = self.game.guesses
         if r < len(guesses):
-            self.on_info(guesses[r])
+            self.on_info(guesses[r], True)  # committed guess: safe to show provenance
         elif r == len(guesses) and self.game.is_complete():
-            self.on_info(self.game.current)  # peek the typed-but-unsubmitted word
+            self.on_info(self.game.current, False)  # peek before committing: hide provenance (it's a hint)
 
     def on_key_text(self, text: str) -> None:
         if text and text.isalpha():

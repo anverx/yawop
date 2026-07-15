@@ -55,3 +55,20 @@ def load_tiers(pack: str) -> dict:
 def tier_of(pack: str, word: str) -> str | None:
     tiers = load_tiers(pack)
     return next((t for t in TIER_ORDER if word in tiers.get(t, [])), None)
+
+
+def is_answer_word(word: str) -> bool:
+    """True if the word can be served as a puzzle answer (it's in some pack's
+    solution pool), vs. being only a valid guess in allowed_guesses."""
+    w = word.strip().lower()
+    for pack in packs():
+        tiers = load_tiers(pack)
+        if tiers:
+            if any(w in ws for ws in tiers.values()):
+                return True
+        else:  # untiered pack (e.g. surprise): its word list is the answer pool
+            for name in ("puzzle_words.txt", "words.txt"):
+                f = ASSETS / pack / name
+                if f.exists() and w in set(read_lines(f)):
+                    return True
+    return False
