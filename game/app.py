@@ -430,25 +430,21 @@ class WordApp(GameShellApp):
         divider.bind(pos=div_bg, size=div_bg)
         content.add_widget(divider)
 
-        # Provenance is a hint (it can reveal a word is answer-eligible), so only show
-        # it once the guess is committed — not when peeking a typed-but-unsubmitted word.
+        # Provenance is a hint (it reveals a word is answer-eligible), so only show it
+        # once the guess is committed — not when peeking a typed-but-unsubmitted word.
         if committed:
-            from worddata.store import is_answer_word
-            sources = worddata.word_sources(word, entry)
-            if sources:  # which packs the word is in (may wrap to 2 lines)
-                src = Label(text="Appears in: " + "  ·  ".join(sources), font_name=theme.font_name,
-                            font_size="12sp", color=self._ACCENT, size_hint_y=None,
-                            halign="center", valign="middle")
-                src.bind(width=lambda i, w: setattr(i, "text_size", (w, None)),
-                         texture_size=lambda i, s: setattr(i, "height", s[1] + dp(4)))
-                content.add_widget(src)
-            answer = is_answer_word(word)
-            status = Label(text="Can be an answer" if answer else "Allowed as a guess only",
-                           font_name=theme.font_name, font_size="11sp", size_hint_y=None, height=dp(18),
-                           color=(0.30, 0.62, 0.36, 1) if answer else theme.text_medium,
-                           halign="center", valign="middle")
-            status.bind(size=lambda i, _v: setattr(i, "text_size", i.size))
-            content.add_widget(status)
+            from worddata.store import answer_packs
+            apacks = answer_packs(word)
+            if apacks:
+                prov = Label(text="Can be the answer in:  " + "  ·  ".join(apacks),
+                             color=(0.30, 0.62, 0.36, 1))
+            else:
+                prov = Label(text="Allowed as a guess only", color=theme.text_medium)
+            prov.font_name, prov.font_size, prov.size_hint_y = theme.font_name, "12sp", None
+            prov.halign, prov.valign = "center", "middle"
+            prov.bind(width=lambda i, w: setattr(i, "text_size", (w, None)),
+                      texture_size=lambda i, s: setattr(i, "height", s[1] + dp(4)))
+            content.add_widget(prov)
 
         body = BoxLayout(orientation="vertical", size_hint_y=None, spacing=dp(7), padding=[dp(2), dp(6)])
         body.bind(minimum_height=body.setter("height"))

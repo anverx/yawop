@@ -57,18 +57,28 @@ def tier_of(pack: str, word: str) -> str | None:
     return next((t for t in TIER_ORDER if word in tiers.get(t, [])), None)
 
 
-def is_answer_word(word: str) -> bool:
-    """True if the word can be served as a puzzle answer (it's in some pack's
-    solution pool), vs. being only a valid guess in allowed_guesses."""
+_PACK_LABEL = {"subtlex-us": "SUBTLEX-US", "subtlex-uk": "SUBTLEX-UK",
+               "wordle": "Official Wordle", "arcane": "Arcane", "surprise": "Surprise"}
+_PACK_ORDER = ["subtlex-us", "subtlex-uk", "wordle", "arcane", "surprise"]
+
+
+def answer_packs(word: str) -> list[str]:
+    """Labels of the packs where the word can be served as an ANSWER (it's in that
+    pack's solution pool). Empty means it's only a valid guess, never an answer."""
     w = word.strip().lower()
-    for pack in packs():
+    out = []
+    for pack in [p for p in _PACK_ORDER if p in packs()]:
         tiers = load_tiers(pack)
         if tiers:
-            if any(w in ws for ws in tiers.values()):
-                return True
+            hit = any(w in ws for ws in tiers.values())
         else:  # untiered pack (e.g. surprise): its word list is the answer pool
-            for name in ("puzzle_words.txt", "words.txt"):
-                f = ASSETS / pack / name
-                if f.exists() and w in set(read_lines(f)):
-                    return True
-    return False
+            hit = any((ASSETS / pack / n).exists() and w in set(read_lines(ASSETS / pack / n))
+                      for n in ("puzzle_words.txt", "words.txt"))
+        if hit:
+            out.append(_PACK_LABEL.get(pack, pack))
+    return out
+
+
+def is_answer_word(word: str) -> bool:
+    """True if the word can be served as a puzzle answer in any pack."""
+    return bool(answer_packs(word))
