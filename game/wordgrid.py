@@ -335,7 +335,12 @@ class WordGridPanel(BoxLayout):
             self._info_btns[r].disabled = not shown
             self._rows[r].set_highlight(r == active and not g.finished)
 
-        if g.finished or not g.is_complete():
+        if g.finished:  # Enter is irrelevant now: announce the outcome instead
+            if g.won:
+                self._enter_btn.set_state(_ENTER_OK, _WHITE, "Victory!", show_icon=False)
+            else:
+                self._enter_btn.set_state(_ENTER_BAD, _WHITE, "Game over", show_icon=False)
+        elif not g.is_complete():
             self._enter_btn.set_state(T.KEY_DEFAULT, _DARK, "Enter", show_icon=True)
         elif g.current == g.answer or g.current in self.allowed:
             self._enter_btn.set_state(_ENTER_OK, _WHITE, "Enter", show_icon=True)
