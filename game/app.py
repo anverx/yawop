@@ -271,7 +271,9 @@ class WordApp(GameShellApp):
         tries = f"{attempts} {'try' if attempts == 1 else 'tries'}"
 
         content = PopupContent()
-        content.add_widget(Image(source=theme.badge_icon, size_hint_y=None, height=dp(64), fit_mode="contain"))
+        # badge_icon is a tint-me silhouette; gold it (like the calendar's win badge)
+        content.add_widget(Image(source=theme.badge_icon, color=theme.badge_on_time,
+                                 size_hint_y=None, height=dp(64), fit_mode="contain"))
 
         def centered(text, size, color, h, bold=True):
             lbl = Label(text=text, font_name=theme.font_name, font_size=size, bold=bold, color=color,
