@@ -57,7 +57,8 @@ publish: all
 	@mkdir -p $(ASSETS)/surprise
 	@cp data/surprise/dictionary.jsonl data/surprise/words.txt $(ASSETS)/surprise/
 	@cp data/allowed_guesses_all.txt $(ASSETS)/
-	$(PY) scripts/apply_blocklist.py --assets $(ASSETS) --slurs blocklist_slurs.txt --proper-nouns proper_nouns.txt
+	$(PY) scripts/find_trivial_plurals.py --assets $(ASSETS) --out trivial_plurals.txt
+	$(PY) scripts/apply_blocklist.py --assets $(ASSETS) --slurs blocklist_slurs.txt --proper-nouns proper_nouns.txt --solutions trivial_plurals.txt
 	@cp blocklist_solutions.txt $(ASSETS)/   # runtime filter: excluded from solutions unless the player opts in
 	$(PY) scripts/build_extra_defs.py --allowed $(ASSETS)/allowed_guesses_all.txt --assets $(ASSETS) --wiktionary-cache data/cache/wiktionary_defs.json --out $(ASSETS)/extra_defs.jsonl
 	@echo "published shipping dictionaries -> $(ASSETS)"
