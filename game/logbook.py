@@ -6,6 +6,7 @@ from datetime import datetime
 from typing import Any
 
 from kivy.metrics import dp
+from kivy.uix.behaviors import ButtonBehavior
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.scrollview import ScrollView
 
@@ -26,6 +27,10 @@ from . import theme as T
 from .store import DIFFICULTIES, answer_of
 
 SEG_COLORS = {"easy": T.TILE_CORRECT, "medium": T.TILE_PRESENT, "hard": (0.86, 0.42, 0.42, 0.9)}
+
+
+class _TapRow(ButtonBehavior, BoxLayout):
+    """A logbook row that reopens its game (frozen) when tapped."""
 
 
 def _fmt_ms(ms: int | None) -> str:
@@ -74,7 +79,8 @@ class WordLogbookScreen(_LogbookScreen):
             self._games_list.add_widget(self._row(p))
 
     def _row(self, p: Any) -> BoxLayout:
-        row = styled(BoxLayout, "logbook_row")
+        row = styled(_TapRow, "logbook_row")
+        row.bind(on_release=lambda *_: self.app.view_play(p))
         try:
             when = datetime.fromisoformat(p.completed_at or p.started_at).strftime("%H:%M")
         except (ValueError, TypeError):

@@ -28,7 +28,7 @@ from .calendar import WordCalendarScreen
 from .gamescreen import WordGameScreen
 from .logbook import WordLogbookScreen
 from .menu import WordMenuScreen
-from .store import WordStore
+from .store import WordStore, answer_of
 from .wordgame import WordGame
 from worddata.store import allowed_guesses
 
@@ -109,9 +109,19 @@ class WordApp(GameShellApp):
     def start_daily(self, difficulty: str) -> None:
         today = datetime.date.today().isoformat()
         if self.store.daily_finished(today, difficulty):  # already won or failed: no retry
-            self._show_already_played(today, difficulty)
+            self._open_finished_daily(today, difficulty, f"Daily · {difficulty.title()}")
             return
         self._start(DEFAULT_PACK, difficulty, today, f"Daily · {difficulty.title()}")
+
+    def _open_finished_daily(self, day: str, difficulty: str, subtitle: str) -> None:
+        """A finished daily can't be replayed, but for a couple of days it can be
+        reviewed exactly as last seen. Once the snapshot expires, just name the word."""
+        snap = self.store.review_daily(day, difficulty)
+        if snap:
+            answer, guesses, elapsed_ms, _won = snap
+            self._view_snapshot(answer, guesses, elapsed_ms, subtitle)
+        else:
+            self._show_already_played(day, difficulty)
 
     def start_random(self, instance: Any = None) -> None:
         """Open the Random Game options popup: difficulty + word pack."""
@@ -208,7 +218,7 @@ class WordApp(GameShellApp):
         def choose(diff: str) -> None:
             popup_holder[0].dismiss()
             if self.store.daily_finished(d.isoformat(), diff):  # already won or failed: no retry
-                self._show_already_played(d.isoformat(), diff)
+                self._open_finished_daily(d.isoformat(), diff, f"{title} · {diff.title()}")
                 return
             self._start(DEFAULT_PACK, diff, d.isoformat(), f"{title} · {diff.title()}")
 
@@ -236,12 +246,46 @@ class WordApp(GameShellApp):
         game = WordGame(answer)
         if resume.guesses:
             game.restore(resume.guesses)
+        self._game = game
         # Only dated (daily/calendar) games are resumable; random games don't persist.
         on_progress = self._on_progress if day is not None else None
         self.game_screen.set_game(game, self._allowed, subtitle, self._on_finish,
                                   self.show_word_info, on_progress=on_progress,
                                   elapsed_ms=resume.elapsed_ms)
         self.sm.current = "game"
+
+    def view_play(self, play: Any) -> None:
+        """Reopen a finished game from the logbook (daily OR random), read-only."""
+        snap = self.store.review_play(play.code, play.started_at)
+        if not snap:
+            self._show_review_unavailable(answer_of(play.code))
+            return
+        answer, guesses, elapsed_ms, _won = snap
+        kind = "Daily" if play.date else "Random"
+        self._view_snapshot(answer, guesses, elapsed_ms, f"{kind} · {play.variant_id.title()}")
+
+    def _view_snapshot(self, answer: str, guesses: list, elapsed_ms: int, subtitle: str) -> None:
+        """Rebuild a finished board and show it, frozen (no timer, no input, no re-record)."""
+        game = WordGame(answer, max_guesses=max(6, len(guesses)))
+        game.restore(guesses)
+        game.finished = True  # replaying a loss short of max wouldn't set it on its own
+        self._current = (DEFAULT_PACK, "", answer)
+        self._game = game
+        self._play_id = None  # viewing only: nothing to record or persist
+        self.game_screen.set_game(game, self._allowed, subtitle, self._on_finish,
+                                  self.show_word_info, on_progress=None, elapsed_ms=elapsed_ms)
+        self.sm.current = "game"
+
+    def _show_review_unavailable(self, answer: str) -> None:
+        from kivyshell.uikit import FixedGrayRoundedButton, Popup, PopupContent, SubtitleLabel, TitleLabel
+        content = PopupContent()
+        content.add_widget(TitleLabel("No longer available"))
+        content.add_widget(SubtitleLabel(f"This game is too old to review. The word was {answer.upper()}."))
+        close = FixedGrayRoundedButton(text="Close")
+        content.add_widget(close)
+        popup = Popup(content, height=220)
+        close.bind(on_press=popup.dismiss)
+        popup.open()
 
     def _on_progress(self, guesses: list, elapsed_ms: int) -> None:
         if self._play_id is not None:
@@ -250,7 +294,9 @@ class WordApp(GameShellApp):
     def _on_finish(self, won: bool, duration_ms: int, attempts: int) -> None:
         _, _, answer = self._current
         if self._play_id is not None:
-            self.store.finish(self._play_id, won, duration_ms, attempts)  # record win AND lose
+            # record win AND lose, and snapshot the final board for later review
+            self.store.finish(self._play_id, won, duration_ms, attempts,
+                              list(self._game.guesses), duration_ms)
         self._play_id = None  # once recorded, 'another try' rounds don't re-record
         if won:
             self._show_success(answer, attempts, duration_ms)
