@@ -114,8 +114,8 @@ class WordApp(GameShellApp):
         self._start(DEFAULT_PACK, difficulty, today, f"Daily · {difficulty.title()}")
 
     def _open_finished_daily(self, day: str, difficulty: str, subtitle: str) -> None:
-        """A finished daily can't be replayed, but for a couple of days it can be
-        reviewed exactly as last seen. Once the snapshot expires, just name the word."""
+        """A finished daily can't be replayed, but it can be reviewed exactly as
+        last seen. If it predates saved boards, just name the word instead."""
         snap = self.store.review_daily(day, difficulty)
         if snap:
             answer, guesses, elapsed_ms, _won = snap
@@ -279,8 +279,8 @@ class WordApp(GameShellApp):
     def _show_review_unavailable(self, answer: str) -> None:
         from kivyshell.uikit import FixedGrayRoundedButton, Popup, PopupContent, SubtitleLabel, TitleLabel
         content = PopupContent()
-        content.add_widget(TitleLabel("No longer available"))
-        content.add_widget(SubtitleLabel(f"This game is too old to review. The word was {answer.upper()}."))
+        content.add_widget(TitleLabel("No saved board"))
+        content.add_widget(SubtitleLabel(f"This game has no saved board to review. The word was {answer.upper()}."))
         close = FixedGrayRoundedButton(text="Close")
         content.add_widget(close)
         popup = Popup(content, height=220)

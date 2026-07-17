@@ -93,21 +93,11 @@ class WordStore:
     def open(self, data_dir: str) -> None:
         self._db.open(data_dir)
         # Board state per play: resumes an unfinished daily, and (once finished)
-        # keeps the played-out board so it can be reviewed for a couple of days.
+        # keeps the played-out board so it can always be reviewed. Each snapshot is
+        # ~80 bytes (guesses as JSON + elapsed), so we keep every game indefinitely.
         self._conn.execute(
             "CREATE TABLE IF NOT EXISTS progress ("
             "play_id INTEGER PRIMARY KEY, elapsed_ms INTEGER DEFAULT 0, state TEXT)")
-        self._conn.commit()
-        self._purge_old_snapshots()
-
-    def _purge_old_snapshots(self, keep_days: int = 2) -> None:
-        """Drop stored boards of games finished more than `keep_days` ago. Unfinished
-        dailies (completed_at IS NULL) are always kept so they stay resumable."""
-        cutoff = (date.today() - timedelta(days=keep_days)).isoformat()
-        self._conn.execute(
-            "DELETE FROM progress WHERE play_id IN ("
-            " SELECT id FROM plays WHERE completed_at IS NOT NULL"
-            " AND substr(completed_at,1,10) < ?)", (cutoff,))
         self._conn.commit()
 
     def close(self) -> None:
@@ -143,12 +133,13 @@ class WordStore:
                guesses: list[str], elapsed_ms: int) -> None:
         self._db.finish_play(play_id, won, duration_ms, attempts)
         # Keep the final board (the finishing guess never reaches save_progress) so
-        # the game can be reviewed later; _purge_old_snapshots() expires it in a few days.
+        # the game stays reviewable forever.
         self.save_progress(play_id, elapsed_ms, guesses)
 
     def review_daily(self, day: str, difficulty: str):
-        """The played-out board of a finished dated puzzle, if still cached:
-        (answer, guesses, elapsed_ms, won). None if never played or expired."""
+        """The played-out board of a finished dated puzzle:
+        (answer, guesses, elapsed_ms, won). None if never played, or played
+        before boards were saved."""
         row = self._conn.execute(
             "SELECT pr.state, pr.elapsed_ms, p.completed, c.code FROM plays p "
             "JOIN challenges c ON c.id=p.challenge_id "
@@ -161,7 +152,8 @@ class WordStore:
 
     def review_play(self, code: str, started_at: str):
         """The played-out board of a specific finished play (logbook row):
-        (answer, guesses, elapsed_ms, won). None if the board is no longer cached."""
+        (answer, guesses, elapsed_ms, won). None if that play has no saved board
+        (e.g. it finished before boards were saved)."""
         row = self._conn.execute(
             "SELECT pr.state, pr.elapsed_ms, p.completed FROM plays p "
             "JOIN challenges c ON c.id=p.challenge_id "
