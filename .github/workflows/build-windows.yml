@@ -46,7 +46,7 @@ jobs:
         with:
           name: yawop-windows
           path: yawop-windows.zip
-          retention-days: 30
+          retention-days: 7
 
   release:
     needs: build
