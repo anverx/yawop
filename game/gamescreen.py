@@ -42,14 +42,16 @@ class WordGameScreen(BackgroundedScreen):
         self._on_progress: Callable[[list, int], None] | None = None
         self._elapsed = 0          # seconds
         self._timer_ev = None
+        self._return_to = "menu"   # screen the Back button returns to
 
     def set_game(self, game: WordGame, allowed: set[str], subtitle: str,
                  on_finish: Callable[[bool, int, int], None],
                  on_info: Callable[[str], None],
                  on_progress: Callable[[list, int], None] | None = None,
-                 elapsed_ms: int = 0) -> None:
+                 elapsed_ms: int = 0, return_to: str = "menu") -> None:
         self._on_finish = on_finish
         self._on_progress = on_progress
+        self._return_to = return_to
         self._elapsed = elapsed_ms // 1000
         self._update_clock()
         if self._panel is not None:
@@ -92,7 +94,7 @@ class WordGameScreen(BackgroundedScreen):
             self._on_progress(gs, self._elapsed * 1000)
 
     def _go_menu(self) -> None:
-        self.app.sm.current = "menu"
+        self.app.sm.current = self._return_to
 
     def show_reveal(self, text: str) -> None:
         if self._panel:

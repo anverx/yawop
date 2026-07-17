@@ -113,13 +113,14 @@ class WordApp(GameShellApp):
             return
         self._start(DEFAULT_PACK, difficulty, today, f"Daily · {difficulty.title()}")
 
-    def _open_finished_daily(self, day: str, difficulty: str, subtitle: str) -> None:
+    def _open_finished_daily(self, day: str, difficulty: str, subtitle: str,
+                             return_to: str = "menu") -> None:
         """A finished daily can't be replayed, but it can be reviewed exactly as
         last seen. If it predates saved boards, just name the word instead."""
         snap = self.store.review_daily(day, difficulty)
         if snap:
             answer, guesses, elapsed_ms, _won = snap
-            self._view_snapshot(answer, guesses, elapsed_ms, subtitle)
+            self._view_snapshot(answer, guesses, elapsed_ms, subtitle, return_to=return_to)
         else:
             self._show_already_played(day, difficulty)
 
@@ -218,9 +219,11 @@ class WordApp(GameShellApp):
         def choose(diff: str) -> None:
             popup_holder[0].dismiss()
             if self.store.daily_finished(d.isoformat(), diff):  # already won or failed: no retry
-                self._open_finished_daily(d.isoformat(), diff, f"{title} · {diff.title()}")
+                self._open_finished_daily(d.isoformat(), diff, f"{title} · {diff.title()}",
+                                          return_to="calendar")
                 return
-            self._start(DEFAULT_PACK, diff, d.isoformat(), f"{title} · {diff.title()}")
+            self._start(DEFAULT_PACK, diff, d.isoformat(), f"{title} · {diff.title()}",
+                        return_to="calendar")
 
         for diff in ("easy", "medium", "hard"):
             btn = RoundedButton(text=diff.title())
@@ -234,7 +237,8 @@ class WordApp(GameShellApp):
         cancel.bind(on_press=popup.dismiss)
         popup.open()
 
-    def _start(self, pack: str, difficulty: str, day: str | None, subtitle: str) -> None:
+    def _start(self, pack: str, difficulty: str, day: str | None, subtitle: str,
+               return_to: str = "menu") -> None:
         # The mature toggle applies to random games only. Dated games (daily and
         # calendar dates, seed=day) must be identical for every player, so they
         # always draw from the standard filtered pool regardless of the setting.
@@ -251,7 +255,7 @@ class WordApp(GameShellApp):
         on_progress = self._on_progress if day is not None else None
         self.game_screen.set_game(game, self._allowed, subtitle, self._on_finish,
                                   self.show_word_info, on_progress=on_progress,
-                                  elapsed_ms=resume.elapsed_ms)
+                                  elapsed_ms=resume.elapsed_ms, return_to=return_to)
         self.sm.current = "game"
 
     def view_play(self, play: Any) -> None:
@@ -262,9 +266,11 @@ class WordApp(GameShellApp):
             return
         answer, guesses, elapsed_ms, _won = snap
         kind = "Daily" if play.date else "Random"
-        self._view_snapshot(answer, guesses, elapsed_ms, f"{kind} · {play.variant_id.title()}")
+        self._view_snapshot(answer, guesses, elapsed_ms, f"{kind} · {play.variant_id.title()}",
+                            return_to="logbook")
 
-    def _view_snapshot(self, answer: str, guesses: list, elapsed_ms: int, subtitle: str) -> None:
+    def _view_snapshot(self, answer: str, guesses: list, elapsed_ms: int, subtitle: str,
+                       return_to: str = "menu") -> None:
         """Rebuild a finished board and show it, frozen (no timer, no input, no re-record)."""
         game = WordGame(answer, max_guesses=max(6, len(guesses)))
         game.restore(guesses)
@@ -273,7 +279,8 @@ class WordApp(GameShellApp):
         self._game = game
         self._play_id = None  # viewing only: nothing to record or persist
         self.game_screen.set_game(game, self._allowed, subtitle, self._on_finish,
-                                  self.show_word_info, on_progress=None, elapsed_ms=elapsed_ms)
+                                  self.show_word_info, on_progress=None, elapsed_ms=elapsed_ms,
+                                  return_to=return_to)
         self.sm.current = "game"
 
     def _show_review_unavailable(self, answer: str) -> None:
