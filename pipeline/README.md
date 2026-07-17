@@ -46,6 +46,51 @@ Wordle-style games need **two** lists, and this pipeline produces both:
 Difficulty boundaries are **percentiles**, not fixed counts, so they survive
 source changes: `EASY=0.15` (top 15%), `MEDIUM=0.40` (up to 40%), hard = the rest.
 
+## Answer eligibility (rule-based)
+
+Not every valid word should be served as a **solution**: proper nouns, typo/
+inflection "words", and vulgar words make poor or unfair answers. We decide this
+by **repeatable, metadata-driven rules — no hand-maintained name/word lists**
+(the one sanctioned exception is a small *obscene* seed list, since vulgarity is a
+judgement the metadata can't fully capture). Nothing here removes a word as a
+*guess*: excluded words stay valid guesses with working definitions. Applied at
+`make publish` (see `classify_answers.py`, `find_trivial_plurals.py`):
+
+**A word is answer-eligible iff it has >=1 sense that is all of:**
+1. **not a proper noun** — no WordNet `instance_hypernyms`, and (for WordNet-only-
+   proper words) no Wiktionary POS `Proper noun`;
+2. **not a mere reference** — its definition isn't "*(alt/obsolete) spelling/form
+   of X*", "*plural of X*", "*misspelling of X*", "*letter-case form of X*", etc.;
+3. **clean-dominant** — its best clean sense **strictly** outranks its best obscene
+   sense by WordNet lemma frequency. **Ties (including 0/0) go to obscene.**
+
+A word is only called a **name** with *positive* proper-noun evidence; with no
+evidence either way it stays eligible (it was defined by *some* source; we never
+strip a word on a guess). A proper noun with a genuine obscure **side meaning**
+(`ghana` = a Maltese folk-singing style, `louis` = a gold coin, `texas` = a
+steamboat's officer deck) is **kept**, and that side meaning is **grafted into its
+dictionary entry** so it actually shows in the lookup (the point is to learn it).
+
+### Two exclusion types, deliberately different
+
+| Kind | Rule output | Applied | Adult mode |
+|------|-------------|---------|-----------|
+| **proper-noun / reference / trivial-plural** | `nonanswer_names.txt`, `trivial_plurals.txt` | build-time removal from answer sources (`tiers.json`, `*words.txt`) only | still excluded — adult mode isn't about names |
+| **obscene** | `blocklist_solutions.txt` (shipped) = curated seed UNION WordNet-obscene-marked | **runtime, mature-gated** filter in `pick_word` | **becomes a valid answer** (random games only; daily is always identical for everyone) |
+
+So `peter` (WordNet: Pope + "obscene terms for penis", no clean standalone sense —
+the verb needs "out") is obscene-gated: never a default answer, guessable and
+defined, and served only in an adult-mode random game. Dual-meaning words whose
+household sense dominates (`cock`, `shaft`, `bush`, `tool`) stay normal answers.
+
+**Adult mode is one switch** governing both *answer-eligibility* and lookup
+*display* (obscene senses can be hidden unless it's on).
+
+The only curated files are the **obscene** ones (`blocklist_slurs.txt`, removed
+everywhere as it's a hard obscenity call; `blocklist_solutions.txt`, the mature-
+gated seed). `trivial_plurals.txt` and `nonanswer_names.txt` are **generated** by
+rules, not written by hand.
+
 ## Requirements
 
 - Python 3, `requests`, `nltk` + the `wordnet` and `omw-1.4` corpora.

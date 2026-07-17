@@ -7,7 +7,7 @@
   "counts": {
     "easy": 131,
     "medium": 228,
-    "hard": 564
+    "hard": 562
   },
   "tiers": {
     "easy": [
@@ -390,7 +390,6 @@
       "viand",
       "endue",
       "ichor",
-      "palau",
       "stour",
       "jacal",
       "hazed",
@@ -581,7 +580,6 @@
       "anime",
       "lamer",
       "malar",
-      "provo",
       "ricer",
       "atomy",
       "lenis",

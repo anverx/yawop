@@ -106,7 +106,6 @@ alike
 aline
 alive
 alkyd
-allah
 allay
 aller
 alley
@@ -543,7 +542,6 @@ bowie
 bowls
 boxed
 boxer
-boyle
 brace
 brack
 bract
@@ -566,7 +564,6 @@ break
 bream
 breed
 brent
-brest
 breve
 briar
 bribe
@@ -683,7 +680,6 @@ camel
 cameo
 campo
 campy
-camus
 canal
 candy
 caned
@@ -838,7 +834,6 @@ clamp
 clams
 clang
 clank
-clark
 claro
 clary
 clash
@@ -1106,7 +1101,6 @@ decor
 decoy
 decry
 deeds
-deere
 defer
 degas
 deify
@@ -1270,7 +1264,6 @@ ducal
 ducat
 duchy
 ducky
-dukas
 dully
 dulse
 dumas
@@ -1300,7 +1293,6 @@ dying
 dyked
 eager
 eagle
-eames
 eared
 early
 earnt
@@ -1427,7 +1419,6 @@ faddy
 faded
 faery
 faggy
-fagin
 fagus
 faint
 fairy
@@ -1614,11 +1605,9 @@ freer
 freon
 fresh
 friar
-frick
 fried
 frier
 fries
-frigg
 frill
 frisk
 frith
@@ -1765,7 +1754,6 @@ gobby
 godly
 goest
 gofer
-gogol
 going
 golem
 golly
@@ -1786,7 +1774,6 @@ gorky
 gorse
 gouda
 gouge
-gould
 gourd
 gouty
 grace
@@ -1988,14 +1975,12 @@ honey
 honor
 hooch
 hooey
-hooke
 hooks
 hooky
 hoops
 hoped
 hoper
 horde
-horne
 horny
 horse
 horst
@@ -2071,7 +2056,6 @@ incan
 incur
 incus
 index
-india
 indie
 indri
 inept
@@ -2178,7 +2162,6 @@ juror
 kabob
 kalif
 kalka
-kandy
 kanga
 kanji
 kapok
@@ -2218,7 +2201,6 @@ kissy
 kited
 kitty
 klick
-kline
 klutz
 knack
 knave
@@ -2255,7 +2237,6 @@ kyles
 kylie
 kylix
 kyrie
-laban
 label
 labia
 labor
@@ -2311,14 +2292,12 @@ leaky
 leant
 leapt
 learn
-leary
 lease
 leash
 least
 leave
 ledge
 leech
-leeds
 leery
 lefty
 legal
@@ -2395,7 +2374,6 @@ lobar
 lobby
 lobed
 local
-locke
 locos
 locum
 locus
@@ -2459,7 +2437,6 @@ lusty
 lutra
 lycee
 lycra
-lydia
 lygus
 lying
 lymph
@@ -2469,7 +2446,6 @@ lyric
 lysis
 lysol
 lyssa
-macao
 macaw
 maced
 macer
@@ -2485,12 +2461,10 @@ magic
 magma
 magus
 mahal
-maine
 maize
 major
 maked
 maker
-makin
 malar
 malay
 maler
@@ -2560,7 +2534,6 @@ mayor
 mayst
 mazed
 mazer
-meade
 mealy
 means
 meant
@@ -2624,7 +2597,6 @@ mingy
 minim
 minke
 minor
-minos
 minty
 minus
 mired
@@ -2658,7 +2630,6 @@ molly
 molto
 momma
 mommy
-momos
 monad
 mondo
 money
@@ -2723,7 +2694,6 @@ mumsy
 munch
 munda
 mungo
-munro
 mural
 murky
 mused
@@ -2805,7 +2775,6 @@ nisei
 nitre
 nitro
 nixed
-nobel
 noble
 nobly
 noddy
@@ -2942,12 +2911,10 @@ paedo
 pagan
 paged
 pager
-paine
 pains
 paint
 paisa
 paise
-palau
 paled
 paler
 pally
@@ -3215,7 +3182,6 @@ prosy
 proto
 proud
 prove
-provo
 prowl
 proxy
 prude
@@ -3388,7 +3354,6 @@ rehab
 reich
 reign
 reiki
-reims
 rejig
 relax
 relay
@@ -3524,7 +3489,6 @@ sable
 sabot
 sabra
 sabre
-sacco
 sacra
 sadhu
 sadly
@@ -3554,13 +3518,11 @@ samia
 sands
 sandy
 saner
-santa
 sappy
 saran
 sarge
 sarin
 sassy
-satan
 satay
 sated
 satin
@@ -3638,7 +3600,6 @@ seine
 seing
 seize
 selah
-seles
 selva
 semen
 senna
@@ -3908,7 +3869,6 @@ sotho
 sough
 sound
 soupy
-sousa
 souse
 south
 sowed
@@ -3931,7 +3891,6 @@ speck
 specs
 speed
 speer
-speke
 spell
 spelt
 spend
@@ -4019,7 +3978,6 @@ steal
 steam
 steed
 steel
-steen
 steep
 steer
 stein
@@ -4452,7 +4410,6 @@ twirp
 twist
 twixt
 tying
-tyler
 typed
 typha
 udder
@@ -4581,7 +4538,6 @@ voile
 volar
 volga
 volta
-volte
 vomit
 voted
 voter
@@ -4603,7 +4559,6 @@ wagon
 wahey
 wahoo
 waist
-waite
 waive
 waked
 waken
@@ -4683,7 +4638,6 @@ wield
 wiggy
 wight
 wilco
-wilde
 willy
 wimpy
 wince
@@ -4706,7 +4660,6 @@ witty
 wizen
 wodge
 woken
-wolfe
 wolof
 woman
 women
@@ -4762,9 +4715,7 @@ yazoo
 yearn
 years
 yeast
-yeats
 yecch
-yemen
 yenta
 yeuch
 yield
@@ -4785,7 +4736,6 @@ yummy
 zaire
 zakat
 zaman
-zarqa
 zebra
 zesty
 zilch

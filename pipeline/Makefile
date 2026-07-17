@@ -57,9 +57,19 @@ publish: all
 	@mkdir -p $(ASSETS)/surprise
 	@cp data/surprise/dictionary.jsonl data/surprise/words.txt $(ASSETS)/surprise/
 	@cp data/allowed_guesses_all.txt $(ASSETS)/
+	# --- Answer-eligibility: rule-based, from definition metadata (no proper-noun hand-list). ---
+	# 1. Rule outputs: trivial -s inflections, proper-noun/reference-only "names", and the
+	#    obscene set (curated UNION WordNet-obscene-marked). See classify_answers.py.
 	$(PY) scripts/find_trivial_plurals.py --assets $(ASSETS) --out trivial_plurals.txt
-	$(PY) scripts/apply_blocklist.py --assets $(ASSETS) --slurs blocklist_slurs.txt --proper-nouns proper_nouns.txt --solutions trivial_plurals.txt
-	@cp blocklist_solutions.txt $(ASSETS)/   # runtime filter: excluded from solutions unless the player opts in
+	$(PY) scripts/classify_answers.py --assets $(ASSETS) \
+	  --wiktionary-cache data/cache/proper_side_meanings.json \
+	  --curated-obscene blocklist_solutions.txt --augment $(ASSETS) \
+	  --out-names nonanswer_names.txt --out-obscene data/answer_obscene.txt
+	# 2. Drop trivial plurals + names from ANSWER sources only (still valid guesses + defined).
+	@cat trivial_plurals.txt nonanswer_names.txt | sort -u > data/answer_exclusions.txt
+	$(PY) scripts/apply_blocklist.py --assets $(ASSETS) --slurs blocklist_slurs.txt --solutions data/answer_exclusions.txt
+	# 3. Ship the generated obscene list as the RUNTIME, mature-gated solution filter.
+	@cp data/answer_obscene.txt $(ASSETS)/blocklist_solutions.txt
 	$(PY) scripts/build_extra_defs.py --allowed $(ASSETS)/allowed_guesses_all.txt --assets $(ASSETS) --wiktionary-cache data/cache/wiktionary_defs.json --out $(ASSETS)/extra_defs.jsonl
 	@echo "published shipping dictionaries -> $(ASSETS)"
 
