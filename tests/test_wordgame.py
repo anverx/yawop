@@ -67,5 +67,59 @@ class TestWordGame(unittest.TestCase):
         self.assertEqual(g.letter_states()["a"], C)  # correct beats absent
 
 
+class TestRestore(unittest.TestCase):
+    """restore() replays saved guesses; the review feature rebuilds finished boards this way."""
+
+    def test_restore_partial_resume(self):
+        g = WordGame("crane")
+        g.restore(["slate", "brace"])
+        self.assertEqual(len(g.guesses), 2)
+        self.assertFalse(g.finished)  # still mid-game
+
+    def test_restore_won_board(self):
+        g = WordGame("crane")
+        g.restore(["slate", "brace", "crane"])
+        self.assertTrue(g.won)
+        self.assertTrue(g.finished)
+        self.assertEqual(len(g.guesses), 3)
+
+    def test_restore_lost_board(self):
+        g = WordGame("vexil", max_guesses=6)
+        g.restore(["adieu", "story", "point", "lucky", "frame", "blush"])
+        self.assertTrue(g.finished)
+        self.assertFalse(g.won)
+        self.assertEqual(len(g.guesses), 6)
+
+    def test_restore_preserves_marks_per_row(self):
+        g = WordGame("crane")
+        g.restore(["crane"])
+        self.assertEqual(g.marks[0], [C, C, C, C, C])
+
+
+class TestExtend(unittest.TestCase):
+    """extend() powers 'another try': reopen a finished board and keep playing."""
+
+    def test_extend_reopens_after_loss(self):
+        g = WordGame("abide", max_guesses=1)
+        for ch in "wrong":
+            g.add_letter(ch)
+        g.submit()
+        self.assertTrue(g.finished)
+        g.extend(1)
+        self.assertFalse(g.finished)
+        self.assertEqual(g.max_guesses, 2)
+
+    def test_can_guess_after_extend(self):
+        g = WordGame("abide", max_guesses=1)
+        for ch in "wrong":
+            g.add_letter(ch)
+        g.submit()
+        g.extend(1)
+        for ch in "abide":
+            g.add_letter(ch)
+        self.assertTrue(g.submit())
+        self.assertTrue(g.won)
+
+
 if __name__ == "__main__":
     unittest.main()
