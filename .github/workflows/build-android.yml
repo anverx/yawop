@@ -178,7 +178,9 @@ jobs:
       # (which lags 6-12h behind deletions), and they give a stable download URL
       # you can open directly on the phone. The single asset is overwritten each run.
       - name: Stage APK under a stable name
-        run: cp "$(ls bin/*.apk | head -1)" yawop-debug.apk
+        run: |
+          cp "$(ls bin/*.apk | head -1)" yawop-debug.apk
+          echo "APP_VERSION=$(grep -oE '[0-9]+\.[0-9]+\.[0-9]+' game/version.py | head -1)" >> "$GITHUB_ENV"
 
       - name: Publish APK to debug-latest release
         uses: softprops/action-gh-release@v1
@@ -189,7 +191,7 @@ jobs:
           files: yawop-debug.apk
           body: |
             Rolling debug APK from the latest manual build.
-            Commit ${{ github.sha }} - run #${{ github.run_number }} - v0.3.0
+            Commit ${{ github.sha }} - run #${{ github.run_number }} - v${{ env.APP_VERSION }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 

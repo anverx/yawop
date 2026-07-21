@@ -2,6 +2,7 @@ name: tests
 
 on:
   push:
+    tags-ignore: ['**']   # tag pushes (releases) don't need a test run; save CI minutes
   pull_request:
 
 jobs:
