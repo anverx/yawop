@@ -20,6 +20,9 @@ TILE_PRESENT = (0.79, 0.71, 0.34, 1)   # gold/yellow
 TILE_ABSENT = (0.47, 0.48, 0.50, 1)    # gray
 TILE_EMPTY = (0.95, 0.95, 0.96, 1)     # near-white
 KEY_DEFAULT = (0.82, 0.84, 0.86, 1)
+# Flat background for the game screen only (the splash image is distracting behind
+# the grid). Slightly cooler/darker than the empty tiles so tiles stay legible.
+GAME_BG = (0.90, 0.91, 0.93, 1)
 
 
 def build_theme() -> Theme:

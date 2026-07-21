@@ -12,17 +12,37 @@ from typing import Any
 
 from kivy.clock import Clock
 from kivy.core.window import Window
+from kivy.graphics import Color, Rectangle
 from kivy.metrics import dp
 from kivy.uix.boxlayout import BoxLayout
 
 from kivyshell.shell.screens.base import BackgroundedScreen
 from kivyshell.uikit import ClockLabel, styled
 
+from . import theme as T
 from .wordgame import WordGame
 from .wordgrid import WordGridPanel
 
 
 class WordGameScreen(BackgroundedScreen):
+    def __init__(self, app, **kwargs) -> None:
+        super().__init__(app, **kwargs)
+        # Game screen only: replace the themed splash image + white tint overlay with a
+        # single flat color. The faint splash behind the grid is distracting; every other
+        # screen keeps the shared background. Content column stays on top untouched.
+        root = self.children[0]  # BackgroundedScreen's FloatLayout
+        for w in list(root.children):
+            if w is not self.content_layout:      # drop the background Image and the overlay
+                root.remove_widget(w)
+        with root.canvas.before:
+            Color(*T.GAME_BG)
+            self._bg_rect = Rectangle(pos=root.pos, size=root.size)
+        root.bind(pos=self._sync_bg, size=self._sync_bg)
+
+    def _sync_bg(self, instance, _value) -> None:
+        self._bg_rect.pos = instance.pos
+        self._bg_rect.size = instance.size
+
     def get_padding(self) -> int:
         return 6
 
