@@ -93,6 +93,18 @@ everywhere as it's a hard obscenity call; `blocklist_solutions.txt`, the mature-
 gated seed). `trivial_plurals.txt` and `nonanswer_names.txt` are **generated** by
 rules, not written by hand.
 
+### Reference resolution (no dead-end lookups)
+
+Many guess-only words are archaic/variant spellings or inflections whose whole
+definition just points at another word ("Alternative spelling of abaca", "plural
+of abac") — a dead end in the lookup. `resolve_references.py` follows the
+reference to its base word (through short chains) and **grafts the base's real
+meaning** onto the entry, sourced from our own dictionary, then WordNet, then the
+Wiktionary cache. So `abaka` shows "Alternative spelling of abaca" *plus* abaca's
+meaning. Runs offline at publish (committed cache); `--fetch` populates the cache
+for new bases. Latest pass resolved ~82% (1,182 -> 218 remaining, a deeply obscure
+"plural of X" tail whose singular no source defines).
+
 ## Requirements
 
 - Python 3, `requests`, `nltk` + the `wordnet` and `omw-1.4` corpora.

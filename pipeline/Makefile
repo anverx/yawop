@@ -73,6 +73,10 @@ publish: all
 	# 3. Ship the generated obscene list as the RUNTIME, mature-gated solution filter.
 	@cp data/answer_obscene.txt $(ASSETS)/blocklist_solutions.txt
 	$(PY) scripts/build_extra_defs.py --allowed $(ASSETS)/allowed_guesses_all.txt --assets $(ASSETS) --wiktionary-cache data/cache/wiktionary_defs.json --out $(ASSETS)/extra_defs.jsonl
+	# 4. Resolve 'reference-only' entries (archaic/variant spellings, inflections) into
+	#    real meanings by grafting the base word's definition. Offline: uses the committed
+	#    Wiktionary cache (run once with --fetch to populate it for new bases).
+	$(PY) scripts/resolve_references.py --assets $(ASSETS) --wiktionary-cache data/cache/wiktionary_defs.json --apply
 	@echo "published shipping dictionaries -> $(ASSETS)"
 
 all: subtlex-us subtlex-uk wordle surprise arcane guesses
