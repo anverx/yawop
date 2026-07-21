@@ -52,8 +52,9 @@ Not every valid word should be served as a **solution**: proper nouns, typo/
 inflection "words", and vulgar words make poor or unfair answers. We decide this
 by **repeatable, metadata-driven rules — no hand-maintained name/word lists**
 (the one sanctioned exception is a small *obscene* seed list, since vulgarity is a
-judgement the metadata can't fully capture). Nothing here removes a word as a
-*guess*: excluded words stay valid guesses with working definitions. Applied at
+judgement the metadata can't fully capture). **Real words stay valid guesses** with
+working definitions; only **proper-noun / reference-only words** (a surname or a
+"spelling of X" — not real words) are removed as guesses too. Applied at
 `make publish` (see `classify_answers.py`, `find_trivial_plurals.py`):
 
 **A word is answer-eligible iff it has >=1 sense that is all of:**
@@ -65,8 +66,8 @@ judgement the metadata can't fully capture). Nothing here removes a word as a
    sense by WordNet lemma frequency. **Ties (including 0/0) go to obscene.**
 
 A word is only called a **name** with *positive* proper-noun evidence; with no
-evidence either way it stays eligible (it was defined by *some* source; we never
-strip a word on a guess). A proper noun with a genuine obscure **side meaning**
+evidence either way it stays eligible (it was defined by *some* source, so we
+don't strip it). A proper noun with a genuine obscure **side meaning**
 (`ghana` = a Maltese folk-singing style, `louis` = a gold coin, `texas` = a
 steamboat's officer deck) is **kept**, and that side meaning is **grafted into its
 dictionary entry** so it actually shows in the lookup (the point is to learn it).
@@ -75,8 +76,9 @@ dictionary entry** so it actually shows in the lookup (the point is to learn it)
 
 | Kind | Rule output | Applied | Adult mode |
 |------|-------------|---------|-----------|
-| **proper-noun / reference / trivial-plural** | `nonanswer_names.txt`, `trivial_plurals.txt` | build-time removal from answer sources (`tiers.json`, `*words.txt`) only | still excluded — adult mode isn't about names |
-| **obscene** | `blocklist_solutions.txt` (shipped) = curated seed UNION WordNet-obscene-marked | **runtime, mature-gated** filter in `pick_word` | **becomes a valid answer** (random games only; daily is always identical for everyone) |
+| **proper-noun / reference-only** (a name, not a real word) | `nonanswer_names.txt` | removed **everywhere** — answer sources, `dictionary.jsonl`, *and* the `allowed_guesses_all.txt` validator (not even a valid guess) | still excluded — adult mode isn't about names |
+| **trivial plural / 3rd-person -s** (a real word) | `trivial_plurals.txt` | removed from **answer sources only**; stays a valid guess with its definition | still excluded |
+| **obscene** (a real word) | `blocklist_solutions.txt` (shipped) = curated seed UNION WordNet-obscene-marked | **runtime, mature-gated** filter in `pick_word`; stays a valid guess | **becomes a valid answer** (random games only; daily is always identical for everyone) |
 
 So `peter` (WordNet: Pope + "obscene terms for penis", no clean standalone sense —
 the verb needs "out") is obscene-gated: never a default answer, guessable and

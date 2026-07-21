@@ -305,7 +305,6 @@ alkie
 alkos
 alkyd
 alkyl
-allah
 allay
 allee
 allel
@@ -1455,7 +1454,6 @@ boyed
 boyfs
 boygs
 boyla
-boyle
 boyos
 boysy
 bozos
@@ -1512,7 +1510,6 @@ brens
 brent
 brere
 brers
-brest
 breve
 brews
 breys
@@ -1784,7 +1781,6 @@ campi
 campo
 camps
 campy
-camus
 canal
 candy
 caned
@@ -2131,7 +2127,6 @@ clank
 clans
 claps
 clapt
-clark
 claro
 clart
 clary
@@ -2800,7 +2795,6 @@ deely
 deems
 deens
 deeps
-deere
 deers
 deets
 deeve
@@ -3280,7 +3274,6 @@ duffs
 dufus
 duing
 duits
-dukas
 duked
 dukes
 dukka
@@ -3367,7 +3360,6 @@ eagle
 eagre
 ealed
 eales
-eames
 eaned
 eards
 eared
@@ -3699,7 +3691,6 @@ faery
 faffs
 faffy
 faggy
-fagin
 fagus
 faiks
 fails
@@ -4181,11 +4172,9 @@ fresh
 frets
 friar
 fribs
-frick
 fried
 frier
 fries
-frigg
 frigs
 frill
 frise
@@ -4644,7 +4633,6 @@ goety
 gofer
 goffs
 gogga
-gogol
 gogos
 goier
 going
@@ -4715,7 +4703,6 @@ gouch
 gouda
 gouge
 gouks
-gould
 goura
 gourd
 gouts
@@ -5294,7 +5281,6 @@ hoody
 hooey
 hoofs
 hooka
-hooke
 hooks
 hooky
 hooly
@@ -5318,7 +5304,6 @@ horde
 horis
 horks
 horme
-horne
 horns
 horny
 horse
@@ -5531,7 +5516,6 @@ incus
 incut
 indew
 index
-india
 indic
 indie
 indol
@@ -5871,7 +5855,6 @@ kamis
 kamme
 kanae
 kanas
-kandy
 kaneh
 kanes
 kanga
@@ -6068,7 +6051,6 @@ klett
 klick
 klieg
 kliks
-kline
 klong
 kloof
 kluge
@@ -6220,7 +6202,6 @@ kyrie
 kytes
 kythe
 laari
-laban
 labda
 label
 labia
@@ -6380,7 +6361,6 @@ leapt
 leare
 learn
 lears
-leary
 lease
 leash
 least
@@ -6396,7 +6376,6 @@ ledgy
 ledum
 leear
 leech
-leeds
 leeks
 leeps
 leers
@@ -6604,7 +6583,6 @@ loche
 lochs
 locie
 locis
-locke
 locks
 locos
 locum
@@ -6798,7 +6776,6 @@ lyase
 lycea
 lycee
 lycra
-lydia
 lygus
 lying
 lymes
@@ -6823,7 +6800,6 @@ maaed
 maare
 maars
 mabes
-macao
 macas
 macaw
 maced
@@ -6862,7 +6838,6 @@ maile
 maill
 mails
 maims
-maine
 mains
 maire
 mairs
@@ -6874,7 +6849,6 @@ makar
 maked
 maker
 makes
-makin
 makis
 makos
 malam
@@ -7030,7 +7004,6 @@ mazes
 mazey
 mazut
 mbira
-meade
 meads
 meals
 mealy
@@ -7215,7 +7188,6 @@ minke
 minks
 minny
 minor
-minos
 mints
 minty
 minus
@@ -7316,7 +7288,6 @@ molys
 momes
 momma
 mommy
-momos
 monad
 monal
 monas
@@ -7482,7 +7453,6 @@ munge
 mungo
 mungs
 munis
-munro
 munts
 muntu
 muons
@@ -7769,7 +7739,6 @@ nixie
 nizam
 nkosi
 nobby
-nobel
 noble
 nobly
 nocks
@@ -8182,7 +8151,6 @@ pagod
 pagri
 paiks
 pails
-paine
 pains
 paint
 paire
@@ -8191,7 +8159,6 @@ paisa
 paise
 pakka
 palas
-palau
 palay
 palea
 paled
@@ -8892,7 +8859,6 @@ proto
 proud
 proul
 prove
-provo
 prowl
 prows
 proxy
@@ -9363,7 +9329,6 @@ reify
 reign
 reiki
 reiks
-reims
 reink
 reins
 reird
@@ -9773,7 +9738,6 @@ sable
 sabot
 sabra
 sabre
-sacco
 sacks
 sacra
 saddo
@@ -9867,7 +9831,6 @@ sango
 sangs
 sanko
 sansa
-santa
 santo
 sants
 saola
@@ -9893,7 +9856,6 @@ sasin
 sasse
 sassy
 satai
-satan
 satay
 sated
 satem
@@ -10091,7 +10053,6 @@ seize
 sekos
 sekts
 selah
-seles
 selfs
 sella
 selle
@@ -10814,7 +10775,6 @@ sound
 soups
 soupy
 sours
-sousa
 souse
 south
 souts
@@ -10886,7 +10846,6 @@ speel
 speer
 speil
 speir
-speke
 speks
 speld
 spelk
@@ -11038,7 +10997,6 @@ steed
 steek
 steel
 steem
-steen
 steep
 steer
 steil
@@ -12184,7 +12142,6 @@ tyers
 tying
 tyiyn
 tykes
-tyler
 tymps
 tynde
 tyned
@@ -12616,7 +12573,6 @@ volet
 volga
 volks
 volta
-volte
 volti
 volts
 volva
@@ -12680,7 +12636,6 @@ wails
 wains
 wairs
 waist
-waite
 waits
 waive
 wakas
@@ -12913,7 +12868,6 @@ wiggy
 wight
 wikis
 wilco
-wilde
 wilds
 wiled
 wiles
@@ -12980,7 +12934,6 @@ woken
 woker
 wokka
 wolds
-wolfe
 wolfs
 wolly
 wolof
@@ -13151,7 +13104,6 @@ yeard
 yearn
 years
 yeast
-yeats
 yecch
 yechs
 yechy
@@ -13164,7 +13116,6 @@ yells
 yelms
 yelps
 yelts
-yemen
 yenta
 yente
 yerba
@@ -13291,7 +13242,6 @@ zanze
 zappy
 zarfs
 zaris
-zarqa
 zatis
 zaxes
 zayin

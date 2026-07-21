@@ -65,9 +65,11 @@ publish: all
 	  --wiktionary-cache data/cache/proper_side_meanings.json \
 	  --curated-obscene blocklist_solutions.txt --augment $(ASSETS) \
 	  --out-names nonanswer_names.txt --out-obscene data/answer_obscene.txt
-	# 2. Drop trivial plurals + names from ANSWER sources only (still valid guesses + defined).
-	@cat trivial_plurals.txt nonanswer_names.txt | sort -u > data/answer_exclusions.txt
-	$(PY) scripts/apply_blocklist.py --assets $(ASSETS) --slurs blocklist_slurs.txt --solutions data/answer_exclusions.txt
+	# 2. Names (proper-noun / reference-only) aren't real words -> removed EVERYWHERE, not
+	#    even valid guesses. Trivial plurals ARE real words -> removed from ANSWER sources
+	#    only (still valid guesses with definitions).
+	$(PY) scripts/apply_blocklist.py --assets $(ASSETS) --slurs blocklist_slurs.txt \
+	  --proper-nouns nonanswer_names.txt --solutions trivial_plurals.txt
 	# 3. Ship the generated obscene list as the RUNTIME, mature-gated solution filter.
 	@cp data/answer_obscene.txt $(ASSETS)/blocklist_solutions.txt
 	$(PY) scripts/build_extra_defs.py --allowed $(ASSETS)/allowed_guesses_all.txt --assets $(ASSETS) --wiktionary-cache data/cache/wiktionary_defs.json --out $(ASSETS)/extra_defs.jsonl
