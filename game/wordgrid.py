@@ -30,6 +30,9 @@ from . import theme as T
 from .wordgame import WORD_LEN, Mark, WordGame
 
 _ENTER_ICON = os.path.join(str(app_root()), "game", "assets", "enter-icon.png")
+# Backspace glyph (U+232B) rendered to a tintable PNG, since Kivy's bundled Roboto
+# has no glyph for it (would show a tofu box).
+_BACKSPACE_ICON = os.path.join(str(app_root()), "game", "assets", "backspace-icon.png")
 _MARK_COLOR = {Mark.CORRECT: T.TILE_CORRECT, Mark.PRESENT: T.TILE_PRESENT, Mark.ABSENT: T.TILE_ABSENT}
 _KEY_ROWS = ["qwertyuiop", "asdfghjkl", "zxcvbnm"]
 # Global letter frequency across every valid guess word (assets/allowed_guesses_all.txt),
@@ -261,7 +264,9 @@ class WordGridPanel(BoxLayout):
                 self._keys[ch] = b
                 row.add_widget(b)
             if r == 2:
-                row.add_widget(self._make_key("Back", lambda *_: self._backspace(), wide=True))
+                bk = self._make_key("", lambda *_: self._backspace(), wide=True)
+                self._draw_backspace_icon(bk)
+                row.add_widget(bk)
             kb.add_widget(row)
         return kb
 
@@ -278,6 +283,26 @@ class WordGridPanel(BoxLayout):
             btn.bind(size=lambda b, *_: setattr(b, "text_size", b.size))
         btn.bind(on_press=cb)
         return btn
+
+    def _draw_backspace_icon(self, btn: RoundedButton) -> None:
+        """Draw the ⌫ glyph (a tinted PNG) centred on the backspace key. Roboto lacks
+        the real character, so we paint the icon on the key's canvas instead of text."""
+        from kivy.core.image import Image as CoreImage
+        from kivy.graphics import Color, Rectangle
+        tex = CoreImage(_BACKSPACE_ICON).texture
+        ar = tex.width / tex.height
+
+        def redraw(*_a: Any) -> None:
+            btn.canvas.after.clear()
+            ih = min(btn.height * 0.42, btn.width * 0.55 / ar)
+            iw = ih * ar
+            with btn.canvas.after:
+                Color(*_DARK)
+                Rectangle(texture=tex, size=(iw, ih),
+                          pos=(btn.center_x - iw / 2, btn.center_y - ih / 2))
+
+        btn.bind(pos=redraw, size=redraw)
+        redraw()
 
     # --- input ---
     def _key(self, ch: str) -> None:
