@@ -279,7 +279,7 @@ class WordGridPanel(BoxLayout):
             # color tag, so it inherits the key's foreground and stays legible when the
             # key turns green/gold/gray during play.
             from kivy.metrics import sp
-            btn.text = f"{text}\n[size={round(sp(9))}]{mass}[/size]"
+            btn.text = f"[b]{text}[/b]\n[size={round(sp(9))}]{mass}[/size]"
             btn.bind(size=lambda b, *_: setattr(b, "text_size", b.size))
         btn.bind(on_press=cb)
         return btn
