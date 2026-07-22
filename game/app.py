@@ -305,8 +305,10 @@ class WordApp(GameShellApp):
             self.store.finish(self._play_id, won, duration_ms, attempts,
                               list(self._game.guesses), duration_ms)
         self._play_id = None  # once recorded, 'another try' rounds don't re-record
-        if won:
+        if won and not self._game.lost:
             self._show_success(answer, attempts, duration_ms)
+        elif won:  # solved only in a bonus row after the game was already lost
+            self._show_bonus_solved(answer)
         else:
             self._show_game_failed(answer)
 
@@ -344,6 +346,38 @@ class WordApp(GameShellApp):
         close = FixedGrayRoundedButton(text="Close")
         content.add_widget(close)
         popup = Popup(content, height=420)
+        lookup.bind(on_press=lambda *_: (popup.dismiss(), self.show_word_info(word)))
+        close.bind(on_press=popup.dismiss)
+        popup.open()
+
+    def _show_bonus_solved(self, word: str) -> None:
+        """Subdued acknowledgement: solved in a bonus row, but the game was already
+        lost, so no celebration (no gold badge, no time/tries stats)."""
+        from kivy.metrics import dp
+        from kivy.uix.label import Label
+        from kivy.uix.widget import Widget
+
+        from kivyshell.uikit import FixedGrayRoundedButton, FixedRoundedButton, Popup, PopupContent, get_theme
+
+        theme = get_theme()
+        content = PopupContent()
+
+        def centered(text, size, color, h, bold=True):
+            lbl = Label(text=text, font_name=theme.font_name, font_size=size, bold=bold, color=color,
+                        size_hint_y=None, height=dp(h), halign="center", valign="middle")
+            lbl.bind(size=lambda i, _v: setattr(i, "text_size", i.size))
+            return lbl
+
+        content.add_widget(centered("You've got it", "24sp", theme.text_dark, 34))
+        content.add_widget(centered(word.upper(), "30sp", self._ACCENT_DARK, 42))
+        content.add_widget(centered("…but the game was already lost.", "14sp", theme.text_medium, 24, bold=False))
+        content.add_widget(Widget(size_hint_y=None, height=dp(4)))
+
+        lookup = FixedRoundedButton(text="Look it up")
+        content.add_widget(lookup)
+        close = FixedGrayRoundedButton(text="Close")
+        content.add_widget(close)
+        popup = Popup(content, height=360)
         lookup.bind(on_press=lambda *_: (popup.dismiss(), self.show_word_info(word)))
         close.bind(on_press=popup.dismiss)
         popup.open()

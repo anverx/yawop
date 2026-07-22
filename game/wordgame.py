@@ -49,6 +49,8 @@ class WordGame:
         self.cursor = 0
         self.won = False
         self.finished = False
+        self.lost = False   # ran out of tries without solving; stays True even if a
+                            # later 'another try' bonus row solves it (still a loss)
 
     @property
     def current(self) -> str:
@@ -94,7 +96,7 @@ class WordGame:
         if guess == self.answer:
             self.won = self.finished = True
         elif len(self.guesses) >= self.max_guesses:
-            self.finished = True
+            self.finished = self.lost = True
         self.slots = [""] * WORD_LEN
         self.cursor = 0
         return True

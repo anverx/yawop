@@ -120,6 +120,29 @@ class TestExtend(unittest.TestCase):
         self.assertTrue(g.submit())
         self.assertTrue(g.won)
 
+    def test_bonus_win_stays_lost(self):
+        # lose at max, then solve in a bonus row: won, but 'lost' sticks (still a loss)
+        g = WordGame("abide", max_guesses=1)
+        for ch in "wrong":
+            g.add_letter(ch)
+        g.submit()
+        self.assertTrue(g.lost)
+        g.extend(1)
+        self.assertTrue(g.lost)  # extend does not clear the loss
+        for ch in "abide":
+            g.add_letter(ch)
+        g.submit()
+        self.assertTrue(g.won)
+        self.assertTrue(g.lost)  # solved, but the game was already lost
+
+    def test_clean_win_not_lost(self):
+        g = WordGame("abide", max_guesses=6)
+        for ch in "abide":
+            g.add_letter(ch)
+        g.submit()
+        self.assertTrue(g.won)
+        self.assertFalse(g.lost)
+
 
 if __name__ == "__main__":
     unittest.main()
