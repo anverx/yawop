@@ -33,15 +33,14 @@ _ENTER_ICON = os.path.join(str(app_root()), "game", "assets", "enter-icon.png")
 _MARK_COLOR = {Mark.CORRECT: T.TILE_CORRECT, Mark.PRESENT: T.TILE_PRESENT, Mark.ABSENT: T.TILE_ABSENT}
 _KEY_ROWS = ["qwertyuiop", "asdfghjkl", "zxcvbnm"]
 # Global letter frequency across every valid guess word (assets/allowed_guesses_all.txt),
-# normalized so the commonest letter = 99.0 (top capped at 99, not 100, so every value
-# stays <=4 chars and keys line up). Shown small under each key like an atomic mass on
-# the periodic table. Regenerate with the one-off script in the commit message.
+# normalized so the commonest letter = 99 (integer, top capped at 99 so it stays 2 digits).
+# A ballpark "which letters are more likely" hint, shown small under each key like an
+# atomic mass on the periodic table. Regenerate with the script in the commit message.
 LETTER_MASS = {
-    "a": 89.3, "b": 24.1, "c": 29.9, "d": 36.5, "e": 98.1, "f": 16.2,
-    "g": 24.2, "h": 26.1, "i": 56.2, "j": 4.4, "k": 21.9, "l": 49.5,
-    "m": 29.3, "n": 43.9, "o": 64.9, "p": 29.7, "q": 1.7, "r": 61.5,
-    "s": 99.0, "t": 48.5, "u": 37.4, "v": 10.3, "w": 15.2, "x": 4.4,
-    "y": 30.5, "z": 6.4,
+    "a": 89, "b": 24, "c": 30, "d": 36, "e": 98, "f": 16, "g": 24, "h": 26,
+    "i": 56, "j": 4, "k": 22, "l": 50, "m": 29, "n": 44, "o": 65, "p": 30,
+    "q": 2, "r": 61, "s": 99, "t": 49, "u": 37, "v": 10, "w": 15, "x": 4,
+    "y": 30, "z": 6,
 }
 _CURSOR = (0.10, 0.62, 1.0, 1)       # neon-blue "type here" cell
 _CURSOR_GLOW = (0.25, 0.72, 1.0)     # soft halo around it (alpha added per layer)
@@ -275,7 +274,7 @@ class WordGridPanel(BoxLayout):
             # color tag, so it inherits the key's foreground and stays legible when the
             # key turns green/gold/gray during play.
             from kivy.metrics import sp
-            btn.text = f"{text}\n[size={round(sp(9))}]{mass:.1f}[/size]"
+            btn.text = f"{text}\n[size={round(sp(9))}]{mass}[/size]"
             btn.bind(size=lambda b, *_: setattr(b, "text_size", b.size))
         btn.bind(on_press=cb)
         return btn
