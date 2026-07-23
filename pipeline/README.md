@@ -149,6 +149,9 @@ eligibility" and "Reference resolution" above for the rules):
 4. `build_extra_defs.py` — WordNet + Wiktionary-cache defs for allowed words no pack defines.
 5. `resolve_references.py` — graft base meanings onto "spelling/plural of X" dead-ends.
 6. `find_nonword_guesses.py` + `apply_blocklist.py` — drop non-English words (no English sense).
+7. `enrich_both_sources.py` — add Wiktionary senses to WordNet-defined guessable words
+   so a lookup shows BOTH sources (skipping references and near-duplicates of the
+   WordNet wording); graceful fetch, committed cache.
 
 Word **selection and lookup at runtime** are not part of this pipeline — they live
 in the game's `worddata/` package (see the top-level `README.md`), which reads the
