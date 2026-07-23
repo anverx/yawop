@@ -104,7 +104,6 @@ adbot
 addax
 added
 adder
-addio
 addle
 adeem
 adept
@@ -126,7 +125,6 @@ adown
 adoze
 adrad
 adred
-adsum
 aduki
 adult
 adunc
@@ -143,7 +141,6 @@ aeons
 aerie
 aeros
 aesir
-afald
 afara
 afars
 afear
@@ -175,7 +172,6 @@ aggri
 aggro
 aggry
 aghas
-agila
 agile
 aging
 agios
@@ -196,7 +192,6 @@ agony
 agood
 agora
 agree
-agria
 agrin
 agros
 aguas
@@ -214,7 +209,6 @@ ahint
 ahold
 ahull
 ahuru
-aidas
 aided
 aider
 aides
@@ -239,7 +233,6 @@ airts
 aisle
 aitch
 aitus
-aiver
 aiyee
 aizle
 ajies
@@ -250,7 +243,6 @@ akees
 akela
 akene
 aking
-akita
 akkas
 alaap
 alack
@@ -281,7 +273,6 @@ aleph
 alert
 aleut
 alews
-aleye
 alfas
 algae
 algal
@@ -334,7 +325,6 @@ along
 aloof
 aloos
 aloud
-alowe
 alpha
 altar
 alter
@@ -424,7 +414,6 @@ anile
 anils
 anima
 anime
-animi
 anion
 anise
 anjou
@@ -447,7 +436,6 @@ anole
 anomy
 ansae
 antae
-antar
 antas
 anted
 antes
@@ -462,7 +450,6 @@ anyon
 anzac
 aorta
 apace
-apage
 apaid
 apart
 apayd
@@ -519,7 +506,6 @@ ardeb
 ardor
 ardri
 aread
-areae
 areal
 arear
 areas
@@ -556,7 +542,6 @@ arise
 arish
 arity
 arius
-arked
 arled
 arles
 armed
@@ -627,8 +612,6 @@ assai
 assay
 asses
 asset
-assez
-assot
 assur
 aster
 astir
@@ -699,7 +682,6 @@ avert
 avgas
 avian
 avine
-avion
 avise
 aviso
 avize
@@ -779,7 +761,6 @@ babul
 babus
 babys
 bacca
-bacco
 baccy
 bacha
 bachs
@@ -805,7 +786,6 @@ bahut
 bails
 bairn
 baisa
-baith
 baits
 baiza
 baize
@@ -830,13 +810,9 @@ balls
 bally
 balms
 balmy
-baloo
 balsa
 balti
 balun
-balus
-bambi
-banak
 banal
 banco
 bancs
@@ -856,10 +832,8 @@ bantu
 banty
 banya
 bapus
-barbe
 barbs
 barby
-barca
 barde
 bardo
 bards
@@ -882,7 +856,6 @@ baron
 barps
 barra
 barre
-barro
 barry
 barth
 barts
@@ -936,7 +909,6 @@ bawty
 bayed
 bayer
 bayes
-bayle
 bayou
 bayts
 bazar
@@ -1002,13 +974,10 @@ belah
 belar
 belay
 belch
-belee
-belga
 belie
 belle
 bells
 belly
-belon
 below
 belts
 bemad
@@ -1046,12 +1015,10 @@ beryl
 besat
 besaw
 besee
-beses
 beset
 besit
 besom
 besot
-besti
 bests
 betas
 beted
@@ -1059,7 +1026,6 @@ betel
 betes
 beths
 betid
-beton
 betta
 betty
 bevel
@@ -1168,7 +1134,6 @@ biter
 bites
 bitey
 bitis
-bitos
 bitou
 bitsy
 bitte
@@ -1186,7 +1151,6 @@ blade
 blads
 blady
 blaer
-blaes
 blaff
 blags
 blahs
@@ -1204,8 +1168,6 @@ blash
 blast
 blate
 blats
-blatt
-blaud
 blawn
 blaws
 blays
@@ -1236,7 +1198,6 @@ blins
 bliny
 blips
 bliss
-blist
 blite
 blits
 blitz
@@ -1258,7 +1219,6 @@ blown
 blows
 blowy
 blubs
-blude
 bluds
 bludy
 blued
@@ -1267,8 +1227,6 @@ blues
 bluet
 bluey
 bluff
-bluid
-blume
 blunk
 blunt
 blurb
@@ -1318,7 +1276,6 @@ bohos
 boils
 boing
 boink
-boite
 boked
 bokeh
 bokes
@@ -1381,7 +1338,6 @@ borak
 boral
 boras
 borax
-borde
 bords
 bored
 boree
@@ -1392,7 +1348,6 @@ borgo
 boric
 borks
 borms
-borna
 borne
 borns
 boron
@@ -1414,7 +1369,6 @@ botel
 botes
 bothy
 botox
-botte
 botts
 botty
 bouge
@@ -1431,12 +1385,10 @@ bouse
 bousy
 bouts
 bovid
-bowat
 bowed
 bowel
 bower
 bowes
-bowet
 bowie
 bowls
 bowne
@@ -1498,17 +1450,11 @@ bread
 break
 bream
 brede
-breds
 breed
-breem
-breer
 brees
-breid
-breis
 breme
 brens
 brent
-brere
 brers
 breve
 brews
@@ -1542,7 +1488,6 @@ broad
 broch
 brock
 brods
-brogh
 brogs
 broil
 broke
@@ -1554,14 +1499,12 @@ brood
 brook
 brool
 broom
-broos
 brose
 brosy
 broth
 brown
 brows
 bruce
-brugh
 bruin
 bruit
 brule
@@ -1589,7 +1532,6 @@ budas
 buddy
 budge
 budis
-budos
 buffa
 buffe
 buffi
@@ -1606,7 +1548,6 @@ buiks
 build
 built
 buist
-bukes
 bulbs
 bulge
 bulgy
@@ -1625,7 +1566,6 @@ bunas
 bunce
 bunch
 bunco
-bunde
 bundh
 bunds
 bundt
@@ -1680,13 +1620,11 @@ bushy
 busks
 busky
 bussu
-busti
 busts
 busty
 butat
 butch
 buteo
-butes
 butle
 butoh
 butte
@@ -1711,7 +1649,6 @@ byrls
 byssi
 bytes
 byway
-caaed
 cabal
 cabas
 cabby
@@ -1737,7 +1674,6 @@ cadie
 cadis
 cadre
 caeca
-caese
 cafes
 caffs
 caged
@@ -1844,11 +1780,9 @@ carps
 carrs
 carry
 carse
-carta
 carte
 carts
 carve
-carvy
 casas
 casco
 cased
@@ -1865,7 +1799,6 @@ catha
 catty
 cauda
 cauks
-cauld
 caulk
 cauls
 caums
@@ -1907,7 +1840,6 @@ celts
 cense
 cento
 cents
-centu
 ceorl
 cepes
 cerci
@@ -1916,12 +1848,10 @@ ceres
 cerge
 ceria
 ceric
-cerne
 ceroc
 ceros
 certs
 certy
-cesse
 cesta
 cesti
 cetes
@@ -1975,12 +1905,10 @@ cheek
 cheep
 cheer
 chefs
-cheka
 chela
 chelp
 chemo
 chems
-chere
 chert
 chess
 chest
@@ -2020,7 +1948,6 @@ chirm
 chiro
 chirp
 chirr
-chirt
 chiru
 chits
 chive
@@ -2112,14 +2039,12 @@ civic
 civie
 civil
 civvy
-clach
 clack
 clade
 clads
 claes
 clags
 claim
-clame
 clamp
 clams
 clang
@@ -2168,7 +2093,6 @@ cline
 cling
 clink
 clint
-clipe
 clips
 clipt
 clits
@@ -2186,7 +2110,6 @@ clone
 clonk
 clons
 cloop
-cloot
 clops
 close
 clote
@@ -2210,7 +2133,6 @@ cluey
 clump
 clung
 clunk
-clype
 cnida
 coach
 coact
@@ -2233,7 +2155,6 @@ cobra
 cobza
 cocas
 cocci
-cocco
 cocks
 cocky
 cocoa
@@ -2241,14 +2162,12 @@ cocos
 codas
 codec
 coded
-coden
 coder
 codes
 codex
 codon
 coeds
 coffs
-cogie
 cogon
 cogue
 cohab
@@ -2301,7 +2220,6 @@ compo
 comps
 compt
 comte
-comus
 conch
 condo
 coned
@@ -2313,7 +2231,6 @@ conge
 congo
 conia
 conic
-conin
 conks
 conky
 conne
@@ -2353,7 +2270,6 @@ copsy
 copts
 coqui
 coral
-coram
 corbe
 corby
 cords
@@ -2373,7 +2289,6 @@ cornu
 corny
 corps
 corse
-corso
 cosec
 cosed
 coses
@@ -2391,7 +2306,6 @@ coths
 cotta
 cotts
 couch
-coude
 cough
 could
 count
@@ -2425,7 +2339,6 @@ coxal
 coxed
 coxes
 coxib
-coyau
 coyed
 coyer
 coyly
@@ -2492,7 +2405,6 @@ crime
 crimp
 crims
 crine
-crios
 cripe
 crips
 crise
@@ -2506,7 +2418,6 @@ crock
 crocs
 croft
 crogs
-cromb
 crome
 crone
 cronk
@@ -2577,7 +2488,6 @@ cults
 culty
 cumec
 cumin
-cundy
 cunei
 cunit
 cunny
@@ -2617,7 +2527,6 @@ cusks
 cusps
 cuspy
 cusso
-cusum
 cutch
 cuted
 cuter
@@ -2678,7 +2587,6 @@ daker
 daled
 dalek
 dales
-dalle
 dally
 dalts
 daman
@@ -2713,7 +2621,6 @@ daris
 darks
 darns
 darpa
-darre
 darts
 darzi
 dashi
@@ -2739,7 +2646,6 @@ davit
 dawah
 dawds
 dawed
-dawen
 dawks
 dawns
 dawts
@@ -2761,7 +2667,6 @@ dears
 deary
 deash
 death
-deave
 deaws
 deawy
 debag
@@ -2797,12 +2702,10 @@ deens
 deeps
 deers
 deets
-deeve
 deevs
 defat
 defer
 deffo
-defis
 defog
 degas
 degum
@@ -2839,7 +2742,6 @@ demob
 demoi
 demon
 demos
-dempt
 demur
 denar
 denay
@@ -2873,7 +2775,6 @@ desex
 deshi
 desis
 desks
-desse
 deter
 detox
 deuce
@@ -2882,8 +2783,6 @@ devel
 devil
 devis
 devon
-devos
-devot
 dewan
 dewar
 dewax
@@ -2905,7 +2804,6 @@ dhows
 dhuti
 diact
 dials
-diane
 diary
 diazo
 dibbs
@@ -2913,7 +2811,6 @@ diced
 dicer
 dices
 dicey
-dicht
 dicks
 dicky
 dicot
@@ -2938,7 +2835,6 @@ dikas
 diked
 diker
 dikes
-dikey
 dildo
 dilli
 dills
@@ -3001,13 +2897,11 @@ dived
 diver
 dives
 divis
-divna
 divos
 divot
 divvy
 diwan
 dixie
-dixit
 diyas
 dizen
 dizzy
@@ -3022,7 +2916,6 @@ dobie
 dobla
 dobra
 dobro
-docht
 docks
 docos
 docus
@@ -3044,7 +2937,6 @@ doggy
 dogie
 dogma
 dohyo
-doilt
 doily
 doing
 doits
@@ -3071,11 +2963,9 @@ doner
 dones
 donga
 dongs
-donko
 donna
 donny
 donor
-donsy
 donut
 doobs
 dooce
@@ -3087,7 +2977,6 @@ dooly
 dooms
 doomy
 doona
-doorn
 doors
 doozy
 dopas
@@ -3097,9 +2986,7 @@ dopes
 dopey
 dorad
 dorba
-dorbs
 doree
-dores
 doric
 doris
 dorks
@@ -3169,7 +3056,6 @@ dozer
 dozes
 dphil
 drabs
-drack
 draco
 draff
 draft
@@ -3198,7 +3084,6 @@ dreer
 drees
 dregs
 dreks
-drent
 drere
 dress
 drest
@@ -3232,7 +3117,6 @@ droop
 drops
 dropt
 dross
-drouk
 drove
 drown
 drows
@@ -3272,11 +3156,9 @@ duets
 duett
 duffs
 dufus
-duing
 duits
 duked
 dukes
-dukka
 dulce
 dules
 dulia
@@ -3389,7 +3271,6 @@ ebony
 ebook
 ecads
 eched
-eches
 echos
 eclat
 ecrus
@@ -3439,7 +3320,6 @@ elate
 elbow
 elchi
 elder
-eldin
 elect
 elegy
 elemi
@@ -3576,13 +3456,11 @@ erred
 error
 erses
 eruct
-erugo
 erupt
 eruvs
 erven
 ervil
 escar
-escot
 esile
 eskar
 esker
@@ -3596,7 +3474,6 @@ estro
 etage
 etape
 etats
-etens
 ethal
 ether
 ethic
@@ -3629,8 +3506,6 @@ evite
 evohe
 evoke
 ewers
-ewest
-ewhow
 ewked
 exact
 exalt
@@ -3727,13 +3602,11 @@ fanum
 faqir
 farad
 farce
-farci
 farcy
 fards
 fared
 farer
 fares
-farle
 farls
 farms
 faros
@@ -3770,7 +3643,6 @@ fawny
 faxed
 faxes
 fayed
-fayer
 fayne
 fayre
 fazed
@@ -3778,15 +3650,12 @@ fazes
 feals
 feare
 fears
-feart
 fease
 feast
 feats
 feaze
 fecal
 feces
-fecht
-fecit
 fecks
 fedex
 feebs
@@ -3824,7 +3693,6 @@ fents
 feods
 feoff
 feral
-ferer
 feres
 feria
 ferly
@@ -3845,7 +3713,6 @@ fetes
 fetid
 fetor
 fetta
-fetts
 fetus
 fetwa
 feuar
@@ -3867,16 +3734,12 @@ fices
 fiche
 fichu
 ficin
-ficos
 ficus
-fides
 fidge
 fidos
 fiefs
 field
 fiend
-fient
-fiere
 fiers
 fiery
 fiest
@@ -3950,14 +3813,12 @@ fives
 fixed
 fixer
 fixes
-fixit
 fizzs
 fizzy
 fjeld
 fjord
 flabs
 flack
-flaff
 flags
 flail
 flair
@@ -3965,10 +3826,8 @@ flake
 flaks
 flaky
 flame
-flamm
 flams
 flamy
-flane
 flank
 flans
 flaps
@@ -4116,7 +3975,6 @@ forth
 forts
 forty
 forum
-forza
 forze
 fossa
 fosse
@@ -4167,7 +4025,6 @@ freit
 fremd
 frena
 freon
-frere
 fresh
 frets
 friar
@@ -4177,7 +4034,6 @@ frier
 fries
 frigs
 frill
-frise
 frisk
 frist
 frith
@@ -4223,7 +4079,6 @@ fuffy
 fugal
 fuggy
 fugie
-fugio
 fugle
 fugly
 fugue
@@ -4244,7 +4099,6 @@ fungs
 funks
 funky
 funny
-fural
 furan
 furca
 furls
@@ -4299,7 +4153,6 @@ gaids
 gaily
 gains
 gairs
-gaita
 gaits
 gaitt
 gajos
@@ -4314,7 +4167,6 @@ gally
 galop
 galut
 galvo
-gamas
 gamay
 gamba
 gambe
@@ -4343,7 +4195,6 @@ gaols
 gaped
 gaper
 gapes
-gapos
 gappy
 garbe
 garbo
@@ -4352,8 +4203,6 @@ garda
 gares
 garis
 garms
-garni
-garre
 garth
 garum
 gases
@@ -4385,7 +4234,6 @@ gauze
 gauzy
 gavel
 gavot
-gawcy
 gawds
 gawks
 gawky
@@ -4417,7 +4265,6 @@ geeps
 geese
 geest
 geist
-geits
 gelds
 gelee
 gelid
@@ -4428,7 +4275,6 @@ gemma
 gemmy
 gemot
 genal
-genas
 genes
 genet
 genic
@@ -4448,14 +4294,9 @@ geode
 geoid
 gerah
 gerbe
-geres
-gerle
 germs
 germy
-gerne
-gesse
 gesso
-geste
 gests
 getas
 getup
@@ -4481,7 +4322,6 @@ gibli
 gibus
 giddy
 gifts
-gigas
 gighe
 gigot
 gigue
@@ -4501,7 +4341,6 @@ ginge
 gings
 ginks
 ginny
-gipon
 gippo
 gippy
 gipsy
@@ -4668,7 +4507,6 @@ goofs
 goofy
 googs
 gooky
-goold
 gools
 gooly
 goons
@@ -4694,7 +4532,6 @@ gorps
 gorse
 gorsy
 gosht
-gosse
 gotch
 goths
 gothy
@@ -4724,7 +4561,6 @@ graff
 graft
 grail
 grain
-graip
 grama
 grame
 gramp
@@ -4755,10 +4591,7 @@ grees
 greet
 grege
 grego
-grein
 grens
-grese
-greve
 grews
 greys
 grice
@@ -4793,13 +4626,11 @@ groin
 groks
 groma
 grone
-groof
 groom
 grope
 gross
 grosz
 grots
-grouf
 group
 grout
 grove
@@ -4817,10 +4648,8 @@ grufe
 gruff
 grume
 grump
-grund
 grunt
 gruss
-gryce
 gryde
 gryke
 grype
@@ -4834,7 +4663,6 @@ guars
 guava
 gucks
 gucky
-gudes
 guess
 guest
 guffs
@@ -4942,7 +4770,6 @@ hafts
 haggs
 hahas
 haick
-haika
 haiks
 haiku
 hails
@@ -4951,7 +4778,6 @@ hains
 haint
 hairs
 hairy
-haith
 hajes
 hajis
 hakam
@@ -4980,7 +4806,6 @@ halva
 halve
 halwa
 hamal
-hamba
 hamed
 hames
 hammy
@@ -4994,7 +4819,6 @@ hangi
 hangs
 hanks
 hanky
-hansa
 hanse
 hants
 haole
@@ -5015,7 +4839,6 @@ harks
 harls
 harms
 harns
-haros
 harps
 harpy
 harry
@@ -5041,7 +4864,6 @@ hauld
 haulm
 hauls
 hault
-hauns
 haunt
 hausa
 hause
@@ -5061,7 +4883,6 @@ hayed
 hayer
 hayes
 hayey
-hayle
 hazan
 hazed
 hazel
@@ -5071,7 +4892,6 @@ heads
 heady
 heald
 heals
-heame
 heaps
 heapy
 heard
@@ -5092,7 +4912,6 @@ heeds
 heedy
 heels
 heeze
-hefte
 hefts
 hefty
 heids
@@ -5146,9 +4965,7 @@ hertz
 herye
 hesps
 hests
-hetes
 heths
-heuch
 heugh
 hevea
 hewed
@@ -5161,12 +4978,10 @@ hexer
 hexes
 hexyl
 heyed
-hiant
 hicks
 hided
 hider
 hides
-hiems
 highs
 hight
 hijab
@@ -5226,7 +5041,6 @@ hodge
 hodja
 hoers
 hogan
-hogen
 hoggs
 hoghs
 hohed
@@ -5262,11 +5076,8 @@ homer
 homes
 homey
 homie
-homme
 homos
-honan
 honda
-honds
 honed
 honer
 hones
@@ -5319,7 +5130,6 @@ hosta
 hosts
 hotch
 hotel
-hoten
 hotly
 hotty
 houff
@@ -5363,14 +5173,12 @@ huggy
 huhus
 huias
 hulas
-hules
 hulks
 hulky
 hullo
 hulls
 hully
 human
-humas
 humes
 humfs
 humic
@@ -5411,7 +5219,6 @@ hying
 hykes
 hylas
 hyleg
-hyles
 hylic
 hymen
 hymns
@@ -5530,7 +5337,6 @@ infer
 infix
 infos
 infra
-ingan
 inger
 ingle
 ingot
@@ -5550,7 +5356,6 @@ inset
 inspo
 intel
 inter
-intil
 intis
 intra
 intro
@@ -5595,7 +5400,6 @@ issue
 istle
 itchy
 items
-ither
 ivied
 ivies
 ivory
@@ -5616,7 +5420,6 @@ jaded
 jades
 jafas
 jaffa
-jagas
 jaged
 jager
 jaggs
@@ -5648,13 +5451,11 @@ jared
 jarks
 jarls
 jarps
-jarta
 jarul
 jasey
 jaspe
 jasps
 jatos
-jauks
 jaunt
 jaups
 javan
@@ -5669,7 +5470,6 @@ jeats
 jebel
 jedis
 jeels
-jeely
 jeeps
 jeers
 jeeze
@@ -5695,7 +5495,6 @@ jeter
 jetes
 jeton
 jetty
-jeune
 jewed
 jewel
 jewie
@@ -5810,7 +5609,6 @@ jupon
 jural
 jurat
 jurel
-jures
 juror
 jurys
 justs
@@ -5820,7 +5618,6 @@ juves
 juvie
 kaama
 kabab
-kabar
 kabob
 kacha
 kacks
@@ -5838,7 +5635,6 @@ kaika
 kaiks
 kails
 kaims
-kaing
 kains
 kakas
 kakis
@@ -5852,7 +5648,6 @@ kamas
 kames
 kamik
 kamis
-kamme
 kanae
 kanas
 kaneh
@@ -5877,7 +5672,6 @@ karks
 karma
 karns
 karoo
-karos
 karri
 karst
 karsy
@@ -5895,7 +5689,6 @@ kauru
 kaury
 kaval
 kavas
-kawas
 kawau
 kawed
 kayak
@@ -5912,7 +5705,6 @@ kecks
 kedge
 kedgy
 keech
-keefs
 keeks
 keels
 keema
@@ -5931,7 +5723,6 @@ kelly
 kelps
 kelpy
 kelts
-kelty
 kembo
 kembs
 kemps
@@ -5945,7 +5736,6 @@ kente
 kents
 kepis
 kerbs
-kerel
 kerfs
 kerky
 kerma
@@ -6032,7 +5822,6 @@ kirby
 kirks
 kirns
 kirri
-kisan
 kisss
 kissy
 kists
@@ -6112,7 +5901,6 @@ kolas
 kolos
 kombu
 konbu
-kondo
 konks
 kooks
 kooky
@@ -6123,7 +5911,6 @@ kopje
 koppa
 korai
 koras
-korat
 kores
 korma
 koros
@@ -6175,9 +5962,7 @@ kurre
 kurta
 kurus
 kusso
-kutas
 kutch
-kutis
 kutus
 kuzus
 kvass
@@ -6228,10 +6013,8 @@ lagan
 lager
 lahal
 lahar
-laich
 laics
 laids
-laigh
 laika
 laiks
 laird
@@ -6258,7 +6041,6 @@ lamia
 lammy
 lamps
 lanai
-lanas
 lance
 lanch
 lande
@@ -6270,7 +6052,6 @@ lants
 lapel
 lapin
 lapis
-lapje
 lapps
 lapse
 larch
@@ -6311,9 +6092,7 @@ latke
 latte
 latus
 lauan
-lauch
 lauds
-laufs
 laugh
 laund
 laura
@@ -6326,7 +6105,6 @@ lavra
 lavvy
 lawed
 lawer
-lawin
 lawks
 lawns
 lawny
@@ -6358,7 +6136,6 @@ leant
 leany
 leaps
 leapt
-leare
 learn
 lears
 lease
@@ -6374,7 +6151,6 @@ ledes
 ledge
 ledgy
 ledum
-leear
 leech
 leeks
 leeps
@@ -6413,7 +6189,6 @@ lenis
 lenos
 lense
 lenss
-lenti
 lento
 lents
 leone
@@ -6423,7 +6198,6 @@ lepra
 lepta
 lepus
 lered
-leres
 lerps
 lesbo
 leses
@@ -6434,12 +6208,10 @@ letup
 leuch
 leuco
 leuds
-leugh
 levas
 levee
 level
 lever
-leves
 levin
 levis
 levys
@@ -6455,18 +6227,15 @@ liane
 liang
 liard
 liars
-liart
 libel
 liber
 libra
 libri
 lichi
-licht
 licit
 licks
 lidar
 lidos
-liefs
 liege
 liens
 liers
@@ -6478,7 +6247,6 @@ lifes
 lifts
 ligan
 liger
-ligge
 light
 ligne
 liing
@@ -6569,7 +6337,6 @@ loafs
 loams
 loamy
 loans
-loast
 loath
 loave
 lobar
@@ -6648,7 +6415,6 @@ loris
 lorry
 losed
 losel
-losen
 loser
 loses
 losss
@@ -6691,18 +6457,14 @@ lowed
 lower
 lowes
 lowly
-lownd
 lowne
 lowns
 lowps
 lowry
-lowse
 lowts
 loxed
 loxes
 loyal
-lozen
-luach
 luaus
 lubed
 lubes
@@ -6770,7 +6532,6 @@ luxer
 luxes
 lweis
 lyams
-lyard
 lyart
 lyase
 lycea
@@ -6792,7 +6553,6 @@ lysis
 lysol
 lyssa
 lyted
-lytes
 lythe
 lytic
 lytta
@@ -6817,7 +6577,6 @@ madge
 madia
 madid
 madly
-madre
 maerl
 mafia
 mafic
@@ -6833,15 +6592,11 @@ mahua
 mahwa
 maids
 maiko
-maiks
 maile
-maill
 mails
 maims
 mains
-maire
 mairs
-maise
 maist
 maize
 major
@@ -6851,7 +6606,6 @@ maker
 makes
 makis
 makos
-malam
 malar
 malas
 malax
@@ -6924,9 +6678,7 @@ mares
 marge
 margs
 maria
-marid
 maris
-marka
 marks
 marle
 marls
@@ -7030,11 +6782,7 @@ meeds
 meers
 meets
 meffs
-meins
-meint
 meiny
-meith
-mekka
 melas
 melba
 melds
@@ -7051,9 +6799,7 @@ memes
 memos
 menad
 mends
-mened
 menes
-menge
 mengs
 mensa
 mense
@@ -7069,7 +6815,6 @@ mercs
 mercy
 merde
 mered
-merel
 merer
 meres
 merge
@@ -7122,11 +6867,9 @@ miasm
 miaul
 micas
 miche
-micht
 micks
 micky
 micos
-micra
 micro
 middy
 midge
@@ -7144,7 +6887,6 @@ mihas
 mihis
 miked
 mikes
-mikra
 mikva
 milch
 milds
@@ -7203,7 +6945,6 @@ miros
 mirth
 mirvs
 mirza
-misch
 misdo
 miser
 mises
@@ -7249,7 +6990,6 @@ model
 modem
 moder
 modes
-modge
 modii
 modus
 moers
@@ -7263,7 +7003,6 @@ mohua
 mohur
 moile
 moils
-moira
 moire
 moist
 moits
@@ -7284,7 +7023,6 @@ molls
 molly
 molto
 molts
-molys
 momes
 momma
 mommy
@@ -7352,7 +7090,6 @@ morus
 mosed
 mosey
 mosks
-mosso
 mossy
 moste
 mosts
@@ -7365,7 +7102,6 @@ motey
 moths
 mothy
 motif
-motis
 motor
 motte
 motto
@@ -7383,7 +7119,6 @@ mount
 moups
 mourn
 mouse
-moust
 mousy
 mouth
 moved
@@ -7421,13 +7156,11 @@ mudra
 muffs
 mufti
 mugga
-muggs
 muggy
 muhly
 muids
 muils
 muirs
-muist
 mujik
 mulch
 mulct
@@ -7457,7 +7190,6 @@ munts
 muntu
 muons
 mural
-muras
 mured
 mures
 murex
@@ -7465,7 +7197,6 @@ murid
 murks
 murky
 murls
-murly
 murra
 murre
 murri
@@ -7486,7 +7217,6 @@ musit
 musks
 musky
 musos
-musse
 mussy
 musth
 musts
@@ -7527,7 +7257,6 @@ nabis
 nabks
 nabla
 nabob
-nache
 nacho
 nacre
 nadas
@@ -7556,7 +7285,6 @@ nalla
 named
 namer
 names
-namma
 namus
 nanas
 nance
@@ -7583,14 +7311,12 @@ naric
 naris
 narks
 narky
-narre
 nasal
 nashi
 nasty
 natal
 natch
 nates
-natis
 natty
 nauch
 naunt
@@ -7629,10 +7355,8 @@ negus
 neifs
 neigh
 neist
-neive
 nelis
 nelly
-nemas
 nemns
 nempt
 nenes
@@ -7674,14 +7398,12 @@ nexts
 nexus
 ngaio
 ngana
-ngati
 ngoma
 ngwee
 nicad
 nicer
 nices
 niche
-nicht
 nicks
 nicol
 nidal
@@ -7765,7 +7487,6 @@ nomes
 nomic
 nomoi
 nomos
-nonas
 nonce
 nones
 nonet
@@ -7829,7 +7550,6 @@ nudge
 nudie
 nudzh
 nuffs
-nugae
 nuked
 nukes
 nulla
@@ -7848,7 +7568,6 @@ nutsy
 nutty
 nyaff
 nyala
-nying
 nylon
 nymph
 nyssa
@@ -7871,7 +7590,6 @@ obese
 obeys
 obias
 obied
-obiit
 obits
 objet
 oboes
@@ -7952,7 +7670,6 @@ olios
 olive
 ollas
 ollav
-oller
 ollie
 olmec
 ology
@@ -8057,8 +7774,6 @@ other
 ottar
 otter
 ottos
-oubit
-oucht
 ouens
 ought
 ouija
@@ -8132,7 +7847,6 @@ pacey
 pacha
 packs
 pacos
-pacta
 pacts
 padis
 padle
@@ -8232,7 +7946,6 @@ parly
 parma
 parol
 parps
-parra
 parrs
 parry
 parse
@@ -8326,7 +8039,6 @@ peece
 peeks
 peels
 peens
-peeoy
 peepe
 peeps
 peers
@@ -8341,13 +8053,10 @@ pekan
 pekes
 pekin
 pekoe
-pelas
 pelau
-peles
 pelfs
 pells
 pelma
-pelon
 pelta
 pelts
 penal
@@ -8438,9 +8147,7 @@ phpht
 phuts
 phyla
 phyle
-piani
 piano
-pians
 pibal
 pical
 picas
@@ -8454,7 +8161,6 @@ picul
 piece
 piend
 piers
-piert
 pieta
 piets
 piety
@@ -8468,7 +8174,6 @@ pikau
 piked
 piker
 pikes
-pikis
 pikul
 pilae
 pilaf
@@ -8512,7 +8217,6 @@ pinus
 pions
 piony
 pious
-pioye
 pioys
 pipal
 pipas
@@ -8530,7 +8234,6 @@ pirls
 pirns
 pirog
 pisco
-pises
 pisky
 pisos
 pissy
@@ -8567,7 +8270,6 @@ plant
 plaps
 plash
 plasm
-plast
 plate
 plats
 platt
@@ -8595,7 +8297,6 @@ ploat
 plods
 plong
 plonk
-plook
 plops
 plots
 plotz
@@ -8711,7 +8412,6 @@ porch
 pored
 porer
 pores
-porge
 porgy
 porin
 porks
@@ -8732,7 +8432,6 @@ posho
 posit
 posse
 posts
-potae
 potch
 poted
 potes
@@ -8745,13 +8444,11 @@ potty
 pouch
 pouff
 poufs
-pouke
 pouks
 poule
 poulp
 poult
 pound
-poupe
 poupt
 pours
 pouts
@@ -8761,7 +8458,6 @@ power
 powin
 pownd
 powns
-powny
 powre
 poxed
 poxes
@@ -8790,10 +8486,8 @@ predy
 preed
 preen
 prees
-preif
 prems
 premy
-prent
 preon
 preop
 preps
@@ -8853,7 +8547,6 @@ prore
 prose
 proso
 pross
-prost
 prosy
 proto
 proud
@@ -8901,7 +8594,6 @@ puffs
 puffy
 puggy
 pugil
-puhas
 pujah
 pujas
 pukas
@@ -8923,7 +8615,6 @@ pulks
 pulli
 pulls
 pully
-pulmo
 pulps
 pulpy
 pulse
@@ -8950,16 +8641,13 @@ pupal
 pupas
 pupil
 puppy
-pupus
 purda
 purdy
-pured
 puree
 purer
 pures
 purge
 purim
-purin
 puris
 purls
 purpy
@@ -8975,7 +8663,6 @@ pusss
 pussy
 puted
 putid
-puton
 putti
 putto
 putts
@@ -9017,7 +8704,6 @@ quads
 quaff
 quags
 quail
-quair
 quais
 quake
 quaky
@@ -9110,7 +8796,6 @@ ragee
 rager
 rages
 ragga
-raggs
 raggy
 ragis
 ragus
@@ -9131,14 +8816,12 @@ raits
 rajab
 rajah
 rajas
-rajes
 raked
 rakee
 raker
 rakes
 rakia
 rakis
-rakus
 rales
 rally
 ralph
@@ -9148,7 +8831,6 @@ ramee
 ramen
 ramet
 ramie
-ramin
 ramis
 rammy
 ramps
@@ -9161,7 +8843,6 @@ randy
 ranee
 ranga
 range
-rangi
 rangs
 rangy
 ranid
@@ -9174,7 +8855,6 @@ raper
 rapes
 raphe
 rapid
-rappe
 rared
 raree
 rarer
@@ -9196,7 +8876,6 @@ rated
 ratel
 rater
 rates
-ratha
 rathe
 raths
 ratio
@@ -9239,7 +8918,6 @@ ready
 reais
 reaks
 realm
-realo
 reals
 reame
 reams
@@ -9307,13 +8985,11 @@ refed
 refel
 refer
 reffo
-refis
 refit
 refix
 refly
 refry
 regal
-regar
 reges
 reggo
 regie
@@ -9343,12 +9019,10 @@ relax
 relay
 relet
 relic
-relie
 relit
 rello
 reman
 remap
-remen
 remet
 remex
 remit
@@ -9361,7 +9035,6 @@ reney
 renga
 renig
 renin
-renne
 renos
 rente
 rents
@@ -9418,7 +9091,6 @@ rewed
 rewet
 rewin
 rewon
-rewth
 rexes
 rezes
 rheas
@@ -9448,7 +9120,6 @@ ricer
 rices
 ricey
 richs
-richt
 ricin
 ricks
 rider
@@ -9462,7 +9133,6 @@ rieve
 rifer
 riffs
 rifle
-rifte
 rifts
 rifty
 riggs
@@ -9500,12 +9170,10 @@ rishi
 risks
 risky
 risps
-risus
 rites
 ritts
 ritzy
 rival
-rivas
 rived
 rivel
 riven
@@ -9513,7 +9181,6 @@ river
 rives
 rivet
 riyal
-rizas
 roach
 roads
 roams
@@ -9570,10 +9237,8 @@ rooks
 rooky
 rooms
 roomy
-roons
 roops
 roopy
-roosa
 roose
 roost
 roots
@@ -9584,7 +9249,6 @@ ropes
 ropey
 roque
 roral
-rores
 roric
 rorid
 rorie
@@ -9597,7 +9261,6 @@ roses
 roset
 roshi
 rosin
-rosit
 rosti
 rosts
 rotal
@@ -9618,7 +9281,6 @@ rouge
 rough
 roule
 rouls
-roums
 round
 roups
 roupy
@@ -9629,7 +9291,6 @@ routh
 routs
 rouxs
 roved
-roven
 rover
 roves
 rowan
@@ -9644,9 +9305,7 @@ rownd
 rowth
 rowts
 royal
-royne
 royst
-rozet
 rozit
 ruana
 rubai
@@ -9685,7 +9344,6 @@ rumba
 rumbo
 rumen
 rumer
-rumes
 rumly
 rummy
 rumor
@@ -9693,7 +9351,6 @@ rumpo
 rumps
 rumpy
 runch
-runds
 runed
 runes
 rungs
@@ -9706,13 +9363,11 @@ rupia
 rural
 rurps
 rurus
-rusas
 ruses
 rushs
 rushy
 rusks
 rusma
-russe
 rusts
 rusty
 ruths
@@ -9721,16 +9376,13 @@ rutty
 ryals
 rybat
 ryked
-rykes
 rymme
 rynds
 ryots
 ryper
 saags
 sabal
-sabed
 saber
-sabes
 sabha
 sabin
 sabir
@@ -9767,14 +9419,12 @@ saids
 saiga
 sails
 saims
-saine
 sains
 saint
 sairs
 saist
 saith
 sajou
-sakai
 saker
 sakes
 sakia
@@ -9787,7 +9437,6 @@ salat
 salep
 sales
 salet
-salic
 salix
 salle
 sally
@@ -9807,7 +9456,6 @@ salut
 salve
 salvo
 saman
-samas
 samba
 samek
 samel
@@ -9829,7 +9477,6 @@ sanga
 sangh
 sango
 sangs
-sanko
 sansa
 santo
 sants
@@ -9865,17 +9512,14 @@ satis
 satyr
 sauba
 sauce
-sauch
 saucy
 saudi
 saugh
 sauls
 sault
 sauna
-saunt
 saury
 saute
-sauts
 saved
 saver
 saves
@@ -9898,7 +9542,6 @@ sayst
 sazes
 scabs
 scads
-scaff
 scags
 scail
 scala
@@ -9909,10 +9552,8 @@ scalp
 scaly
 scamp
 scams
-scand
 scans
 scant
-scapa
 scape
 scapi
 scare
@@ -9924,7 +9565,6 @@ scary
 scath
 scats
 scatt
-scaud
 scaup
 scaur
 scaws
@@ -9938,7 +9578,6 @@ schmo
 schul
 schwa
 scion
-sclim
 scody
 scoff
 scogs
@@ -9954,11 +9593,9 @@ score
 scorn
 scots
 scoug
-scoup
 scour
 scout
 scowl
-scowp
 scows
 scrab
 scrae
@@ -10003,7 +9640,6 @@ scyes
 sdayn
 sdein
 seals
-seame
 seams
 seamy
 seans
@@ -10025,7 +9661,6 @@ sedum
 seeds
 seedy
 seeks
-seeld
 seels
 seely
 seems
@@ -10051,7 +9686,6 @@ seity
 seiza
 seize
 sekos
-sekts
 selah
 selfs
 sella
@@ -10063,20 +9697,17 @@ semen
 semes
 semie
 semis
-senas
 sends
 senes
 sengi
 senna
 senor
-sensa
 sense
 sensi
 sente
 senti
 sents
 senvy
-senza
 sepad
 sepal
 sepia
@@ -10096,18 +9727,15 @@ serge
 seric
 serif
 serin
-serks
 seron
 serow
 serra
-serre
 serrs
 serry
 serum
 serve
 servo
 sesey
-sessa
 setae
 setal
 seton
@@ -10127,7 +9755,6 @@ sexer
 sexes
 sexto
 sexts
-seyen
 shack
 shade
 shads
@@ -10174,7 +9801,6 @@ sheal
 shear
 sheas
 sheds
-sheel
 sheen
 sheep
 sheer
@@ -10188,7 +9814,6 @@ sheng
 shent
 sheol
 sherd
-shere
 shero
 shets
 sheva
@@ -10303,7 +9928,6 @@ sield
 siens
 sient
 sieth
-sieur
 sieve
 sifts
 sighs
@@ -10320,8 +9944,6 @@ sikes
 sikhs
 silds
 siled
-silen
-siler
 siles
 silex
 silks
@@ -10334,7 +9956,6 @@ silty
 silva
 simar
 simas
-simba
 simis
 simon
 simps
@@ -10400,15 +10021,11 @@ skean
 skear
 skeds
 skeed
-skeef
-skeen
 skeer
 skees
 skeet
-skegg
 skegs
 skein
-skelf
 skell
 skelm
 skelp
@@ -10441,11 +10058,9 @@ skite
 skits
 skive
 skivy
-sklim
 skoal
 skody
 skoff
-skogs
 skols
 skool
 skort
@@ -10458,12 +10073,10 @@ skulk
 skull
 skunk
 skyed
-skyer
 skyey
 skyfs
 skype
 skyre
-skyrs
 skyte
 slabs
 slack
@@ -10547,7 +10160,6 @@ slunk
 slurb
 slurp
 slurs
-sluse
 slush
 sluts
 slyer
@@ -10555,7 +10167,6 @@ slyly
 slype
 smaak
 smack
-smaik
 small
 smalm
 smalt
@@ -10564,10 +10175,7 @@ smart
 smash
 smaze
 smear
-smeek
 smees
-smeik
-smeke
 smell
 smelt
 smerk
@@ -10638,7 +10246,6 @@ snits
 snobs
 snods
 snoek
-snoep
 snogs
 snoke
 snood
@@ -10650,7 +10257,6 @@ snore
 snort
 snots
 snout
-snowk
 snows
 snowy
 snubs
@@ -10691,12 +10297,9 @@ sojus
 sokah
 soken
 sokes
-sokol
 solah
 solan
 solar
-solas
-solde
 soldi
 soldo
 solds
@@ -10715,7 +10318,6 @@ somas
 somen
 somer
 sonar
-sonce
 sonde
 sones
 songs
@@ -10728,11 +10330,9 @@ sonsy
 sooey
 sooks
 sooky
-soole
 sools
 sooms
 soops
-soote
 sooth
 soots
 sooty
@@ -10741,13 +10341,9 @@ sophs
 sophy
 sopor
 soppy
-sopra
 soral
 soras
-sorbo
 sorbs
-sorda
-sordo
 sords
 sored
 soree
@@ -10794,7 +10390,6 @@ sowse
 sowth
 soyas
 soyle
-soyuz
 sozin
 space
 spacy
@@ -10805,8 +10400,6 @@ spaer
 spaes
 spags
 spahi
-spail
-spait
 spake
 spald
 spale
@@ -10817,15 +10410,12 @@ spane
 spang
 spank
 spans
-spard
 spare
 spark
 spars
-spart
 spasm
 spate
 spats
-spaul
 spawl
 spawn
 spaws
@@ -10844,8 +10434,6 @@ spect
 speed
 speel
 speer
-speil
-speir
 speks
 speld
 spelk
@@ -10904,7 +10492,6 @@ spool
 spoom
 spoon
 spoor
-spoot
 spore
 spork
 sport
@@ -10957,7 +10544,6 @@ stage
 stags
 stagy
 staid
-staig
 stain
 stair
 stake
@@ -10980,7 +10566,6 @@ start
 stash
 state
 stats
-staun
 stave
 staws
 stays
@@ -10999,7 +10584,6 @@ steel
 steem
 steep
 steer
-steil
 stein
 stela
 stele
@@ -11027,7 +10611,6 @@ stilb
 stile
 still
 stilt
-stime
 stims
 stimy
 sting
@@ -11035,7 +10618,6 @@ stink
 stint
 stipa
 stipe
-stire
 stirk
 stirp
 stirs
@@ -11060,7 +10642,6 @@ stond
 stone
 stong
 stonk
-stonn
 stony
 stood
 stook
@@ -11082,11 +10663,9 @@ stoup
 stour
 stout
 stove
-stown
 stowp
 stows
 strad
-strae
 strag
 strak
 strap
@@ -11112,7 +10691,6 @@ study
 stuff
 stull
 stulm
-stumm
 stump
 stums
 stung
@@ -11121,7 +10699,6 @@ stuns
 stunt
 stupa
 stupe
-sture
 sturt
 styed
 styes
@@ -11130,14 +10707,11 @@ styli
 stylo
 styme
 stymy
-styre
 styte
 suave
 subah
-subas
 subby
 suber
-subha
 succi
 sucks
 sucky
@@ -11150,7 +10724,6 @@ sudsy
 suede
 suent
 suers
-suete
 suets
 suety
 sufis
@@ -11170,7 +10743,6 @@ sukuk
 sukur
 sulci
 sulfa
-sulfo
 sulks
 sulky
 sulla
@@ -11179,7 +10751,6 @@ sulph
 sulus
 sumac
 sumed
-sumis
 summa
 sumos
 sumph
@@ -11203,7 +10774,6 @@ surat
 surds
 sured
 surer
-sures
 surfs
 surfy
 surge
@@ -11292,7 +10862,6 @@ sworn
 swots
 swoun
 swung
-sybbe
 sybil
 syboe
 sybow
@@ -11308,9 +10877,7 @@ sylva
 symar
 synch
 syncs
-synds
 syned
-synes
 synod
 synth
 syped
@@ -11321,9 +10888,7 @@ syren
 syrup
 sysop
 sythe
-syver
 taals
-taata
 tabby
 taber
 tabes
@@ -11335,7 +10900,6 @@ taboo
 tabor
 tabun
 tabus
-tacan
 tacca
 taces
 tacet
@@ -11415,12 +10979,10 @@ tanks
 tanky
 tanna
 tansy
-tanti
 tanto
 tanty
 tapas
 taped
-tapen
 taper
 tapes
 tapet
@@ -11433,7 +10995,6 @@ tardo
 tardy
 tared
 tares
-targa
 targe
 tarns
 taroc
@@ -11446,7 +11007,6 @@ tarry
 tarsi
 tarts
 tarty
-tasar
 tased
 taser
 tases
@@ -11467,8 +11027,6 @@ tatts
 tatty
 tatum
 tatus
-taube
-tauld
 taunt
 tauon
 taupe
@@ -11476,7 +11034,6 @@ tauts
 tavah
 tavas
 taver
-tawai
 tawas
 tawed
 tawer
@@ -11514,14 +11071,12 @@ teddy
 teels
 teems
 teend
-teene
 teens
 teeny
 teers
 teeth
 teffs
 teggs
-tegua
 tegus
 tehrs
 teiid
@@ -11539,7 +11094,6 @@ tells
 telly
 teloi
 telos
-temed
 temes
 tempi
 tempo
@@ -11550,7 +11104,6 @@ tench
 tends
 tendu
 tener
-tenes
 tenet
 tenge
 tenia
@@ -11562,7 +11115,6 @@ tenor
 tense
 tenth
 tents
-tenty
 tenue
 tepal
 tepas
@@ -11572,7 +11124,6 @@ tepoy
 terai
 teras
 terce
-terek
 teres
 terfe
 terfs
@@ -11583,13 +11134,11 @@ terns
 terra
 terry
 terse
-terts
 tesla
 testa
 teste
 tests
 testy
-tetes
 teths
 teton
 tetra
@@ -11605,7 +11154,6 @@ texes
 texts
 thack
 thagi
-thaim
 thais
 thale
 thali
@@ -11613,7 +11161,6 @@ thana
 thane
 thang
 thank
-thans
 thanx
 tharm
 thars
@@ -11665,8 +11212,6 @@ thorp
 those
 thous
 thowl
-thrae
-thraw
 three
 threw
 thrid
@@ -11731,9 +11276,7 @@ timed
 timer
 times
 timid
-timon
 timps
-tinas
 tinct
 tinds
 tinea
@@ -11799,7 +11342,6 @@ token
 toker
 tokes
 tokos
-tolan
 tolar
 tolas
 toled
@@ -11851,7 +11393,6 @@ toppy
 toque
 torah
 toran
-toras
 torch
 torcs
 tores
@@ -11918,7 +11459,6 @@ tract
 trade
 trads
 tragi
-traik
 trail
 train
 trait
@@ -11952,7 +11492,6 @@ trema
 trems
 trend
 tress
-trest
 trets
 trews
 treyf
@@ -11968,14 +11507,12 @@ tried
 trier
 tries
 triff
-trigo
 trigs
 trike
 trild
 trill
 trims
 trine
-trins
 triol
 trior
 trios
@@ -11991,7 +11528,6 @@ trock
 trode
 trods
 trogs
-trois
 troke
 troll
 tromp
@@ -12049,7 +11585,6 @@ tubes
 tucks
 tudor
 tufas
-tuffe
 tuffs
 tufts
 tufty
@@ -12058,7 +11593,6 @@ tugra
 tuile
 tuina
 tuism
-tuktu
 tules
 tulip
 tulle
@@ -12143,7 +11677,6 @@ tying
 tyiyn
 tykes
 tymps
-tynde
 tyned
 tynes
 typal
@@ -12182,12 +11715,9 @@ ulnas
 ulpan
 ultra
 ulvas
-ulyie
-ulzie
 umami
 umbel
 umber
-umble
 umbos
 umbra
 umbre
@@ -12286,7 +11816,6 @@ unwit
 unwon
 unzip
 upbow
-upbye
 updos
 updry
 upend
@@ -12314,13 +11843,11 @@ urate
 urban
 urbex
 urbia
-urdee
 ureal
 ureas
 uredo
 ureic
 urena
-urent
 urged
 urger
 urges
@@ -12332,7 +11859,6 @@ urman
 urnal
 urned
 urped
-ursae
 ursid
 urson
 ursus
@@ -12407,9 +11933,7 @@ vatus
 vauch
 vault
 vaunt
-vaute
 vauts
-vawte
 vaxes
 veale
 veals
@@ -12449,7 +11973,6 @@ venue
 venus
 verbs
 verge
-verra
 verry
 verse
 verso
@@ -12523,7 +12046,6 @@ virus
 visas
 vised
 vises
-visie
 visit
 visne
 vison
@@ -12535,12 +12057,10 @@ vital
 vitas
 vitex
 vitis
-vitro
 vitta
 vivas
 vivat
 vivda
-viver
 vives
 vivid
 vixen
@@ -12584,7 +12104,6 @@ voter
 votes
 vouch
 vouge
-voulu
 vowed
 vowel
 vower
@@ -12685,7 +12204,6 @@ warms
 warns
 warps
 warre
-warst
 warts
 warty
 wases
@@ -12744,21 +12262,16 @@ weeny
 weeps
 weepy
 weest
-weete
 weets
-wefte
 wefts
-weids
 weigh
 weing
 weird
 weirs
-weise
 weize
 wekas
 welch
 welds
-welke
 welks
 welkt
 wells
@@ -12786,10 +12299,8 @@ whang
 whaps
 whare
 wharf
-whata
 whats
 whaup
-whaur
 wheal
 whear
 wheat
@@ -12856,7 +12367,6 @@ wides
 widow
 width
 wield
-wiels
 wifed
 wifes
 wifey
@@ -12872,7 +12382,6 @@ wilds
 wiled
 wiles
 wilga
-wilis
 wilja
 wills
 willy
@@ -12891,7 +12400,6 @@ wings
 wingy
 winks
 winky
-winna
 winns
 winos
 winze
@@ -12932,7 +12440,6 @@ woful
 wojus
 woken
 woker
-wokka
 wolds
 wolfs
 wolly
@@ -13009,7 +12516,6 @@ wroth
 wrung
 wryer
 wryly
-wuddy
 wudus
 wulls
 wurst
@@ -13017,7 +12523,6 @@ wuses
 wushu
 wussy
 wuxia
-wyled
 wyles
 wynds
 wynns
@@ -13044,7 +12549,6 @@ xylyl
 xysti
 xysts
 yaars
-yabas
 yabba
 yabby
 yacca
@@ -13078,7 +12582,6 @@ yarks
 yarns
 yarrs
 yarta
-yarto
 yates
 yauds
 yauld
@@ -13094,8 +12597,6 @@ ybore
 yclad
 ycled
 ycond
-ydrad
-ydred
 yeads
 yeahs
 yealm
@@ -13130,7 +12631,6 @@ yetts
 yeuch
 yeuks
 yeuky
-yeven
 yeves
 yewen
 yexed
@@ -13140,13 +12640,11 @@ yield
 yiked
 yikes
 yills
-yince
 yipes
 yippy
 yirds
 yirks
 yirrs
-yirth
 yites
 yitie
 ylems
@@ -13201,7 +12699,6 @@ yrapt
 yrent
 yrivd
 yrneh
-ysame
 ytost
 yuans
 yucas
@@ -13313,7 +12810,6 @@ zooks
 zooms
 zoons
 zooty
-zoppa
 zoppo
 zoril
 zoris

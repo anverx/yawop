@@ -53,9 +53,12 @@ inflection "words", and vulgar words make poor or unfair answers. We decide this
 by **repeatable, metadata-driven rules — no hand-maintained name/word lists**
 (the one sanctioned exception is a small *obscene* seed list, since vulgarity is a
 judgement the metadata can't fully capture). **Real words stay valid guesses** with
-working definitions; only **proper-noun / reference-only words** (a surname or a
-"spelling of X" — not real words) are removed as guesses too. Applied at
-`make publish` (see `classify_answers.py`, `find_trivial_plurals.py`):
+working definitions; only words that aren't real **English** words are removed as
+guesses too: **proper-noun / reference-only** (a surname or a bare "spelling of X"),
+and **non-English** words that only have a foreign-language Wiktionary entry (`whaur`,
+`garre` — see `find_nonword_guesses.py`; borrowings that entered English like `pizza`
+keep an English sense and survive). Applied at `make publish` (see
+`classify_answers.py`, `find_trivial_plurals.py`, `find_nonword_guesses.py`):
 
 **A word is answer-eligible iff it has >=1 sense that is all of:**
 1. **not a proper noun** — no WordNet `instance_hypernyms`, and (for WordNet-only-

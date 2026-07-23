@@ -77,6 +77,11 @@ publish: all
 	#    real meanings by grafting the base word's definition. Offline: uses the committed
 	#    Wiktionary cache (run once with --fetch to populate it for new bases).
 	$(PY) scripts/resolve_references.py --assets $(ASSETS) --wiktionary-cache data/cache/wiktionary_defs.json --apply
+	# 5. Drop non-English words (only a foreign-language Wiktionary entry, no English
+	#    sense) from every list -- it's an English word game. Borrowings that entered
+	#    English (pizza, kebab) keep their English entry and survive.
+	$(PY) scripts/find_nonword_guesses.py --assets $(ASSETS) --out non_english.txt
+	$(PY) scripts/apply_blocklist.py --assets $(ASSETS) --proper-nouns non_english.txt
 	@echo "published shipping dictionaries -> $(ASSETS)"
 
 all: subtlex-us subtlex-uk wordle surprise arcane guesses

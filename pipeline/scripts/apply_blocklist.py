@@ -104,6 +104,10 @@ def main() -> None:
         if n:
             print(f"  {pack_dir.name}: removed {n} occurrence(s)")
         total += n
+    n = _strip_jsonl(assets / "extra_defs.jsonl", everywhere)  # fallback defs also lose them
+    if n:
+        print(f"  extra_defs.jsonl: removed {n}")
+    total += n
     n = _strip_lines(assets / "allowed_guesses_all.txt", everywhere)  # everywhere barred as guesses
     if n:
         print(f"  allowed_guesses_all.txt: removed {n}")
