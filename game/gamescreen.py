@@ -79,7 +79,16 @@ class WordGameScreen(BackgroundedScreen):
         self._panel = WordGridPanel(game, allowed, subtitle=subtitle, on_finish=self._finished,
                                     on_info=on_info, on_back=self._go_menu, on_guess=self._progress)
         self._host.add_widget(self._panel)
+        self._apply_win_caption()   # a resumed/reviewed clean win shows its time straight away
         self._start_timer()
+
+    def _apply_win_caption(self) -> None:
+        """Show 'M:SS · N tries' under the Victory bar for a cleanly-won game."""
+        g = self._panel.game if self._panel else None
+        if g and g.won and not g.lost:
+            m, s = divmod(self._elapsed, 60)
+            tries = f"{g.attempts} {'try' if g.attempts == 1 else 'tries'}"
+            self._panel.set_win_caption(f"{m}:{s:02d} · {tries}")
 
     # --- stopwatch ---
     def _start_timer(self) -> None:
@@ -102,6 +111,7 @@ class WordGameScreen(BackgroundedScreen):
     # --- game events ---
     def _finished(self, won: bool, attempts: int) -> None:
         self._stop_timer()
+        self._apply_win_caption()   # freeze time/tries under the Victory bar before the popup
         if self._on_finish:
             self._on_finish(won, self._elapsed * 1000, attempts)
 

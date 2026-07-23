@@ -130,15 +130,17 @@ class EnterButton(ButtonBehavior, AnchorLayout):
         self._icon = Image(source=_ENTER_ICON, size_hint=(None, None), size=(dp(26), dp(26)),
                            fit_mode="contain", color=_DARK)
         self._label = Label(text="Enter", font_name=get_theme().font_name, font_size="20sp",
-                            bold=True, size_hint=(None, None), color=_DARK)
+                            bold=True, markup=True, halign="center", size_hint=(None, None), color=_DARK)
         self._label.bind(texture_size=self._label.setter("size"))
         inner.add_widget(self._icon)
         inner.add_widget(self._label)
         self.add_widget(inner)
 
-    def set_state(self, bg: tuple, fg: tuple, text: str = "Enter", show_icon: bool = True) -> None:
+    def set_state(self, bg: tuple, fg: tuple, text: str = "Enter", show_icon: bool = True,
+                  sub: str = "") -> None:
         self.bg_color = bg
-        self._label.text = text
+        from kivy.metrics import sp
+        self._label.text = f"{text}\n[size={round(sp(12))}]{sub}[/size]" if sub else text
         self._label.color = fg
         self._icon.color = fg
         self._icon.opacity = 1 if show_icon else 0
@@ -170,6 +172,7 @@ class WordGridPanel(BoxLayout):
         self.on_info = on_info
         self.on_guess = on_guess   # persist in-progress guesses (screen owns elapsed time)
         self._flash = ""
+        self._win_caption = ""     # "M:SS · N tries", shown under "Victory!" (screen sets it)
         theme = get_theme()
 
         # --- Section 1: matrix (subtitle + tile grid + status + reveal) ---
@@ -352,6 +355,11 @@ class WordGridPanel(BoxLayout):
     def on_key_action(self, action: str) -> None:
         (self._enter if action == "enter" else self._backspace)()
 
+    def set_win_caption(self, text: str) -> None:
+        """Persist time/tries under the 'Victory!' bar (survives closing the popup)."""
+        self._win_caption = text
+        self.render()
+
     def show_reveal(self, text: str) -> None:
         self.reveal.text = text
 
@@ -380,7 +388,8 @@ class WordGridPanel(BoxLayout):
 
         if g.finished:  # Enter is irrelevant now: announce the outcome instead
             if g.won and not g.lost:
-                self._enter_btn.set_state(_ENTER_OK, _WHITE, "Victory!", show_icon=False)
+                self._enter_btn.set_state(_ENTER_OK, _WHITE, "Victory!", show_icon=False,
+                                          sub=self._win_caption)
             else:  # lost, or solved only in an 'another try' bonus row after losing
                 self._enter_btn.set_state(_ENTER_BAD, _WHITE, "Game over", show_icon=False)
         elif not g.is_complete():
