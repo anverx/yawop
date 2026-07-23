@@ -230,23 +230,25 @@ records additionally carry `gutenberg_search_url` and, where found, `examples`:
 
 ## Results
 
-Current **shipped** answer pools (`assets/dictionaries/`), after the publish
+Rough **shipped** magnitudes (`assets/dictionaries/`), after the publish
 post-processing removes trivial plurals, proper-noun/reference-only names, and
-non-English words from the answer sources:
+non-English words from the answer sources (ballpark — exact counts shift each rebuild):
 
-| Pack | Answer pool (shipped) | Easy / Medium / Hard |
-|------|----------------------:|:--------------------:|
-| `subtlex-us` | 4,014 | 705 / 1,023 / 2,286 |
-| `subtlex-uk` | 4,548 | 800 / 1,222 / 2,526 |
-| `wordle` | 2,308 | 346 / 578 / 1,384 |
-| `surprise` | 4,750 | — (no tiers) |
-| `arcane` | 921 | 131 / 228 / 562 |
+| Pack | Answer pool (approx) |
+|------|---------------------:|
+| `subtlex-us` | ~4,000 |
+| `subtlex-uk` | ~4,500 |
+| `wordle` | ~2,300 |
+| `surprise` | ~4,700 |
+| `arcane` | ~900 |
 
-- **Allowed-guess validator** (`allowed_guesses_all.txt`): **12,829** distinct valid
-  guesses (down from ~25k of the raw sources: proper nouns, non-English words, and
-  junk are stripped; obscene words and trivial plurals stay guessable but aren't
-  answers).
-- **Defined words** (≥1 sense in a shipped dictionary): **12,362**.
+Each tiered pack splits easy / medium / hard at the `EASY`/`MEDIUM` frequency
+percentiles (default 15% / next 25% / rest), so the counts follow the pool size.
+
+- **Allowed-guess validator** (`allowed_guesses_all.txt`): **~13,000** distinct valid
+  guesses (roughly half the raw sources: proper nouns, non-English words, and junk are
+  stripped; obscene words and trivial plurals stay guessable but aren't answers).
+- **Defined words** (≥1 sense in a shipped dictionary): **~12,000+**.
 - **Arcane usage examples**: most arcane words carry ≥1 Wikisource literary citation.
 - **Caches** (committed, "black hole"): `dictionaryapi.json`, `wiktionary_defs.json`,
   `wikisource.json`. Re-runs hit zero network for cached lookups.
