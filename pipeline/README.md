@@ -137,6 +137,19 @@ Tunables (pass on the command line, e.g. `make all UK_MAX_API=2000`):
 the `surprise` list, and `allowed_guesses_all.txt`). Working intermediates and
 caches under `data/` stay behind.
 
+It then runs a **rule-based post-processing pass** over the shipped assets — all
+metadata-driven, the only curated inputs being the obscene lists (see "Answer
+eligibility" and "Reference resolution" above for the rules):
+
+1. `find_trivial_plurals.py` — flag bare `-s` inflections (barred from answers only).
+2. `classify_answers.py` — proper-noun / reference-only words → `nonanswer_names.txt`
+   (removed everywhere); obscene set (WordNet-marked ∪ curated) → the mature-gated
+   `blocklist_solutions.txt`; graft rescued side meanings into eligible entries.
+3. `apply_blocklist.py` — apply the slur / name / trivial-plural lists to the assets.
+4. `build_extra_defs.py` — WordNet + Wiktionary-cache defs for allowed words no pack defines.
+5. `resolve_references.py` — graft base meanings onto "spelling/plural of X" dead-ends.
+6. `find_nonword_guesses.py` + `apply_blocklist.py` — drop non-English words (no English sense).
+
 Word **selection and lookup at runtime** are not part of this pipeline — they live
 in the game's `worddata/` package (see the top-level `README.md`), which reads the
 published assets with no dependency on this tooling.
@@ -217,19 +230,26 @@ records additionally carry `gutenberg_search_url` and, where found, `examples`:
 
 ## Results
 
-Latest `make all` (`US_MAX_API=800 UK_MAX_API=1200 WORDLE_MAX_API=500`):
+Current **shipped** answer pools (`assets/dictionaries/`), after the publish
+post-processing removes trivial plurals, proper-noun/reference-only names, and
+non-English words from the answer sources:
 
-| Pack | Source words (5-letter) | Answer pool (defined) | Easy / Medium / Hard |
-|------|------------------------:|----------------------:|:--------------------:|
-| `subtlex-us` | 6,779 | 5,480 | 822 / 1,370 / 3,288 |
-| `subtlex-uk` | 19,151 | 6,594 | 989 / 1,649 / 3,956 |
-| `wordle` | 2,315 answers (12,972 allowed) | 2,309 | 346 / 578 / 1,385 |
-| `surprise` | union | 6,895 | — (no tiers) |
-| `arcane` | 4,128 Gutenberg − top-4,000 SUBTLEX (junk-filtered) | 1,009 | 151 / 253 / 605 |
+| Pack | Answer pool (shipped) | Easy / Medium / Hard |
+|------|----------------------:|:--------------------:|
+| `subtlex-us` | 4,014 | 705 / 1,023 / 2,286 |
+| `subtlex-uk` | 4,548 | 800 / 1,222 / 2,526 |
+| `wordle` | 2,308 | 346 / 578 / 1,384 |
+| `surprise` | 4,750 | — (no tiers) |
+| `arcane` | 921 | 131 / 228 / 562 |
 
-- **Arcane usage examples**: 984 of 1,009 words (97.5%) have ≥1 Wikisource literary citation (dictionaries, cyclopaedias, catalogues, etc. are filtered out — only prose/verse).
-- **Allowed-guess validator** (`data/allowed_guesses_all.txt`): 25,154 distinct valid words.
-- **Caches**: `dictionaryapi.json` ~2,050 words; `wikisource.json` ~1,000 words. Re-runs hit zero network for cached lookups.
+- **Allowed-guess validator** (`allowed_guesses_all.txt`): **12,829** distinct valid
+  guesses (down from ~25k of the raw sources: proper nouns, non-English words, and
+  junk are stripped; obscene words and trivial plurals stay guessable but aren't
+  answers).
+- **Defined words** (≥1 sense in a shipped dictionary): **12,362**.
+- **Arcane usage examples**: most arcane words carry ≥1 Wikisource literary citation.
+- **Caches** (committed, "black hole"): `dictionaryapi.json`, `wiktionary_defs.json`,
+  `wikisource.json`. Re-runs hit zero network for cached lookups.
 
 Answer-pool coverage is bounded by the per-pack `*_MAX_API` budgets (unfilled gaps
 are pruned); raise a budget and re-run to grow a pool — cached words are free, so
