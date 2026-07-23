@@ -50,6 +50,7 @@ _CURSOR_GLOW = (0.25, 0.72, 1.0)     # soft halo around it (alpha added per laye
 _ENTER_OK = T.TILE_CORRECT
 _ENTER_BAD = (0.86, 0.30, 0.30, 1)
 _DARK, _WHITE = (0.1, 0.1, 0.1, 1), (1, 1, 1, 1)
+_WARN_BG = (0.98, 0.87, 0.90, 1)     # subdued pink: this letter/position contradicts a prior clue
 
 
 class Tile(ButtonBehavior, Label):
@@ -65,11 +66,13 @@ class Tile(ButtonBehavior, Label):
         self.cursor = False
         self.bind(pos=self._redraw, size=self._redraw)
 
-    def set(self, ch: str, mark: Mark | None, cursor: bool = False) -> None:
+    def set(self, ch: str, mark: Mark | None, cursor: bool = False, warn: bool = False) -> None:
         self.text = ch.upper()
         self.cursor = cursor
         if mark is None:
-            self.bg, self.border, self.color = T.TILE_EMPTY, True, (0.2, 0.2, 0.2, 1)
+            # warn = a light pink hint that this letter contradicts an earlier clue
+            self.bg = _WARN_BG if warn else T.TILE_EMPTY
+            self.border, self.color = True, (0.2, 0.2, 0.2, 1)
         else:
             self.bg, self.border, self.color = _MARK_COLOR[mark], False, _WHITE
         self._redraw()
@@ -274,7 +277,7 @@ class WordGridPanel(BoxLayout):
         return kb
 
     def _make_key(self, text: str, cb: Callable, wide: bool = False) -> RoundedButton:
-        btn = RoundedButton(text=text, font_size="15sp", bg_color=T.KEY_DEFAULT, color=_DARK,
+        btn = RoundedButton(text=text, font_size="18sp", bg_color=T.KEY_DEFAULT, color=_DARK,
                             size_hint=(1.6 if wide else 1, 1))
         mass = LETTER_MASS.get(text.lower()) if len(text) == 1 and text.isalpha() else None
         if mass is not None:
@@ -363,17 +366,39 @@ class WordGridPanel(BoxLayout):
     def show_reveal(self, text: str) -> None:
         self.reveal.text = text
 
+    def _clue_constraints(self):
+        """From committed rows: known letter per position (green), letters barred from
+        a position (yellow there), and fully-absent letters (gray). Used to pink-warn
+        contradictions on the active row."""
+        g = self.game
+        greens: dict[int, str] = {}
+        barred: dict[int, set] = {i: set() for i in range(WORD_LEN)}
+        for guess, marks in zip(g.guesses, g.marks):
+            for i, (ch, mk) in enumerate(zip(guess, marks)):
+                if mk == Mark.CORRECT:
+                    greens[i] = ch
+                elif mk == Mark.PRESENT:
+                    barred[i].add(ch)
+        absent = {c for c, st in g.letter_states().items() if st == Mark.ABSENT}
+        return greens, barred, absent
+
     # --- render ---
     def render(self) -> None:
         g = self.game
         active = len(g.guesses)
+        greens, barred, absent = self._clue_constraints()
         for r in range(len(self._tiles)):
             if r < active:
                 for c in range(WORD_LEN):
                     self._tiles[r][c].set(g.guesses[r][c], g.marks[r][c])
             elif r == active and not g.finished:
                 for c in range(WORD_LEN):
-                    self._tiles[r][c].set(g.slots[c], None, cursor=(c == g.cursor))
+                    ch = g.slots[c]
+                    warn = bool(ch) and (
+                        (c in greens and ch != greens[c])   # this spot is already known to be another letter
+                        or ch in barred[c]                  # this letter is known NOT to sit here (was yellow here)
+                        or ch in absent)                    # this letter isn't in the word at all
+                    self._tiles[r][c].set(ch, None, cursor=(c == g.cursor), warn=warn)
             else:
                 for c in range(WORD_LEN):
                     self._tiles[r][c].set("", None)
