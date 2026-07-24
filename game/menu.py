@@ -35,7 +35,7 @@ class WordMenuScreen(MenuScreen):
             streak_text=self.app.streak_text,
             actions=[
                 ("Random Game", self.app.start_random),
-                ("Strategy", self.app.show_strategy),
+                ("How to play", self.app.show_help),
                 ("Logbook", self.app.show_logbook),
                 ("About", self.app.show_about),
             ],

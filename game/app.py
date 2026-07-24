@@ -663,28 +663,13 @@ class WordApp(GameShellApp):
         popup.open()
 
     def show_about(self, instance: Any = None) -> None:
-        from kivy.metrics import dp
-        from kivy.uix.label import Label
-
         from kivyshell.uikit import (CaptionLabel, FixedGrayRoundedButton, FixedRoundedButton,
-                                     LinkButton, Popup, PopupContent, SubtitleLabel, TitleLabel, get_theme)
+                                     LinkButton, Popup, PopupContent, SubtitleLabel, TitleLabel)
 
         from .version import __version__
-        theme = get_theme()
         content = PopupContent()
         content.add_widget(TitleLabel("yawop"))
         content.add_widget(SubtitleLabel("Yet Another WOrd Puzzle"))
-
-        # How to play — most players meet the rules here first.
-        how = Label(text="Guess the hidden 5-letter word in six tries.\n"
-                         "Green = right letter, right spot.\n"
-                         "Yellow = right letter, wrong spot.\n"
-                         "Gray = not in the word.",
-                    font_name=theme.font_name, font_size="14sp", color=theme.text_dark,
-                    halign="center", valign="middle", size_hint_y=None, height=dp(96))
-        how.bind(width=lambda *_: setattr(how, "text_size", (how.width, None)))
-        content.add_widget(how)
-
         content.add_widget(CaptionLabel(f"version {__version__}"))
         content.add_widget(CaptionLabel("Definitions: WordNet (Princeton) · Wiktionary (CC BY-SA)"))
         content.add_widget(CaptionLabel("License: GNU AGPL v3 · free & open source"))
@@ -697,7 +682,7 @@ class WordApp(GameShellApp):
         content.add_widget(policy)
         close = FixedGrayRoundedButton(text="Close")
         content.add_widget(close)
-        popup = Popup(content, height=500)
+        popup = Popup(content, height=380)
         policy.bind(on_press=lambda *_: (popup.dismiss(), self.show_policy()))
         close.bind(on_press=popup.dismiss)
         popup.open()
@@ -716,7 +701,7 @@ class WordApp(GameShellApp):
         ("ADIEU", ["CLIMB", "SHIRT", "SPORT"]),
     ]
 
-    def show_strategy(self, instance: Any = None) -> None:
+    def show_help(self, instance: Any = None) -> None:
         from kivy.metrics import dp, sp
         from kivy.uix.boxlayout import BoxLayout
         from kivy.uix.label import Label
@@ -724,6 +709,7 @@ class WordApp(GameShellApp):
 
         from kivyshell.uikit import FixedGrayRoundedButton, Popup, PopupContent, SubtitleLabel, TitleLabel, get_theme
 
+        from . import theme as T
         from .wordgrid import LETTER_MASS
 
         theme = get_theme()
@@ -736,19 +722,33 @@ class WordApp(GameShellApp):
             lbl.bind(size=lambda i, _v: setattr(i, "text_size", i.size))
             return lbl
 
+        def hx(c: tuple) -> str:
+            return "%02x%02x%02x" % (int(c[0] * 255), int(c[1] * 255), int(c[2] * 255))
+
         content = PopupContent()
-        content.add_widget(TitleLabel("Starting strategies"))
-        content.add_widget(fit(SubtitleLabel(
-            "Strong openers probe common letters. The score is the combined frequency of "
-            "the distinct letters the two words test — overlaps count once, so a good "
-            "second word adds new letters. Best pick in green.",
-            size_hint_y=None, height=dp(70), halign="center", valign="middle")))
+        content.add_widget(TitleLabel("How to play"))
 
         sv = ScrollView(size_hint=(1, 1))
         col = BoxLayout(orientation="vertical", size_hint_y=None, spacing=dp(8), padding=[0, dp(4)])
         col.bind(minimum_height=col.setter("height"))
         sv.add_widget(col)
         content.add_widget(sv)
+
+        # Rules — colour the keywords with their tile colours.
+        rules = ("Guess the hidden 5-letter word in six tries.\n"
+                 f"[b][color={hx(T.TILE_CORRECT)}]Green[/color][/b] = right letter, right spot.\n"
+                 f"[b][color={hx(T.TILE_PRESENT)}]Yellow[/color][/b] = right letter, wrong spot.\n"
+                 f"[b][color={hx(T.TILE_ABSENT)}]Gray[/color][/b] = not in the word.")
+        col.add_widget(fit(Label(text=rules, markup=True, font_name=theme.font_name, font_size="14sp",
+                                 color=theme.text_dark, halign="center", valign="middle",
+                                 size_hint_y=None, height=dp(104))))
+
+        col.add_widget(SubtitleLabel("Starting strategies", size_hint_y=None, height=dp(30)))
+        col.add_widget(fit(Label(
+            text="Openers that probe many common letters. Score = combined frequency of the "
+                 "distinct letters the pair tests (overlaps count once) — best in green.",
+            font_name=theme.font_name, font_size="13sp", color=theme.text_medium,
+            halign="center", valign="middle", size_hint_y=None, height=dp(58))))
 
         def opener_block(first: str, options: list[str], fav: bool = False) -> BoxLayout:
             block = BoxLayout(orientation="vertical", size_hint_y=None, height=dp(72), spacing=dp(2))
@@ -775,6 +775,6 @@ class WordApp(GameShellApp):
 
         close = FixedGrayRoundedButton(text="Close")
         content.add_widget(close)
-        popup = Popup(content, height=520)
+        popup = Popup(content, height=540)
         close.bind(on_press=popup.dismiss)
         popup.open()
