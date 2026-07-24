@@ -663,19 +663,45 @@ class WordApp(GameShellApp):
         popup.open()
 
     def show_about(self, instance: Any = None) -> None:
-        from kivyshell.uikit import CaptionLabel, FixedGrayRoundedButton, FixedRoundedButton, Popup, PopupContent, SubtitleLabel, TitleLabel
+        from kivy.metrics import dp
+        from kivy.uix.label import Label
+
+        from kivyshell.uikit import (CaptionLabel, FixedGrayRoundedButton, FixedRoundedButton,
+                                     LinkButton, Popup, PopupContent, SubtitleLabel, TitleLabel, get_theme)
 
         from .version import __version__
+        theme = get_theme()
         content = PopupContent()
         content.add_widget(TitleLabel("yawop"))
         content.add_widget(SubtitleLabel("Yet Another WOrd Puzzle"))
+
+        # How to play — most players meet the rules here first.
+        how = Label(text="Guess the hidden 5-letter word in six tries.\n"
+                         "Green = right letter, right spot.\n"
+                         "Yellow = right letter, wrong spot.\n"
+                         "Gray = not in the word.",
+                    font_name=theme.font_name, font_size="14sp", color=theme.text_dark,
+                    halign="center", valign="middle", size_hint_y=None, height=dp(96))
+        how.bind(width=lambda *_: setattr(how, "text_size", (how.width, None)))
+        content.add_widget(how)
+
         content.add_widget(CaptionLabel(f"version {__version__}"))
         content.add_widget(CaptionLabel("Definitions: WordNet (Princeton) · Wiktionary (CC BY-SA)"))
+        content.add_widget(CaptionLabel("License: GNU AGPL v3 · free & open source"))
+
+        gh = LinkButton("github.com/anverx/yawop")
+        gh.bind(on_press=lambda *_: self._open_url("https://github.com/anverx/yawop"))
+        content.add_widget(gh)
+
         policy = FixedRoundedButton(text="About the words")
         content.add_widget(policy)
         close = FixedGrayRoundedButton(text="Close")
         content.add_widget(close)
-        popup = Popup(content, height=300)
+        popup = Popup(content, height=500)
         policy.bind(on_press=lambda *_: (popup.dismiss(), self.show_policy()))
         close.bind(on_press=popup.dismiss)
         popup.open()
+
+    def _open_url(self, url: str) -> None:
+        import webbrowser
+        webbrowser.open(url)
