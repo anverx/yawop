@@ -136,6 +136,20 @@ class TestDailyCompletion(_StoreTest):
         self.assertFalse(self.store.daily_finished("2026-06-15", "medium"),
                          "another day's completion should not count")
 
+    def test_today_won_vs_failed_status(self):
+        """today_completion marks wins, today_failed marks losses; mutually exclusive."""
+        import datetime
+        today = datetime.date.today().isoformat()
+        w = self.store.start("easy", today, "crane")
+        self.store.finish(w.play_id, True, 30000, 3, ["arose", "crane"], 30000)
+        f = self.store.start("hard", today, "vexil")
+        self.store.finish(f.play_id, False, 60000, 6,
+                          ["adieu", "story", "point", "lucky", "frame", "blush"], 60000)
+        won, failed = self.store.today_completion(), self.store.today_failed()
+        self.assertTrue(won["easy"] and not failed["easy"], "won daily -> won, not failed")
+        self.assertTrue(failed["hard"] and not won["hard"], "lost daily -> failed, not won")
+        self.assertFalse(won["medium"] or failed["medium"], "unplayed -> neither")
+
 
 class TestStatistics(_StoreTest):
     """stats_by_difficulty aggregates only finished games; wins drive avg/best."""

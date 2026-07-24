@@ -178,6 +178,19 @@ class WordStore:
         c = self._db.completion_today(date.today().isoformat(), DIFFICULTIES)
         return {k: (v is not Completion.NONE) for k, v in c.items()}
 
+    def today_failed(self) -> dict[str, bool]:
+        """Per-difficulty: today's daily was played to a finish but NOT solved (a loss).
+        Mutually exclusive with today_completion (one play per daily)."""
+        today = date.today().isoformat()
+        out = {d: False for d in DIFFICULTIES}
+        rows = self._conn.execute(
+            "SELECT c.variant_id FROM plays p JOIN challenges c ON c.id=p.challenge_id "
+            "WHERE c.date=? AND p.completed_at IS NOT NULL AND p.completed=0", (today,)).fetchall()
+        for (d,) in rows:
+            if d in out:
+                out[d] = True
+        return out
+
     def streak(self) -> int:
         return self._db.streak()
 

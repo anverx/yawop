@@ -16,14 +16,38 @@ class WordMenuScreen(MenuScreen):
         self._embolden()
 
     def on_enter(self) -> None:
-        super().on_enter()          # refresh streak / completion badges
+        super().on_enter()          # refresh streak / win badges
         self._embolden()            # keep menu text bold after any rebuild
+        self._mark_daily_status()   # also mark FAILED dailies (super only marks wins)
 
     def _embolden(self) -> None:
         """Bold every text label in the menu (titles, buttons, streak)."""
         for w in self.walk(restrict=True):
             if isinstance(w, Label):
                 w.bold = True
+
+    def _mark_daily_status(self) -> None:
+        """Show the win (gold W) or failed (black crown) badge per difficulty. The
+        shared menu only marks wins; a lost daily is finished too and should show.
+        The failed crown PNG is near-black, so the badge's gold tint leaves it black."""
+        from kivy.core.image import Image as CoreImage
+
+        from kivyshell.uikit import get_theme
+
+        from .theme import FAILED_BADGE
+        won = self.app.daily_completion()   # {difficulty: won?}
+        failed = self.app.daily_failed()    # {difficulty: finished-but-lost?}
+        won_tex = CoreImage(get_theme().badge_icon).texture
+        failed_tex = CoreImage(FAILED_BADGE).texture
+        for vid, badge in self._badges.items():
+            if won.get(vid):
+                badge._texture = won_tex
+                badge.show()
+            elif failed.get(vid):
+                badge._texture = failed_tex
+                badge.show()
+            else:
+                badge.hide()
 
     def menu_config(self) -> MenuConfig:
         return MenuConfig(

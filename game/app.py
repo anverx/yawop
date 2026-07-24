@@ -105,6 +105,9 @@ class WordApp(GameShellApp):
     def daily_completion(self) -> dict[str, bool]:
         return self.store.today_completion()
 
+    def daily_failed(self) -> dict[str, bool]:
+        return self.store.today_failed()
+
     # --- game flow ---
     def start_daily(self, difficulty: str) -> None:
         today = datetime.date.today().isoformat()
