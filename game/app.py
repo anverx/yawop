@@ -752,7 +752,8 @@ class WordApp(GameShellApp):
 
         def opener_block(first: str, options: list[str], fav: bool = False) -> BoxLayout:
             block = BoxLayout(orientation="vertical", size_hint_y=None, height=dp(72), spacing=dp(2))
-            head = ("★  " if fav else "") + f"[b]{first}[/b]  →  then"
+            # » renders in Roboto (→ and ★ don't); mark the favourite with green text
+            head = f"[b]{first}[/b]  »  then" + ("   (a favourite)" if fav else "")
             h = Label(text=head, markup=True, font_name=theme.font_name, font_size="15sp",
                       color=(theme.text_dark if not fav else green), size_hint_y=None, height=dp(24),
                       halign="left", valign="middle")
