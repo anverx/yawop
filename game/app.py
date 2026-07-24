@@ -705,3 +705,76 @@ class WordApp(GameShellApp):
     def _open_url(self, url: str) -> None:
         import webbrowser
         webbrowser.open(url)
+
+    # Starting-strategy openers: a first word, then second-word options. The score is
+    # the combined frequency of the DISTINCT letters the pair probes (overlaps count
+    # once), so a good follow-up adds new common letters rather than repeating them.
+    _FAVOURITE = ("RAISE", "POUND")
+    _OPENERS = [
+        ("SLATE", ["CRONY", "CLOUT", "PILOT"]),
+        ("CRANE", ["TANGY", "PIOUS", "BIDET"]),
+        ("ADIEU", ["CLIMB", "SHIRT", "SPORT"]),
+    ]
+
+    def show_strategy(self, instance: Any = None) -> None:
+        from kivy.metrics import dp, sp
+        from kivy.uix.boxlayout import BoxLayout
+        from kivy.uix.label import Label
+        from kivy.uix.scrollview import ScrollView
+
+        from kivyshell.uikit import FixedGrayRoundedButton, Popup, PopupContent, SubtitleLabel, TitleLabel, get_theme
+
+        from .wordgrid import LETTER_MASS
+
+        theme = get_theme()
+        green, grey = (0.30, 0.62, 0.36, 1), theme.text_medium
+
+        def pair_score(a: str, b: str) -> int:
+            return sum(LETTER_MASS.get(c, 0) for c in set((a + b).lower()))
+
+        def fit(lbl: Label) -> Label:
+            lbl.bind(size=lambda i, _v: setattr(i, "text_size", i.size))
+            return lbl
+
+        content = PopupContent()
+        content.add_widget(TitleLabel("Starting strategies"))
+        content.add_widget(fit(SubtitleLabel(
+            "Strong openers probe common letters. The score is the combined frequency of "
+            "the distinct letters the two words test — overlaps count once, so a good "
+            "second word adds new letters. Best pick in green.",
+            size_hint_y=None, height=dp(70), halign="center", valign="middle")))
+
+        sv = ScrollView(size_hint=(1, 1))
+        col = BoxLayout(orientation="vertical", size_hint_y=None, spacing=dp(8), padding=[0, dp(4)])
+        col.bind(minimum_height=col.setter("height"))
+        sv.add_widget(col)
+        content.add_widget(sv)
+
+        def opener_block(first: str, options: list[str], fav: bool = False) -> BoxLayout:
+            block = BoxLayout(orientation="vertical", size_hint_y=None, height=dp(72), spacing=dp(2))
+            head = ("★  " if fav else "") + f"[b]{first}[/b]  →  then"
+            h = Label(text=head, markup=True, font_name=theme.font_name, font_size="15sp",
+                      color=(theme.text_dark if not fav else green), size_hint_y=None, height=dp(24),
+                      halign="left", valign="middle")
+            block.add_widget(fit(h))
+            row = BoxLayout(orientation="horizontal", size_hint_y=None, height=dp(46), spacing=dp(6))
+            ranked = sorted(options, key=lambda o: -pair_score(first, o))
+            for i, o in enumerate(ranked):
+                best = (i == 0)
+                lbl = Label(text=f"[b]{o}[/b]\n[size={round(sp(11))}]{pair_score(first, o)}[/size]",
+                            markup=True, font_name=theme.font_name, font_size="16sp",
+                            color=(green if best else grey), halign="center", valign="middle")
+                row.add_widget(fit(lbl))
+            block.add_widget(row)
+            return block
+
+        fa, fb = self._FAVOURITE
+        col.add_widget(opener_block(fa, [fb], fav=True))
+        for first, opts in self._OPENERS:
+            col.add_widget(opener_block(first, opts))
+
+        close = FixedGrayRoundedButton(text="Close")
+        content.add_widget(close)
+        popup = Popup(content, height=520)
+        close.bind(on_press=popup.dismiss)
+        popup.open()
