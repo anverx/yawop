@@ -28,6 +28,9 @@ _MAX_SENSES = 3
 _STYLE = re.compile(r"<style.*?</style>", re.S)
 _TAGS = re.compile(r"<[^>]+>")
 _WS = re.compile(r"\s+")
+# Wiktionary stubs with no real definition ("request for definition"): drop them.
+PLACEHOLDER = re.compile(r"needs a definition|please help out|\brfdef\b|"
+                         r"add a definition, then remove|this (term|word) is (used|a)\W*$", re.I)
 
 
 def clean(html: str) -> str:
@@ -63,7 +66,7 @@ def extract_senses(data: dict) -> list[dict]:
         label = pos if pick == "en" else LANG_NAMES.get(pick, pick.upper())
         for d in group.get("definitions", []):
             text = clean(d.get("definition", ""))
-            if not text or (label, text) in seen:
+            if not text or (label, text) in seen or PLACEHOLDER.search(text):
                 continue
             seen.add((label, text))
             senses.append({"pos_label": label, "definition": text, "source": "wiktionary"})

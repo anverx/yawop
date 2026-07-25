@@ -34,6 +34,7 @@ REFERENCE = re.compile(
     r"|^\W*(misspelling|plural|clipping|abbreviation|initialism|acronym|synonym|inflection|genitive|"
     r"comparative|superlative|present participle|past tense|past participle|gerund|third[- ]person singular)"
     r"(\s+and\s+\w+)?\s+of\b", re.I)
+PLACEHOLDER = re.compile(r"needs a definition|please help out|\brfdef\b|add a definition, then remove", re.I)
 _MAX_ADD = 3
 
 
@@ -108,7 +109,7 @@ def main() -> None:
         add, have = [], list(defs.get(w, []))
         for s in wik:
             d = s.get("definition", "") or ""
-            if not d or REFERENCE.search(d) or near_dup(d, have):
+            if not d or REFERENCE.search(d) or PLACEHOLDER.search(d) or near_dup(d, have):
                 continue
             add.append({"pos_label": s.get("pos_label", "noun"), "definition": d, "source": "wiktionary"})
             have.append(d)
