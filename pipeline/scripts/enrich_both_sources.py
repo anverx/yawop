@@ -34,7 +34,8 @@ REFERENCE = re.compile(
     r"|^\W*(misspelling|plural|clipping|abbreviation|initialism|acronym|synonym|inflection|genitive|"
     r"comparative|superlative|present participle|past tense|past participle|gerund|third[- ]person singular)"
     r"(\s+and\s+\w+)?\s+of\b", re.I)
-PLACEHOLDER = re.compile(r"needs a definition|please help out|\brfdef\b|add a definition, then remove", re.I)
+PLACEHOLDER = re.compile(r"needs a definition|please help out|\brfdef\b|add a definition, then remove|"
+                         r"\\[a-zA-Z]+|displaystyle|[{}]", re.I)  # stubs + unrenderable LaTeX/math residue
 _MAX_ADD = 3
 
 

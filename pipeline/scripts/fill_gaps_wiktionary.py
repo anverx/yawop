@@ -28,15 +28,30 @@ _MAX_SENSES = 3
 _STYLE = re.compile(r"<style.*?</style>", re.S)
 _TAGS = re.compile(r"<[^>]+>")
 _WS = re.compile(r"\s+")
+_CSS = re.compile(r"\.mw-parser-output[^{]*\{[^}]*\}")   # leaked stylesheet rules
+_DISPLAYSTYLE = re.compile(r"\{\\displaystyle[^}]*\}")    # LaTeX display math wrapper
+_BRACES = re.compile(r"\{[^{}]*\}")                       # any other {…} residue
 # Wiktionary stubs with no real definition ("request for definition"): drop them.
 PLACEHOLDER = re.compile(r"needs a definition|please help out|\brfdef\b|"
                          r"add a definition, then remove|this (term|word) is (used|a)\W*$", re.I)
+# Unrenderable LaTeX/math residue (nested braces the cleaner can't unwrap): a real
+# English definition never contains a \command or a stray brace, so treat as junk.
+LATEX = re.compile(r"\\[a-zA-Z]+|displaystyle|[{}]")
 
 
-def clean(html: str) -> str:
-    txt = _STYLE.sub("", html)
+def is_junk(text: str) -> bool:
+    return not text or bool(PLACEHOLDER.search(text)) or bool(LATEX.search(text))
+
+
+def clean(raw: str) -> str:
+    import html as _html
+    txt = _STYLE.sub("", raw)
+    txt = _CSS.sub("", txt)              # .mw-parser-output …{…} stylesheet leaks
+    txt = _DISPLAYSTYLE.sub("", txt)     # {\displaystyle …} LaTeX
+    txt = _BRACES.sub("", txt)           # stray {…}
     txt = _TAGS.sub("", txt)
-    txt = txt.replace("&quot;", '"').replace("&amp;", "&")
+    txt = _html.unescape(txt)            # &nbsp; &#39; … -> real characters
+    txt = _TAGS.sub("", txt)             # in case an entity revealed a tag
     return _WS.sub(" ", txt).strip()
 
 
@@ -66,7 +81,7 @@ def extract_senses(data: dict) -> list[dict]:
         label = pos if pick == "en" else LANG_NAMES.get(pick, pick.upper())
         for d in group.get("definitions", []):
             text = clean(d.get("definition", ""))
-            if not text or (label, text) in seen or PLACEHOLDER.search(text):
+            if is_junk(text) or (label, text) in seen:
                 continue
             seen.add((label, text))
             senses.append({"pos_label": label, "definition": text, "source": "wiktionary"})
