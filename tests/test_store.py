@@ -13,6 +13,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 from game.store import WordStore  # noqa: E402
+from kivyshell.shell import Completion  # noqa: E402
 
 
 class _StoreTest(unittest.TestCase):
@@ -149,6 +150,47 @@ class TestDailyCompletion(_StoreTest):
         self.assertTrue(won["easy"] and not failed["easy"], "won daily -> won, not failed")
         self.assertTrue(failed["hard"] and not won["hard"], "lost daily -> failed, not won")
         self.assertFalse(won["medium"] or failed["medium"], "unplayed -> neither")
+
+
+class TestMonthCrown(_StoreTest):
+    """The monthly crown requires a COMPLETED month with EVERY day won."""
+
+    def _win_day(self, iso: str, on_time: bool = True) -> None:
+        r = self.store.start("easy", iso, "crane")
+        self.store.finish(r.play_id, True, 1000, 1, ["crane"], 1000)
+        if on_time:  # finish() stamps 'now'; force the challenge date so it counts on-time
+            self.store._conn.execute("UPDATE plays SET completed_at=? WHERE id=?", (iso + "T10:00:00", r.play_id))
+            self.store._conn.commit()
+
+    def _crown(self, y: int, m: int):
+        cal = self.store.calendar_state()
+        cal.year, cal.month = y, m
+        return cal.fetch_data().month_crown
+
+    def test_no_crown_while_a_day_is_unplayed(self):
+        import calendar
+        y, m = 2021, 2                       # a completed, 28-day month
+        n = calendar.monthrange(y, m)[1]
+        for dd in range(1, n):               # win days 1..27, leave the last
+            self._win_day(f"{y}-{m:02d}-{dd:02d}")
+        self.assertEqual(self._crown(y, m), Completion.NONE, "one day unplayed -> no crown")
+        self._win_day(f"{y}-{m:02d}-{n:02d}")  # now finish the month
+        self.assertEqual(self._crown(y, m), Completion.ON_TIME, "every day won on-time -> gold crown")
+
+    def test_no_crown_for_current_month(self):
+        import datetime
+        today = datetime.date.today()
+        self._win_day(today.isoformat())
+        self.assertEqual(self._crown(today.year, today.month), Completion.NONE,
+                         "current month isn't over -> no crown even if today is won")
+
+    def test_late_wins_give_silver_not_gold(self):
+        import calendar
+        y, m = 2021, 4
+        n = calendar.monthrange(y, m)[1]
+        for dd in range(1, n + 1):           # all won, but back-played (completed_at = today, i.e. late)
+            self._win_day(f"{y}-{m:02d}-{dd:02d}", on_time=False)
+        self.assertEqual(self._crown(y, m), Completion.LATE, "all won but late -> silver crown")
 
 
 class TestStatistics(_StoreTest):

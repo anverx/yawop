@@ -83,7 +83,26 @@ class _CalState:
             cell = days.setdefault(d, {})
             if cell.get(diff, Completion.NONE) is Completion.NONE:  # a win wins over a failure
                 cell[diff] = FAILED
-        return CalData(ms.month_name, ms.streak_text, days, ms.month_badge, ms.protected_dates)
+        # kivyshell's month badge only looks at played days and ignores whether the
+        # month is over -> it hands out crowns mid-month and for months with unplayed
+        # days. Recompute: a crown only for a COMPLETED month where EVERY day was won.
+        return CalData(ms.month_name, ms.streak_text, days, self._month_crown(days), ms.protected_dates)
+
+    def _month_crown(self, days: dict):
+        import calendar
+        today = date.today()
+        if (self.year, self.month) >= (today.year, today.month):
+            return Completion.NONE   # current or future month isn't over yet -> no crown
+        ndays = calendar.monthrange(self.year, self.month)[1]
+        isos = [f"{self.year:04d}-{self.month:02d}-{d:02d}" for d in range(1, ndays + 1)]
+
+        def won(iso: str, on_time_only: bool = False) -> bool:
+            wins = (Completion.ON_TIME,) if on_time_only else (Completion.ON_TIME, Completion.LATE)
+            return any(v in wins for v in days.get(iso, {}).values())
+
+        if not all(won(iso) for iso in isos):        # any day unsolved -> no crown
+            return Completion.NONE
+        return Completion.ON_TIME if all(won(iso, on_time_only=True) for iso in isos) else Completion.LATE
 
 
 class WordStore:
