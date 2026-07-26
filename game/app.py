@@ -666,14 +666,37 @@ class WordApp(GameShellApp):
         popup.open()
 
     def show_about(self, instance: Any = None) -> None:
+        from kivy.uix.behaviors import ButtonBehavior
+        from kivy.uix.label import Label
+
         from kivyshell.uikit import (CaptionLabel, FixedGrayRoundedButton, FixedRoundedButton,
-                                     LinkButton, Popup, PopupContent, SubtitleLabel, TitleLabel)
+                                     LinkButton, Popup, PopupContent, SubtitleLabel, TitleLabel, get_theme)
 
         from .version import __version__
         content = PopupContent()
         content.add_widget(TitleLabel("yawop"))
         content.add_widget(SubtitleLabel("Yet Another WOrd Puzzle"))
-        content.add_widget(CaptionLabel(f"version {__version__}"))
+
+        # Tapping the version 5× quickly opens the hidden developer menu.
+        class _TapLabel(ButtonBehavior, Label):
+            pass
+        theme = get_theme()
+        taps = {"n": 0, "t": 0.0}
+        ver = _TapLabel(text=f"version {__version__}", font_name=theme.font_name, font_size="12sp",
+                        color=theme.text_medium, size_hint_y=None, height=24, bold=True)
+
+        def _ver_tap(*_a: Any) -> None:
+            import time as _t
+            now = _t.time()
+            taps["n"] = taps["n"] + 1 if now - taps["t"] < 2.0 else 1
+            taps["t"] = now
+            if taps["n"] >= 5:
+                taps["n"] = 0
+                popup.dismiss()
+                self._show_dev_menu()
+
+        ver.bind(on_press=_ver_tap)
+        content.add_widget(ver)
         content.add_widget(CaptionLabel("Definitions: WordNet (Princeton) · Wiktionary (CC BY-SA)"))
         content.add_widget(CaptionLabel("License: GNU AGPL v3 · free & open source"))
 
@@ -693,6 +716,91 @@ class WordApp(GameShellApp):
     def _open_url(self, url: str) -> None:
         import webbrowser
         webbrowser.open(url)
+
+    def _show_dev_menu(self) -> None:
+        """Hidden developer menu (reached by tapping the About version 5×). Exports the
+        sqlite DB so a game's state can be inspected off-device."""
+        import datetime
+
+        from kivy.metrics import dp
+        from kivy.uix.label import Label
+
+        from kivyshell.uikit import FixedGrayRoundedButton, FixedRoundedButton, Popup, PopupContent, TitleLabel, get_theme
+
+        theme = get_theme()
+        content = PopupContent()
+        content.add_widget(TitleLabel("Developer"))
+        status = Label(text="", font_name=theme.font_name, font_size="12sp", color=theme.text_medium,
+                       size_hint_y=None, height=dp(52), halign="center", valign="middle")
+        status.bind(size=lambda i, _v: setattr(i, "text_size", i.size))
+        content.add_widget(status)
+
+        filename = f"yawop_{datetime.date.today().isoformat()}.db"
+
+        def export_db(*_a: Any) -> None:
+            import os
+            path = self.store.db_path()
+            if not path or not os.path.exists(path):
+                status.text = "No database on disk."
+                return
+            from kivy.utils import platform
+            if platform == "android":
+                try:
+                    with open(path, "rb") as f:
+                        self._android_save_file(f.read(), "application/x-sqlite3", filename, status)
+                except Exception as e:  # noqa: BLE001
+                    status.text = f"Error: {e}"
+            else:
+                import shutil
+                try:
+                    dest = os.path.join(os.path.expanduser("~"), "Downloads", filename)
+                    os.makedirs(os.path.dirname(dest), exist_ok=True)
+                    shutil.copy2(path, dest)
+                    status.text = f"Saved to {dest}"
+                except Exception as e:  # noqa: BLE001
+                    status.text = f"Error: {e}"
+
+        btn = FixedRoundedButton(text="Export database")
+        btn.bind(on_press=export_db)
+        content.add_widget(btn)
+        close = FixedGrayRoundedButton(text="Close")
+        content.add_widget(close)
+        popup = Popup(content, height=300)
+        close.bind(on_press=popup.dismiss)
+        popup.open()
+
+    def _android_save_file(self, content_bytes: bytes, mime_type: str, filename: str, status: Any) -> None:
+        """Let the user pick a save location via the system 'create document' dialog
+        (Storage Access Framework) — no storage permission needed. Defaults near Downloads."""
+        from android import activity as android_activity  # type: ignore
+        from android import mActivity  # type: ignore
+        from jnius import autoclass  # type: ignore
+
+        Intent = autoclass("android.content.Intent")
+        request_code = 9042
+
+        def on_result(req_code: int, result_code: int, intent_data: Any) -> None:
+            android_activity.unbind(on_activity_result=on_result)
+            if req_code != request_code:
+                return
+            if result_code != -1 or intent_data is None:   # -1 == RESULT_OK
+                status.text = "Export cancelled"
+                return
+            try:
+                stream = mActivity.getContentResolver().openOutputStream(intent_data.getData())
+                stream.write(content_bytes)
+                stream.flush()
+                stream.close()
+                status.text = f"Exported {filename}"
+            except Exception as e:  # noqa: BLE001
+                status.text = f"Error saving: {e}"
+
+        android_activity.bind(on_activity_result=on_result)
+        intent = Intent(Intent.ACTION_CREATE_DOCUMENT)
+        intent.addCategory(Intent.CATEGORY_OPENABLE)
+        intent.setType(mime_type)
+        intent.putExtra(Intent.EXTRA_TITLE, filename)
+        mActivity.startActivityForResult(intent, request_code)
 
     # Starting-strategy openers: a first word, then second-word options. The score is
     # the combined frequency of the DISTINCT letters the pair probes (overlaps count

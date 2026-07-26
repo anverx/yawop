@@ -31,7 +31,7 @@ android.numeric_version = 1
 # kivyshell (the shared UI lib) is pure Python and is vendored as a git submodule
 # at libs/kivyshell; game/__init__.py puts it on sys.path, so it bundles as plain
 # source and needs no entry here. CI must checkout with submodules: recursive.
-requirements = python3,kivy,pillow,cython==3.0.12
+requirements = python3,kivy,pillow,pyjnius,cython==3.0.12
 
 # Supported orientations (portrait, landscape, all)
 orientation = portrait

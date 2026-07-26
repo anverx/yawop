@@ -89,8 +89,10 @@ class _CalState:
 class WordStore:
     def __init__(self) -> None:
         self._db = SqliteStore()
+        self._data_dir: str | None = None
 
     def open(self, data_dir: str) -> None:
+        self._data_dir = data_dir
         self._db.open(data_dir)
         # Board state per play: resumes an unfinished daily, and (once finished)
         # keeps the played-out board so it can always be reviewed. Each snapshot is
@@ -102,6 +104,13 @@ class WordStore:
 
     def close(self) -> None:
         self._db.close()
+
+    def db_path(self) -> str | None:
+        """On-disk path of the sqlite file (for the dev-menu export). None if in-memory."""
+        if not self._data_dir or self._data_dir == ":memory:":
+            return None
+        from pathlib import Path
+        return str(Path(self._data_dir) / "kivyshell.db")
 
     @property
     def _conn(self):
