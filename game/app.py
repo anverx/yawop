@@ -49,11 +49,33 @@ class WordApp(GameShellApp):
         self.store = WordStore()
         self.store.open(self.user_data_dir)
         self._play_id: int | None = None
+        self._day: str | None = None   # the dated daily currently in play (for finish recovery)
         self._last_random = {"pack": DEFAULT_PACK, "difficulty": "medium"}
         self._allow_mature = bool(self._load_pref("allow_mature", False))
 
     def close_storage(self) -> None:
         self.store.close()
+
+    # --- Android lifecycle ---
+    # build() (hence open_storage) runs once per process. If the app is torn down on
+    # backgrounding, on_stop closes the DB but the live widgets remain, so on return
+    # the store is closed while the game is still playable -> writes/resume silently
+    # operate on a dead connection (a clean win vanishes; the puzzle restarts every
+    # open). Returning True from on_pause keeps the process alive so the connection
+    # survives; on_resume re-opens defensively in case it didn't.
+    def on_pause(self) -> bool:
+        return True
+
+    def on_resume(self) -> None:
+        self._ensure_store()
+
+    def _ensure_store(self) -> None:
+        """Reopen the store if its connection was closed (e.g. an on_stop fired while
+        the process lingered in the background)."""
+        if getattr(self, "store", None) is None or not self.store.is_open():
+            self._log("store was closed on resume; reopening")
+            self.store = getattr(self, "store", None) or WordStore()
+            self.store.open(self.user_data_dir)
 
     # --- simple JSON prefs in user_data_dir (survives restarts) ---
     def _prefs_path(self) -> str:
@@ -245,11 +267,14 @@ class WordApp(GameShellApp):
         # The mature toggle applies to random games only. Dated games (daily and
         # calendar dates, seed=day) must be identical for every player, so they
         # always draw from the standard filtered pool regardless of the setting.
+        self._ensure_store()  # never run on a connection an on_stop may have closed
         allow_mature = self._allow_mature and day is None
         answer = worddata.pick_word(pack, difficulty, seed=day, allow_mature=allow_mature)
         self._current = (pack, difficulty, answer)
         resume = self.store.start(difficulty, day, answer)  # resumes an unfinished daily
         self._play_id = resume.play_id
+        self._day = day
+        self._log(f"start day={day} diff={difficulty} play_id={resume.play_id} resumed={len(resume.guesses)}")
         game = WordGame(answer)
         if resume.guesses:
             game.restore(resume.guesses)
@@ -301,12 +326,32 @@ class WordApp(GameShellApp):
         if self._play_id is not None:
             self.store.save_progress(self._play_id, elapsed_ms, guesses)
 
+    def _log(self, msg: str) -> None:
+        """Append a timestamped line to a small event log (for chasing the elusive
+        'win didn't record' bug). Exportable from the dev menu; best-effort."""
+        try:
+            import datetime
+            with open(os.path.join(self.user_data_dir, "yawop_events.log"), "a", encoding="utf-8") as f:
+                f.write(f"{datetime.datetime.now().isoformat()} {msg}\n")
+        except Exception:  # noqa: BLE001
+            pass
+
     def _on_finish(self, won: bool, duration_ms: int, attempts: int) -> None:
-        _, _, answer = self._current
-        if self._play_id is not None:
+        _, difficulty, answer = self._current
+        pid, recovered = self._play_id, False
+        if pid is None and won and not self._game.lost and self._day is not None:
+            # A CLEAN win with no play id shouldn't happen (only a bonus win after a
+            # loss legitimately has no play id, and that's gated by game.lost above).
+            # It means the play/session state got confused (an intermittent, so-far-
+            # unreproducible bug). Re-acquire the day's play so the win still records
+            # instead of being silently dropped.
+            pid = self.store.start(difficulty, self._day, answer).play_id
+            recovered = True
+        if pid is not None:
             # record win AND lose, and snapshot the final board for later review
-            self.store.finish(self._play_id, won, duration_ms, attempts,
-                              list(self._game.guesses), duration_ms)
+            self.store.finish(pid, won, duration_ms, attempts, list(self._game.guesses), duration_ms)
+        self._log(f"finish day={self._day} diff={difficulty} won={won} lost={self._game.lost} "
+                  f"play_id={pid} recovered={recovered}")
         self._play_id = None  # once recorded, 'another try' rounds don't re-record
         if won and not self._game.lost:
             self._show_success(answer, attempts, duration_ms)
@@ -760,12 +805,37 @@ class WordApp(GameShellApp):
                 except Exception as e:  # noqa: BLE001
                     status.text = f"Error: {e}"
 
+        def export_log(*_a: Any) -> None:
+            path = os.path.join(self.user_data_dir, "yawop_events.log")
+            if not os.path.exists(path):
+                status.text = "No event log yet."
+                return
+            from kivy.utils import platform
+            if platform == "android":
+                try:
+                    with open(path, "rb") as f:
+                        self._android_save_file(f.read(), "text/plain", "yawop_events.log", status)
+                except Exception as e:  # noqa: BLE001
+                    status.text = f"Error: {e}"
+            else:
+                import shutil
+                try:
+                    dest = os.path.join(os.path.expanduser("~"), "Downloads", "yawop_events.log")
+                    os.makedirs(os.path.dirname(dest), exist_ok=True)
+                    shutil.copy2(path, dest)
+                    status.text = f"Saved to {dest}"
+                except Exception as e:  # noqa: BLE001
+                    status.text = f"Error: {e}"
+
         btn = FixedRoundedButton(text="Export database")
         btn.bind(on_press=export_db)
         content.add_widget(btn)
+        logbtn = FixedRoundedButton(text="Export event log")
+        logbtn.bind(on_press=export_log)
+        content.add_widget(logbtn)
         close = FixedGrayRoundedButton(text="Close")
         content.add_widget(close)
-        popup = Popup(content, height=300)
+        popup = Popup(content, height=360)
         close.bind(on_press=popup.dismiss)
         popup.open()
 

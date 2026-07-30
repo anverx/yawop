@@ -111,6 +111,8 @@ class WordStore:
         self._data_dir: str | None = None
 
     def open(self, data_dir: str) -> None:
+        if self.is_open():
+            self.close()  # reopen safely: don't leak a prior connection
         self._data_dir = data_dir
         self._db.open(data_dir)
         # Board state per play: resumes an unfinished daily, and (once finished)
@@ -123,6 +125,9 @@ class WordStore:
 
     def close(self) -> None:
         self._db.close()
+
+    def is_open(self) -> bool:
+        return self._db._db is not None
 
     def db_path(self) -> str | None:
         """On-disk path of the sqlite file (for the dev-menu export). None if in-memory."""

@@ -102,6 +102,32 @@ class TestResume(_StoreTest):
         self.assertNotEqual(r2.play_id, r1.play_id, "random should be a new play")
         self.assertEqual(r2.guesses, [], "random should not carry prior guesses")
 
+    def test_resume_survives_close_and_reopen(self):
+        """A daily saved, then the store closed and reopened (the Android
+        background/foreground lifecycle), still resumes the same play + guesses.
+        Guards the win-vanishes bug: writes must reach disk and a fresh connection
+        must see them."""
+        r = self.store.start("hard", "2026-07-30", "vexil")
+        self.store.save_progress(r.play_id, 8000, ["adieu", "story"])
+        self.store.close()
+        self.assertFalse(self.store.is_open(), "close() should drop the connection")
+        self.store.open(self._tmp.name)
+        self.assertTrue(self.store.is_open(), "reopen should restore the connection")
+        resumed = self.store.start("hard", "2026-07-30", "vexil")
+        self.assertEqual((resumed.play_id, resumed.guesses, resumed.elapsed_ms),
+                         (r.play_id, ["adieu", "story"], 8000),
+                         "reopened store should resume the same play after a restart")
+
+    def test_double_open_is_safe(self):
+        """open() on an already-open store reopens cleanly (no leaked connection,
+        no lost data) — open_storage may run again on a resumed process."""
+        r = self.store.start("easy", "2026-07-30", "toast")
+        self.store.save_progress(r.play_id, 2000, ["slate"])
+        self.store.open(self._tmp.name)  # open again without closing first
+        self.assertTrue(self.store.is_open(), "store should still be open")
+        resumed = self.store.start("easy", "2026-07-30", "toast")
+        self.assertEqual(resumed.guesses, ["slate"], "data should survive a re-open")
+
 
 class TestDailyCompletion(_StoreTest):
     """daily_finished() is strict: a loss finishes the daily just like a win."""
