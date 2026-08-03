@@ -124,6 +124,8 @@ class WordGameScreen(BackgroundedScreen):
             self._on_progress(gs, self._elapsed * 1000)
 
     def _go_menu(self) -> None:
+        if hasattr(self.app, "_log"):
+            self.app._log(f"back to {self._return_to} (finished={self._panel.game.finished if self._panel else '?'})")
         self.app.sm.current = self._return_to
 
     def show_reveal(self, text: str) -> None:

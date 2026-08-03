@@ -52,8 +52,10 @@ class WordApp(GameShellApp):
         self._day: str | None = None   # the dated daily currently in play (for finish recovery)
         self._last_random = {"pack": DEFAULT_PACK, "difficulty": "medium"}
         self._allow_mature = bool(self._load_pref("allow_mature", False))
+        self._log("open_storage (process start / build)")
 
     def close_storage(self) -> None:
+        self._log("close_storage (on_stop)")
         self.store.close()
 
     # --- Android lifecycle ---
@@ -64,10 +66,16 @@ class WordApp(GameShellApp):
     # open). Returning True from on_pause keeps the process alive so the connection
     # survives; on_resume re-opens defensively in case it didn't.
     def on_pause(self) -> bool:
+        self._log("on_pause")
         return True
 
     def on_resume(self) -> None:
+        self._log("on_resume")
         self._ensure_store()
+
+    def on_stop(self) -> None:
+        self._log("on_stop")
+        super().on_stop()
 
     def _ensure_store(self) -> None:
         """Reopen the store if its connection was closed (e.g. an on_stop fired while
