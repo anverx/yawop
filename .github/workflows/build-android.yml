@@ -187,11 +187,27 @@ jobs:
       # Publish to a rolling "debug-latest" pre-release instead of an Actions
       # artifact. Release assets do NOT count against the artifact-storage quota
       # (which lags 6-12h behind deletions), and they give a stable download URL
-      # you can open directly on the phone. The single asset is overwritten each run.
-      - name: Stage APK under a stable name
+      # you can open directly on the phone. The versioned asset is refreshed each
+      # run (old debug APKs are pruned below), so the release holds just the latest.
+      - name: Stage APK under a versioned name
         run: |
-          cp "$(ls bin/*.apk | head -1)" yawop-debug.apk
-          echo "APP_VERSION=$(grep -oE '[0-9]+\.[0-9]+\.[0-9]+' game/version.py | head -1)" >> "$GITHUB_ENV"
+          APP_VERSION=$(grep -oE '[0-9]+\.[0-9]+\.[0-9]+' game/version.py | head -1)
+          APK_NAME="yawop-debug-v${APP_VERSION}.apk"
+          cp "$(ls bin/*.apk | head -1)" "$APK_NAME"
+          echo "APP_VERSION=$APP_VERSION" >> "$GITHUB_ENV"
+          echo "APK_NAME=$APK_NAME" >> "$GITHUB_ENV"
+
+      # The asset name carries the version, so a new build's file no longer
+      # overwrites the old one by name. Delete prior debug APKs first to keep
+      # "debug-latest" a single, current APK (best-effort: never fail the build).
+      - name: Remove previous debug APKs from debug-latest
+        continue-on-error: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release view debug-latest --json assets -q '.assets[].name' 2>/dev/null \
+            | grep -E '^yawop-debug.*\.apk$' \
+            | xargs -r -I{} gh release delete-asset debug-latest {} -y
 
       - name: Publish APK to debug-latest release
         uses: softprops/action-gh-release@v1
@@ -199,7 +215,7 @@ jobs:
           tag_name: debug-latest
           name: Latest debug build
           prerelease: true
-          files: yawop-debug.apk
+          files: ${{ env.APK_NAME }}
           body: |
             Rolling debug APK from the latest manual build.
             Commit ${{ github.sha }} - run #${{ github.run_number }} - v${{ env.APP_VERSION }}
