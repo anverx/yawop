@@ -50,8 +50,13 @@ android.ndk = 25b
 # Android architecture
 android.archs = arm64-v8a, armeabi-v7a
 
-# Pin to a tagged p4a release for reproducible builds
-p4a.branch = v2026.05.09
+# Pin to a tagged p4a release for reproducible builds.
+# NOT v2026.05.09: that release builds hostpython 3.14.2 from source, whose
+# bundled pip is broken (ImportError: BuildDependencyInstallError), so a
+# from-scratch build fails at run_pymodules_install. It only ever succeeded here
+# because the .buildozer cache skipped the rebuild; once that cache was evicted
+# (>7 days idle) every build broke. v2024.01.21 ships Python 3.11 (stable pip).
+p4a.branch = v2024.01.21
 
 # Android features
 android.allow_backup = True
