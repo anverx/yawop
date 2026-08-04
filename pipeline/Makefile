@@ -100,7 +100,9 @@ gutenberg:  data/gutenberg/dictionary.jsonl
 guesses:    data/allowed_guesses_all.txt
 
 # ---- SUBTLEX-US --------------------------------------------------------------
-data/subtlex-us/words_ranked.txt:
+# One fetch produces both the frequency-order inventory (words_ranked.txt) and the
+# lowercase-frequency ranking (words_lc_ranked.txt) used for difficulty tiering.
+data/subtlex-us/words_ranked.txt data/subtlex-us/words_lc_ranked.txt &:
 	$(PY) scripts/fetch.py --pack subtlex-us --out-dir data/subtlex-us
 
 data/subtlex-us/dict.wordnet.jsonl: data/subtlex-us/words_ranked.txt
@@ -115,8 +117,11 @@ data/subtlex-us/dictionary.jsonl data/subtlex-us/puzzle_words.txt data/subtlex-u
 	  --out-words data/subtlex-us/puzzle_words.txt \
 	  --out-undefined data/subtlex-us/undefined_words.txt
 
-data/subtlex-us/tiers.json: data/subtlex-us/puzzle_words.txt
-	$(PY) scripts/assign_tiers.py --words $< --out $@ --easy $(EASY) --medium $(MEDIUM)
+# Tier by lowercase (common-word) frequency, not the case-folded total, so proper
+# names don't inflate a rare word's difficulty (e.g. "brock" the badger -> hard).
+data/subtlex-us/tiers.json: data/subtlex-us/puzzle_words.txt data/subtlex-us/words_lc_ranked.txt
+	$(PY) scripts/assign_tiers.py --words $< --out $@ --easy $(EASY) --medium $(MEDIUM) \
+	  --rank-by data/subtlex-us/words_lc_ranked.txt
 
 # ---- SUBTLEX-UK --------------------------------------------------------------
 data/subtlex-uk/words_ranked.txt:
@@ -153,10 +158,11 @@ data/wordle/dictionary.jsonl data/wordle/puzzle_words.txt data/wordle/undefined_
 	  --out-words data/wordle/puzzle_words.txt \
 	  --out-undefined data/wordle/undefined_words.txt
 
-# Wordle has no frequency of its own: tier by SUBTLEX-US rank.
-data/wordle/tiers.json: data/wordle/puzzle_words.txt data/subtlex-us/words_ranked.txt
+# Wordle has no frequency of its own: tier by SUBTLEX-US lowercase-frequency rank
+# (same proper-noun-safe ranking as the subtlex-us pack).
+data/wordle/tiers.json: data/wordle/puzzle_words.txt data/subtlex-us/words_lc_ranked.txt
 	$(PY) scripts/assign_tiers.py --words $< --out $@ \
-	  --rank-by data/subtlex-us/words_ranked.txt --easy $(EASY) --medium $(MEDIUM)
+	  --rank-by data/subtlex-us/words_lc_ranked.txt --easy $(EASY) --medium $(MEDIUM)
 
 # ---- Gutenberg (internal ingredient for the arcane pack; not a game option) --
 data/gutenberg/words_ranked.txt: wordlist.url

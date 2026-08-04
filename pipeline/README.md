@@ -46,6 +46,15 @@ Wordle-style games need **two** lists, and this pipeline produces both:
 Difficulty boundaries are **percentiles**, not fixed counts, so they survive
 source changes: `EASY=0.15` (top 15%), `MEDIUM=0.40` (up to 40%), hard = the rest.
 
+Difficulty is ranked by **lowercase frequency** (SUBTLEX's `FREQlow`, in
+`words_lc_ranked.txt`), not the case-folded total. The total conflates a rare
+word with any proper name that shares its spelling — so "brock" (a badger)
+inherited wrestler/Pokémon "Brock" frequency and looked *medium*. `FREQlow`
+counts only lowercase (common-word) usage, so such words fall to their true, rare
+tier while genuine words that are *also* surnames (crane, stone, grant) keep their
+real frequency. Rule-based, from corpus metadata: no name list, no threshold. The
+`wordle` pack borrows the same lowercase ranking.
+
 ## Answer eligibility (rule-based)
 
 Not every valid word should be served as a **solution**: proper nouns, typo/
