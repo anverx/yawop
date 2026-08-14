@@ -101,7 +101,9 @@ guesses:    data/allowed_guesses_all.txt
 
 # ---- Russian (Phase 1) -------------------------------------------------------
 # Self-contained build straight into assets (Russian can't use the English chain:
-# no WordNet, no English dictionary API). Frequency + curated dict + surnames.
+# no WordNet, no English dictionary API). Frequency + curated dict + surnames,
+# filtered to BASE FORMS ONLY (verbs = infinitive) via pymorphy3.
+# Build-time dep (NOT in the APK):  pip install pymorphy3 pymorphy3-dicts-ru
 russian:
 	$(PY) scripts/build_russian.py
 

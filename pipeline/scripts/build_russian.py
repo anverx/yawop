@@ -14,9 +14,17 @@ a self-contained, lighter build from three public sources:
 Conventions (see the yawop pipeline README): ё is folded to е everywhere (32-key
 board), words are lowercased, 5 Cyrillic letters only.
 
+BASE FORMS ONLY: we keep only dictionary headwords, no inflected forms — nouns in
+the nominative singular, base (masc. nom. sg.) adjectives, and verbs ONLY as the
+infinitive (никаких склонений/спряжений). This needs a Russian morphological
+analyzer at BUILD TIME only (never shipped in the APK):
+
+    pip install pymorphy3 pymorphy3-dicts-ru
+    # (isolated, no venv:  pip install --break-system-packages --target=LIB ...  then PYTHONPATH=LIB)
+
 Outputs under assets/dictionaries/russian/:
-  * allowed_guesses.txt — union of all real 5-letter words (per-pack guess validator)
-  * tiers.json          — ANSWERS = frequency-ranked ∩ valid − surnames, split easy/med/hard
+  * allowed_guesses.txt — every base-form 5-letter word (per-pack guess validator)
+  * tiers.json          — ANSWERS = frequency-ranked base forms, split easy/med/hard
   * dictionary.jsonl    — one {word, senses:[]} line per answer (registers the pack;
                           lookups gracefully show 'no definition' until Phase 2)
 
@@ -66,6 +74,40 @@ def five_letter_ranked(text: str) -> list[str]:
     return out
 
 
+# Base-form gate: keep only dictionary headwords. Verbs kept as INFINITIVE (INFN)
+# only, so no conjugated forms. Proper nouns excluded. Words here are ё-folded, but
+# pymorphy's dictionary uses ё, so we compare FOLDED lemmas (else актёр->актер dies).
+_KEEP_POS = {"NOUN", "ADJF", "INFN"}
+_PROPER = {"Name", "Surn", "Patr", "Geox"}
+
+
+def _make_base_form_filter():
+    try:
+        import pymorphy3
+    except ImportError as e:
+        raise SystemExit(
+            "build_russian needs a Russian morphological analyzer (build-time only):\n"
+            "  pip install pymorphy3 pymorphy3-dicts-ru\n"
+            "  # or isolated: pip install --break-system-packages --target=LIB pymorphy3 "
+            "pymorphy3-dicts-ru  (then run with PYTHONPATH=LIB)") from e
+    morph = pymorphy3.MorphAnalyzer()
+
+    def is_base_form(w: str) -> bool:
+        for p in morph.parse(w):
+            if not p.is_known:                          # real dictionary word, not a guess
+                continue                                # (drops many transliterated names)
+            if p.normal_form.replace("ё", "е") != w:    # must itself be the base form
+                continue
+            if p.tag.POS not in _KEEP_POS:              # noun / adjective / infinitive
+                continue
+            if _PROPER & set(p.tag.grammemes):          # no proper nouns pymorphy recognizes
+                continue
+            return True
+        return False
+
+    return is_base_form
+
+
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--assets", default=str(Path(__file__).resolve().parents[2] / "assets" / "dictionaries"))
@@ -81,11 +123,15 @@ def main() -> int:
     comprehensive = five_letter_set(get(DANAKT_URL, "cp1251"))
     surnames = five_letter_set(get(SURNAMES_URL, "cp1251"))
 
-    freq_set = set(freq_ranked)
-    allowed = sorted(freq_set | valid | comprehensive)
+    print("filtering to base forms (pymorphy3: nouns/adjectives + verb infinitives only)...", file=sys.stderr)
+    is_base_form = _make_base_form_filter()
+    candidates = (set(freq_ranked) | valid | comprehensive) - surnames
+    base_forms = {w for w in candidates if is_base_form(w)}
 
-    # Answers: frequency order (common first), must be a real valid word, not a surname.
-    answers = [w for w in freq_ranked if w in valid and w not in surnames]
+    # Guesses: every base-form 5-letter word (no inflected forms).
+    allowed = sorted(base_forms)
+    # Answers: base forms in frequency order (common first) so tiers are meaningful.
+    answers = [w for w in freq_ranked if w in base_forms]
 
     n = len(answers)
     easy_end, medium_end = round(n * args.easy), round(n * args.medium)
