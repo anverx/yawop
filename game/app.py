@@ -818,17 +818,20 @@ class WordApp(GameShellApp):
             if not os.path.exists(path):
                 status.text = "No event log yet."
                 return
+            # Export as .txt (matches text/plain): Android's document picker rewrites a
+            # mismatched extension to a fallback like "(invalid).txt".
+            log_filename = f"yawop-events-{datetime.date.today().isoformat()}.txt"
             from kivy.utils import platform
             if platform == "android":
                 try:
                     with open(path, "rb") as f:
-                        self._android_save_file(f.read(), "text/plain", "yawop_events.log", status)
+                        self._android_save_file(f.read(), "text/plain", log_filename, status)
                 except Exception as e:  # noqa: BLE001
                     status.text = f"Error: {e}"
             else:
                 import shutil
                 try:
-                    dest = os.path.join(os.path.expanduser("~"), "Downloads", "yawop_events.log")
+                    dest = os.path.join(os.path.expanduser("~"), "Downloads", log_filename)
                     os.makedirs(os.path.dirname(dest), exist_ok=True)
                     shutil.copy2(path, dest)
                     status.text = f"Saved to {dest}"
