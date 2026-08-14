@@ -99,6 +99,12 @@ arcane:     data/arcane/tiers.json data/arcane/dictionary.jsonl
 gutenberg:  data/gutenberg/dictionary.jsonl
 guesses:    data/allowed_guesses_all.txt
 
+# ---- Russian (Phase 1) -------------------------------------------------------
+# Self-contained build straight into assets (Russian can't use the English chain:
+# no WordNet, no English dictionary API). Frequency + curated dict + surnames.
+russian:
+	$(PY) scripts/build_russian.py
+
 # ---- SUBTLEX-US --------------------------------------------------------------
 # One fetch produces both the frequency-order inventory (words_ranked.txt) and the
 # lowercase-frequency ranking (words_lc_ranked.txt) used for difficulty tiering.
