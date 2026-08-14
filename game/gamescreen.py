@@ -68,7 +68,9 @@ class WordGameScreen(BackgroundedScreen):
                  on_finish: Callable[[bool, int, int], None],
                  on_info: Callable[[str], None],
                  on_progress: Callable[[list, int], None] | None = None,
-                 elapsed_ms: int = 0, return_to: str = "menu") -> None:
+                 elapsed_ms: int = 0, return_to: str = "menu",
+                 keyboard: list[str] | None = None,
+                 letter_mass: dict[str, int] | None = None) -> None:
         self._on_finish = on_finish
         self._on_progress = on_progress
         self._return_to = return_to
@@ -77,7 +79,8 @@ class WordGameScreen(BackgroundedScreen):
         if self._panel is not None:
             self._host.remove_widget(self._panel)
         self._panel = WordGridPanel(game, allowed, subtitle=subtitle, on_finish=self._finished,
-                                    on_info=on_info, on_back=self._go_menu, on_guess=self._progress)
+                                    on_info=on_info, on_back=self._go_menu, on_guess=self._progress,
+                                    keyboard=keyboard, letter_mass=letter_mass)
         self._host.add_widget(self._panel)
         self._apply_win_caption()   # a resumed/reviewed clean win shows its time straight away
         self._start_timer()

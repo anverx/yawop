@@ -61,6 +61,7 @@ class WordMenuScreen(MenuScreen):
                 ("Random Game", self.app.start_random),
                 ("How to play", self.app.show_help),
                 ("Logbook", self.app.show_logbook),
+                ("Languages", self.app.show_languages),
                 ("About", self.app.show_about),
             ],
             exit_label="Exit",

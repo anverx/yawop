@@ -30,13 +30,47 @@ from .logbook import WordLogbookScreen
 from .menu import WordMenuScreen
 from .store import WordStore, answer_of
 from .wordgame import WordGame
-from worddata.store import allowed_guesses
+from worddata.store import allowed_guesses, pack_allowed_guesses
 
 DEFAULT_PACK = "subtlex-us"
-# (pack_id, short label) shown in the Random Game options popup.
-PACKS = [("subtlex-us", "US"), ("subtlex-uk", "UK"), ("wordle", "Official"), ("arcane", "Arcane")]
-PACK_LABEL = dict(PACKS)
 DIFFICULTIES = ["easy", "medium", "hard"]
+# Short labels for the Random Game subtitle (union across all languages' packs).
+PACK_LABEL = {"subtlex-us": "US", "subtlex-uk": "UK", "wordle": "Official",
+              "arcane": "Arcane", "surprise": "Surprise", "russian": "Русский"}
+
+# ЙЦУКЕН keyboard with ё folded into е (32 keys). Rows: 12 / 11 / 9.
+_CYRILLIC_ROWS = ["йцукенгшщзхъ", "фывапролджэ", "ячсмитьбю"]
+
+# One entry per language "world". ADD A LANGUAGE by shipping its pack under
+# assets/dictionaries/<pack>/ (with its own allowed_guesses.txt + tiers.json) and
+# appending an entry here — nothing else is hardcoded to en/ru. Each world gets its
+# OWN store/DB (subdir => separate calendar + streak), daily pack, on-screen keyboard,
+# and Random-Game pack list. English keeps the root data dir so existing players'
+# history is preserved; every other language lives in its own subdirectory.
+LANGUAGES = [
+    {"lang": "en", "label": "English", "pack": "subtlex-us", "subdir": "", "keyboard": None,
+     "random_packs": [("subtlex-us", "US"), ("subtlex-uk", "UK"), ("wordle", "Official"), ("arcane", "Arcane")]},
+    {"lang": "ru", "label": "Русский", "pack": "russian", "subdir": "ru", "keyboard": _CYRILLIC_ROWS,
+     "random_packs": [("russian", "Русский")]},
+]
+
+
+class _LangProfile:
+    """A language 'world': its own store (hence its own calendar/streak), daily pack,
+    keyboard layout, per-key letter frequencies, guess set, and Random-Game packs.
+    The app's active self.store / self._allowed point at the current profile's values."""
+
+    def __init__(self, spec: dict, store: WordStore, ddir: str,
+                 allowed: set, letter_mass: dict | None) -> None:
+        self.lang = spec["lang"]
+        self.label = spec["label"]
+        self.pack = spec["pack"]
+        self.keyboard = spec["keyboard"]
+        self.random_packs = spec["random_packs"]
+        self.store = store
+        self.ddir = ddir
+        self.allowed = allowed
+        self.letter_mass = letter_mass
 
 if platform not in ("android", "ios"):
     Window.size = (400, 720)
@@ -45,18 +79,36 @@ if platform not in ("android", "ios"):
 class WordApp(GameShellApp):
     def open_storage(self) -> None:
         set_theme(T.build_theme())
-        self._allowed = allowed_guesses()
-        self.store = WordStore()
-        self.store.open(self.user_data_dir)
+        from .wordgrid import compute_letter_mass
+        # Build one profile (its own DB) per language world.
+        self._profiles: dict[str, _LangProfile] = {}
+        for spec in LANGUAGES:
+            ddir = self.user_data_dir if not spec["subdir"] else os.path.join(self.user_data_dir, spec["subdir"])
+            if spec["subdir"]:
+                os.makedirs(ddir, exist_ok=True)
+            store = WordStore()
+            store.open(ddir)
+            allowed = pack_allowed_guesses(spec["pack"]) or allowed_guesses()
+            mass = compute_letter_mass(allowed) if spec["keyboard"] else None  # non-Latin board
+            self._profiles[spec["lang"]] = _LangProfile(spec, store, ddir, allowed, mass)
         self._play_id: int | None = None
         self._day: str | None = None   # the dated daily currently in play (for finish recovery)
-        self._last_random = {"pack": DEFAULT_PACK, "difficulty": "medium"}
         self._allow_mature = bool(self._load_pref("allow_mature", False))
-        self._log("open_storage (process start / build)")
+        self._activate(self._load_pref("lang", LANGUAGES[0]["lang"]))
+        self._last_random = {"pack": self._active.pack, "difficulty": "medium"}
+        self._log(f"open_storage (process start / build) lang={self._lang}")
+
+    def _activate(self, lang: str) -> None:
+        """Make `lang` the active world: bind self.store/_allowed to its profile."""
+        self._active = self._profiles.get(lang) or self._profiles[LANGUAGES[0]["lang"]]
+        self._lang = self._active.lang
+        self.store = self._active.store
+        self._allowed = self._active.allowed
 
     def close_storage(self) -> None:
         self._log("close_storage (on_stop)")
-        self.store.close()
+        for prof in getattr(self, "_profiles", {}).values():
+            prof.store.close()
 
     # --- Android lifecycle ---
     # build() (hence open_storage) runs once per process. If the app is torn down on
@@ -78,12 +130,14 @@ class WordApp(GameShellApp):
         super().on_stop()
 
     def _ensure_store(self) -> None:
-        """Reopen the store if its connection was closed (e.g. an on_stop fired while
-        the process lingered in the background)."""
-        if getattr(self, "store", None) is None or not self.store.is_open():
-            self._log("store was closed on resume; reopening")
-            self.store = getattr(self, "store", None) or WordStore()
-            self.store.open(self.user_data_dir)
+        """Reopen any profile store whose connection was closed (e.g. an on_stop fired
+        while the process lingered in the background), then re-bind the active one."""
+        for prof in getattr(self, "_profiles", {}).values():
+            if prof.store is None or not prof.store.is_open():
+                self._log(f"store {prof.lang} was closed; reopening")
+                prof.store.open(prof.ddir)
+        if getattr(self, "_active", None) is not None:
+            self.store = self._active.store
 
     # --- simple JSON prefs in user_data_dir (survives restarts) ---
     def _prefs_path(self) -> str:
@@ -138,13 +192,46 @@ class WordApp(GameShellApp):
     def daily_failed(self) -> dict[str, bool]:
         return self.store.today_failed()
 
+    # --- language worlds ---
+    def show_languages(self, instance: Any = None) -> None:
+        """The 'Languages' menu item: pick a language world. Switching is live — each
+        world keeps its own daily, calendar, and streak (separate DB)."""
+        from kivyshell.uikit import FixedGrayRoundedButton, Popup, PopupContent, RoundedButton, TitleLabel
+        content = PopupContent()
+        content.add_widget(TitleLabel("Language"))
+        holder: list = []
+        for spec in LANGUAGES:
+            current = spec["lang"] == self._lang
+            btn = RoundedButton(text=spec["label"] + ("  (current)" if current else ""))
+            btn.bind(on_press=lambda _x, lg=spec["lang"]: (holder[0].dismiss(), self.switch_language(lg)))
+            content.add_widget(btn)
+        close = FixedGrayRoundedButton(text="Close")
+        content.add_widget(close)
+        popup = Popup(content, height=160 + 52 * len(LANGUAGES), width_hint=0.8)
+        holder.append(popup)
+        close.bind(on_press=popup.dismiss)
+        popup.open()
+
+    def switch_language(self, lang: str) -> None:
+        if lang == self._lang or lang not in self._profiles:
+            return
+        self._activate(lang)
+        self._save_pref("lang", lang)
+        self._last_random = {"pack": self._active.pack,
+                             "difficulty": self._last_random.get("difficulty", "medium")}
+        self._log(f"switch language -> {lang}")
+        # Refresh the menu to the newly active world (streak + daily badges read self.store).
+        if getattr(self, "menu_screen", None) is not None:
+            self.sm.current = "menu"
+            self.menu_screen.on_enter()
+
     # --- game flow ---
     def start_daily(self, difficulty: str) -> None:
         today = datetime.date.today().isoformat()
         if self.store.daily_finished(today, difficulty):  # already won or failed: no retry
             self._open_finished_daily(today, difficulty, f"Daily · {difficulty.title()}")
             return
-        self._start(DEFAULT_PACK, difficulty, today, f"Daily · {difficulty.title()}")
+        self._start(self._active.pack, difficulty, today, f"Daily · {difficulty.title()}")
 
     def _open_finished_daily(self, day: str, difficulty: str, subtitle: str,
                              return_to: str = "menu") -> None:
@@ -179,7 +266,10 @@ class WordApp(GameShellApp):
             styled,
         )
 
+        packs = self._active.random_packs
         sel = dict(self._last_random)
+        if sel["pack"] not in {pid for pid, _ in packs}:  # last pack may be another language's
+            sel["pack"] = packs[0][0]
         content = PopupContent()
         content.add_widget(TitleLabel("Random Game"))
 
@@ -195,7 +285,7 @@ class WordApp(GameShellApp):
         content.add_widget(SubtitleLabel("Word Pack"))
         pack_row = styled(BoxLayout, "selection_row")
         pack_group = SelectableButtonGroup(on_select=lambda v: sel.__setitem__("pack", v))
-        for pid, label in PACKS:
+        for pid, label in packs:
             b = SelectableButton(text=label, selected=(pid == sel["pack"]), **get_styles()["selection_btn"])
             pack_group.add(pid, b)
             pack_row.add_widget(b)
@@ -227,7 +317,7 @@ class WordApp(GameShellApp):
             self._last_random = dict(sel)
             holder[0].dismiss()
             self._start(sel["pack"], sel["difficulty"], None,
-                        f"{PACK_LABEL[sel['pack']]} · {sel['difficulty'].title()}")
+                        f"{PACK_LABEL.get(sel['pack'], sel['pack'])} · {sel['difficulty'].title()}")
 
         play = FixedRoundedButton(text="Play")
         play.bind(on_press=on_play)
@@ -255,7 +345,7 @@ class WordApp(GameShellApp):
                 self._open_finished_daily(d.isoformat(), diff, f"{title} · {diff.title()}",
                                           return_to="calendar")
                 return
-            self._start(DEFAULT_PACK, diff, d.isoformat(), f"{title} · {diff.title()}",
+            self._start(self._active.pack, diff, d.isoformat(), f"{title} · {diff.title()}",
                         return_to="calendar")
 
         for diff in ("easy", "medium", "hard"):
@@ -291,7 +381,8 @@ class WordApp(GameShellApp):
         on_progress = self._on_progress if day is not None else None
         self.game_screen.set_game(game, self._allowed, subtitle, self._on_finish,
                                   self.show_word_info, on_progress=on_progress,
-                                  elapsed_ms=resume.elapsed_ms, return_to=return_to)
+                                  elapsed_ms=resume.elapsed_ms, return_to=return_to,
+                                  keyboard=self._active.keyboard, letter_mass=self._active.letter_mass)
         self.sm.current = "game"
 
     def view_play(self, play: Any) -> None:
@@ -311,12 +402,13 @@ class WordApp(GameShellApp):
         game = WordGame(answer, max_guesses=max(6, len(guesses)))
         game.restore(guesses)
         game.finished = True  # replaying a loss short of max wouldn't set it on its own
-        self._current = (DEFAULT_PACK, "", answer)
+        self._current = (self._active.pack, "", answer)
         self._game = game
         self._play_id = None  # viewing only: nothing to record or persist
         self.game_screen.set_game(game, self._allowed, subtitle, self._on_finish,
                                   self.show_word_info, on_progress=None, elapsed_ms=elapsed_ms,
-                                  return_to=return_to)
+                                  return_to=return_to,
+                                  keyboard=self._active.keyboard, letter_mass=self._active.letter_mass)
         self.sm.current = "game"
 
     def _show_review_unavailable(self, answer: str) -> None:
@@ -459,7 +551,7 @@ class WordApp(GameShellApp):
 
     def _show_already_played(self, day: str, difficulty: str) -> None:
         from kivyshell.uikit import FixedGrayRoundedButton, Popup, PopupContent, SubtitleLabel, TitleLabel
-        answer = worddata.pick_word(DEFAULT_PACK, difficulty, seed=day)
+        answer = worddata.pick_word(self._active.pack, difficulty, seed=day)
         content = PopupContent()
         content.add_widget(TitleLabel("Already played"))
         content.add_widget(SubtitleLabel(f"That day's {difficulty} word was {answer.upper()}."))

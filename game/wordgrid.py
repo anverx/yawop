@@ -45,6 +45,15 @@ LETTER_MASS = {
     "q": 2, "r": 61, "s": 99, "t": 49, "u": 37, "v": 10, "w": 15, "x": 4,
     "y": 30, "z": 6,
 }
+
+
+def compute_letter_mass(words: Any) -> dict[str, int]:
+    """Per-letter frequency (0-99, commonest = 99) over a word list — the runtime
+    equivalent of the hardcoded English LETTER_MASS, for other alphabets (Russian)."""
+    from collections import Counter
+    counts = Counter(ch for w in words for ch in w)
+    top = max(counts.values(), default=0)
+    return {ch: min(99, round(n / top * 99)) for ch, n in counts.items()} if top else {}
 _CURSOR = (0.10, 0.62, 1.0, 1)       # neon-blue "type here" cell
 _CURSOR_GLOW = (0.25, 0.72, 1.0)     # soft halo around it (alpha added per layer)
 _ENTER_OK = T.TILE_CORRECT
@@ -167,10 +176,14 @@ class WordGridPanel(BoxLayout):
                  on_finish: Callable[[bool, int], None] | None = None,
                  on_info: Callable[[str], None] | None = None,
                  on_back: Callable[[], None] | None = None,
-                 on_guess: Callable[[list[str]], None] | None = None, **kwargs: Any) -> None:
+                 on_guess: Callable[[list[str]], None] | None = None,
+                 keyboard: list[str] | None = None,
+                 letter_mass: dict[str, int] | None = None, **kwargs: Any) -> None:
         super().__init__(orientation="vertical", spacing=dp(4), **kwargs)
         self.game = game
         self.allowed = allowed
+        self._key_rows = keyboard or _KEY_ROWS      # per-language layout (default QWERTY)
+        self._letter_mass = letter_mass or LETTER_MASS
         self.on_finish = on_finish
         self.on_info = on_info
         self.on_guess = on_guess   # persist in-progress guesses (screen owns elapsed time)
@@ -263,13 +276,14 @@ class WordGridPanel(BoxLayout):
     def _build_keyboard(self) -> BoxLayout:
         self._keys: dict[str, RoundedButton] = {}
         kb = BoxLayout(orientation="vertical", spacing=dp(5), size_hint_y=0.24, padding=[dp(2), 0])
-        for r, letters in enumerate(_KEY_ROWS):
+        last = len(self._key_rows) - 1
+        for r, letters in enumerate(self._key_rows):
             row = BoxLayout(spacing=dp(4), size_hint_y=1)
             for ch in letters:
                 b = self._make_key(ch.upper(), lambda _x, c=ch: self._key(c))
                 self._keys[ch] = b
                 row.add_widget(b)
-            if r == 2:
+            if r == last:
                 bk = self._make_key("", lambda *_: self._backspace(), wide=True)
                 self._draw_backspace_icon(bk)
                 row.add_widget(bk)
@@ -279,7 +293,7 @@ class WordGridPanel(BoxLayout):
     def _make_key(self, text: str, cb: Callable, wide: bool = False) -> RoundedButton:
         btn = RoundedButton(text=text, font_size="18sp", bg_color=T.KEY_DEFAULT, color=_DARK,
                             size_hint=(1.6 if wide else 1, 1))
-        mass = LETTER_MASS.get(text.lower()) if len(text) == 1 and text.isalpha() else None
+        mass = self._letter_mass.get(text.lower()) if len(text) == 1 and text.isalpha() else None
         if mass is not None:
             # letter (symbol) over its frequency (atomic-mass style). The number has no
             # color tag, so it inherits the key's foreground and stays legible when the

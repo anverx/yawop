@@ -36,6 +36,14 @@ def allowed_guesses() -> set[str]:
     return set(read_lines(f)) if f.exists() else set()
 
 
+def pack_allowed_guesses(pack: str) -> set[str]:
+    """Valid-guess set for a single pack (its own allowed_guesses.txt). Empty if the
+    pack has no per-pack list (English packs share the global allowed_guesses_all.txt;
+    a language pack like 'russian' ships its own so guesses stay in that alphabet)."""
+    f = ASSETS / pack / "allowed_guesses.txt"
+    return set(read_lines(f)) if f.exists() else set()
+
+
 def solution_blocklist() -> set[str]:
     """Vulgar/anatomical words kept as valid guesses but excluded from puzzle
     SOLUTIONS by default. Applied at pick time unless the player opts in. (Slurs
