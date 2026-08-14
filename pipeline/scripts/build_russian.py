@@ -8,8 +8,12 @@ a self-contained, lighter build from three public sources:
                  ANSWERS are common and tiers are meaningful.
   * valid dict — mediahope/Wordle-Russian-Dictionary: the set of real 5-letter
                  words a player may GUESS (includes inflected forms).
-  * comprehensive + surnames — danakt/russian-words (cp1251): extra guess coverage,
-                 and a surname stoplist to keep proper nouns out of ANSWERS.
+  * comprehensive — danakt/russian-words (cp1251): extra guess coverage.
+
+Proper nouns are excluded by the morphological analyzer (pymorphy: Surn/Name/Patr/
+Geox grammemes + is_known), NOT by danakt's surname file — that file is far too
+broad (24k five-letter entries) and wrongly lists common nouns like песня, книга,
+школа, кость as "surnames", which would delete them from the game entirely.
 
 Conventions (see the yawop pipeline README): ё is folded to е everywhere (32-key
 board), words are lowercased, 5 Cyrillic letters only.
@@ -42,7 +46,6 @@ from pathlib import Path
 FREQ_URL = "https://raw.githubusercontent.com/hermitdave/FrequencyWords/master/content/2018/ru/ru_50k.txt"
 VALID_URL = "https://raw.githubusercontent.com/mediahope/Wordle-Russian-Dictionary/main/Russian.txt"
 DANAKT_URL = "https://raw.githubusercontent.com/danakt/russian-words/master/russian.txt"
-SURNAMES_URL = "https://raw.githubusercontent.com/danakt/russian-words/master/russian_surnames.txt"
 
 FIVE = re.compile(r"^[а-я]{5}$")  # ё already folded to е, so the alphabet is а-я
 
@@ -119,13 +122,12 @@ def main() -> int:
     freq_ranked = five_letter_ranked(get(FREQ_URL))
     print("fetching curated valid dictionary (mediahope)...", file=sys.stderr)
     valid = five_letter_set(get(VALID_URL))
-    print("fetching comprehensive dictionary + surnames (danakt, cp1251)...", file=sys.stderr)
+    print("fetching comprehensive dictionary (danakt, cp1251)...", file=sys.stderr)
     comprehensive = five_letter_set(get(DANAKT_URL, "cp1251"))
-    surnames = five_letter_set(get(SURNAMES_URL, "cp1251"))
 
     print("filtering to base forms (pymorphy3: nouns/adjectives + verb infinitives only)...", file=sys.stderr)
     is_base_form = _make_base_form_filter()
-    candidates = (set(freq_ranked) | valid | comprehensive) - surnames
+    candidates = set(freq_ranked) | valid | comprehensive
     base_forms = {w for w in candidates if is_base_form(w)}
 
     # Guesses: every base-form 5-letter word (no inflected forms).
