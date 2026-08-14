@@ -57,6 +57,31 @@ publish: all
 	@mkdir -p $(ASSETS)/surprise
 	@cp data/surprise/dictionary.jsonl data/surprise/words.txt $(ASSETS)/surprise/
 	@cp data/allowed_guesses_all.txt $(ASSETS)/
+	# --- Answer-eligibility: rule-based, from definition metadata (no proper-noun hand-list). ---
+	# 1. Rule outputs: trivial -s inflections, proper-noun/reference-only "names", and the
+	#    obscene set (curated UNION WordNet-obscene-marked). See classify_answers.py.
+	$(PY) scripts/find_trivial_plurals.py --assets $(ASSETS) --out trivial_plurals.txt
+	$(PY) scripts/classify_answers.py --assets $(ASSETS) \
+	  --wiktionary-cache data/cache/proper_side_meanings.json \
+	  --curated-obscene blocklist_solutions.txt --augment $(ASSETS) \
+	  --out-names nonanswer_names.txt --out-obscene data/answer_obscene.txt
+	# 2. Names (proper-noun / reference-only) aren't real words -> removed EVERYWHERE, not
+	#    even valid guesses. Trivial plurals ARE real words -> removed from ANSWER sources
+	#    only (still valid guesses with definitions).
+	$(PY) scripts/apply_blocklist.py --assets $(ASSETS) --slurs blocklist_slurs.txt \
+	  --proper-nouns nonanswer_names.txt --solutions trivial_plurals.txt
+	# 3. Ship the generated obscene list as the RUNTIME, mature-gated solution filter.
+	@cp data/answer_obscene.txt $(ASSETS)/blocklist_solutions.txt
+	$(PY) scripts/build_extra_defs.py --allowed $(ASSETS)/allowed_guesses_all.txt --assets $(ASSETS) --wiktionary-cache data/cache/wiktionary_defs.json --out $(ASSETS)/extra_defs.jsonl
+	# 4. Resolve 'reference-only' entries (archaic/variant spellings, inflections) into
+	#    real meanings by grafting the base word's definition. Offline: uses the committed
+	#    Wiktionary cache (run once with --fetch to populate it for new bases).
+	$(PY) scripts/resolve_references.py --assets $(ASSETS) --wiktionary-cache data/cache/wiktionary_defs.json --apply
+	# 5. Drop non-English words (only a foreign-language Wiktionary entry, no English
+	#    sense) from every list -- it's an English word game. Borrowings that entered
+	#    English (pizza, kebab) keep their English entry and survive.
+	$(PY) scripts/find_nonword_guesses.py --assets $(ASSETS) --out non_english.txt
+	$(PY) scripts/apply_blocklist.py --assets $(ASSETS) --proper-nouns non_english.txt
 	@echo "published shipping dictionaries -> $(ASSETS)"
 
 all: subtlex-us subtlex-uk wordle surprise arcane guesses
@@ -75,7 +100,9 @@ gutenberg:  data/gutenberg/dictionary.jsonl
 guesses:    data/allowed_guesses_all.txt
 
 # ---- SUBTLEX-US --------------------------------------------------------------
-data/subtlex-us/words_ranked.txt:
+# One fetch produces both the frequency-order inventory (words_ranked.txt) and the
+# lowercase-frequency ranking (words_lc_ranked.txt) used for difficulty tiering.
+data/subtlex-us/words_ranked.txt data/subtlex-us/words_lc_ranked.txt &:
 	$(PY) scripts/fetch.py --pack subtlex-us --out-dir data/subtlex-us
 
 data/subtlex-us/dict.wordnet.jsonl: data/subtlex-us/words_ranked.txt
@@ -90,8 +117,11 @@ data/subtlex-us/dictionary.jsonl data/subtlex-us/puzzle_words.txt data/subtlex-u
 	  --out-words data/subtlex-us/puzzle_words.txt \
 	  --out-undefined data/subtlex-us/undefined_words.txt
 
-data/subtlex-us/tiers.json: data/subtlex-us/puzzle_words.txt
-	$(PY) scripts/assign_tiers.py --words $< --out $@ --easy $(EASY) --medium $(MEDIUM)
+# Tier by lowercase (common-word) frequency, not the case-folded total, so proper
+# names don't inflate a rare word's difficulty (e.g. "brock" the badger -> hard).
+data/subtlex-us/tiers.json: data/subtlex-us/puzzle_words.txt data/subtlex-us/words_lc_ranked.txt
+	$(PY) scripts/assign_tiers.py --words $< --out $@ --easy $(EASY) --medium $(MEDIUM) \
+	  --rank-by data/subtlex-us/words_lc_ranked.txt
 
 # ---- SUBTLEX-UK --------------------------------------------------------------
 data/subtlex-uk/words_ranked.txt:
@@ -128,10 +158,11 @@ data/wordle/dictionary.jsonl data/wordle/puzzle_words.txt data/wordle/undefined_
 	  --out-words data/wordle/puzzle_words.txt \
 	  --out-undefined data/wordle/undefined_words.txt
 
-# Wordle has no frequency of its own: tier by SUBTLEX-US rank.
-data/wordle/tiers.json: data/wordle/puzzle_words.txt data/subtlex-us/words_ranked.txt
+# Wordle has no frequency of its own: tier by SUBTLEX-US lowercase-frequency rank
+# (same proper-noun-safe ranking as the subtlex-us pack).
+data/wordle/tiers.json: data/wordle/puzzle_words.txt data/subtlex-us/words_lc_ranked.txt
 	$(PY) scripts/assign_tiers.py --words $< --out $@ \
-	  --rank-by data/subtlex-us/words_ranked.txt --easy $(EASY) --medium $(MEDIUM)
+	  --rank-by data/subtlex-us/words_lc_ranked.txt --easy $(EASY) --medium $(MEDIUM)
 
 # ---- Gutenberg (internal ingredient for the arcane pack; not a game option) --
 data/gutenberg/words_ranked.txt: wordlist.url
@@ -173,8 +204,12 @@ data/surprise/dictionary.jsonl data/surprise/words.txt &: data/subtlex-us/dictio
 	$(PY) scripts/combine_surprise.py --dicts $^ \
 	  --out-dict data/surprise/dictionary.jsonl --out-words data/surprise/words.txt
 
-# ---- Allowed-guess validation set (union of every valid word) ----------------
-data/allowed_guesses_all.txt: data/subtlex-us/words_ranked.txt data/subtlex-uk/words_ranked.txt data/wordle/allowed_guesses.txt data/gutenberg/words_ranked.txt
+# ---- Allowed-guess validation set --------------------------------------------
+# Union of the DEFINED pack words (puzzle_words, post def-prune) plus Wordle's
+# curated allowed-guess list. Deliberately NOT the raw words_ranked lists: those
+# subtitle/OCR corpora carry proper nouns and junk (e.g. 'malet', a surname) that
+# are never real playable words. 'palet' etc. survive via Wordle's curated list.
+data/allowed_guesses_all.txt: data/subtlex-us/puzzle_words.txt data/subtlex-uk/puzzle_words.txt data/arcane/puzzle_words.txt data/wordle/allowed_guesses.txt
 	sort -u $^ > $@
 
 clean:

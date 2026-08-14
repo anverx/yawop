@@ -49,10 +49,42 @@ def lookup_entry(word: str, pack: str | None = None) -> dict | None:
             gutenberg_url = rec.get("gutenberg_search_url", gutenberg_url)
             break
 
-    if not found_in:
+    if not senses and not pack:  # fallback: WordNet-filled defs for otherwise-undefined words
+        extra = store.ASSETS / "extra_defs.jsonl"
+        if extra.exists():
+            for rec in store.read_jsonl(extra):
+                if rec["word"].lower() == word:
+                    for s in rec.get("senses", []):
+                        if _sense_key(s) not in seen:
+                            seen.add(_sense_key(s))
+                            senses.append(s)
+                    break
+
+    if not found_in and not senses:
         return None
     return {"word": word, "senses": senses, "examples": examples,
             "gutenberg_search_url": gutenberg_url, "packs": found_in}
+
+
+_PACK_LABELS = {"subtlex-us": "SUBTLEX-US", "subtlex-uk": "SUBTLEX-UK",
+                "wordle": "Official Wordle", "arcane": "Arcane", "surprise": "Surprise"}
+
+
+def word_sources(word: str, entry: dict | None = None) -> list[str]:
+    """Human labels for where a valid guess comes from (for the info popup), even
+    when it has no definition. `entry` (from lookup_entry) is reused if provided."""
+    word = word.strip().lower()
+    out: list[str] = []
+    if entry is None:
+        entry = lookup_entry(word)
+    for p in (entry or {}).get("packs", []):
+        lbl = _PACK_LABELS.get(p["pack"], p["pack"])
+        if lbl not in out:
+            out.append(lbl)
+    wl = store.ASSETS / "wordle" / "allowed_guesses.txt"
+    if "Official Wordle" not in out and wl.exists() and word in set(store.read_lines(wl)):
+        out.append("Official Wordle")
+    return out
 
 
 def format_entry(entry: dict, color: bool = True) -> str:

@@ -1,0 +1,38 @@
+# Slurs: removed EVERYWHERE. Never served as a solution, never accepted as a
+# guess, no lookup entry. Ethnic/racial slurs only. One lowercase word per line;
+# blank lines and '#'-comments ignored. Applied by scripts/apply_blocklist.py.
+coons
+negro
+pikey
+aryan
+boche
+chink
+dagos
+darky
+dykes
+fagot
+ginzo
+gooks
+goyim
+guido
+hadji
+hajji
+hebes
+honky
+hymie
+injun
+kafir
+kikes
+kraut
+limey
+lubra
+massa
+nigga
+nigra
+paddy
+pommy
+sambo
+spick
+spics
+squaw
+yobbo
