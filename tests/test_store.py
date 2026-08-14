@@ -94,6 +94,22 @@ class TestResume(_StoreTest):
         self.assertFalse(self.store.daily_finished("2026-07-14", "easy"),
                          "in-progress daily should not count as finished")
 
+    def test_resume_after_other_plays_inserted(self):
+        """Reopening an unfinished daily must resume it even after OTHER plays have
+        been started this session. Regression for the connection-scoped
+        last_insert_rowid bug: record_challenge used to return a stale rowid for an
+        already-recorded challenge, filing the reopen under the wrong challenge_id so
+        it never resumed (and wins recorded against a phantom challenge)."""
+        first = self.store.start("hard", "2026-07-30", "vexil")
+        self.store.save_progress(first.play_id, 5000, ["adieu", "story"])
+        # start unrelated plays so the connection's last_insert_rowid goes stale
+        self.store.start("easy", "2026-07-30", "toast")
+        self.store.start("medium", "2026-07-29", "crane")
+        # now reopen the FIRST daily: must resume the same play, not spawn a new one
+        again = self.store.start("hard", "2026-07-30", "vexil")
+        self.assertEqual((again.play_id, again.guesses), (first.play_id, ["adieu", "story"]),
+                         "reopening after other plays should resume the same play")
+
     def test_random_never_resumes(self):
         """Random games always start fresh (day is None), never resume."""
         r1 = self.store.start("easy", None, "mango")
