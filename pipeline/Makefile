@@ -106,6 +106,7 @@ guesses:    data/allowed_guesses_all.txt
 # Build-time dep (NOT in the APK):  pip install pymorphy3 pymorphy3-dicts-ru
 russian:
 	$(PY) scripts/build_russian.py
+	$(PY) scripts/enrich_russian.py   # Phase 2: ru.wiktionary defs + answer eligibility
 
 # ---- SUBTLEX-US --------------------------------------------------------------
 # One fetch produces both the frequency-order inventory (words_ranked.txt) and the
