@@ -25,6 +25,9 @@ GUTENBERG_MAX_API ?= 500
 # Difficulty tier boundaries (cumulative fractions): easy top 15%, medium up to 40%.
 EASY   ?= 0.15
 MEDIUM ?= 0.40
+# --letter-blend folds puzzle guessability (distinct-letter frequency, product) into
+# difficulty, so a common word of rare/repeated letters (e.g. "puppy") counts as
+# harder than its frequency alone implies. Parameter-free.
 
 # Arcane pack: subtract only the top-N most frequent SUBTLEX words (so archaic
 # words rarely seen in modern subtitles survive). ~4000 yields ~1000 clean words.
@@ -82,6 +85,15 @@ publish: all
 	#    English (pizza, kebab) keep their English entry and survive.
 	$(PY) scripts/find_nonword_guesses.py --assets $(ASSETS) --out non_english.txt
 	$(PY) scripts/apply_blocklist.py --assets $(ASSETS) --proper-nouns non_english.txt
+	# 6. Verb inflections with no noun/adjective life (arose, chose) aren't base-form
+	#    answers -> removed from ANSWERS only (still guessable). And proper nouns WordNet's
+	#    instance check missed via a 'music of X' companion sense (haydn, ghana) -> removed
+	#    EVERYWHERE. --keep protects common nouns WordNet mislabels as instances.
+	$(PY) scripts/find_verb_inflections.py --assets $(ASSETS) --out verb_inflections.txt
+	$(PY) scripts/find_proper_leaks.py --assets $(ASSETS) --out proper_leaks.txt \
+	  --keep islet corse arhat melba linux vesta spica volta lethe mensa
+	$(PY) scripts/apply_blocklist.py --assets $(ASSETS) \
+	  --proper-nouns proper_leaks.txt --solutions verb_inflections.txt
 	@echo "published shipping dictionaries -> $(ASSETS)"
 
 all: subtlex-us subtlex-uk wordle surprise arcane guesses
@@ -130,7 +142,7 @@ data/subtlex-us/dictionary.jsonl data/subtlex-us/puzzle_words.txt data/subtlex-u
 # names don't inflate a rare word's difficulty (e.g. "brock" the badger -> hard).
 data/subtlex-us/tiers.json: data/subtlex-us/puzzle_words.txt data/subtlex-us/words_lc_ranked.txt
 	$(PY) scripts/assign_tiers.py --words $< --out $@ --easy $(EASY) --medium $(MEDIUM) \
-	  --rank-by data/subtlex-us/words_lc_ranked.txt
+	  --rank-by data/subtlex-us/words_lc_ranked.txt --letter-blend
 
 # ---- SUBTLEX-UK --------------------------------------------------------------
 data/subtlex-uk/words_ranked.txt:
@@ -149,7 +161,7 @@ data/subtlex-uk/dictionary.jsonl data/subtlex-uk/puzzle_words.txt data/subtlex-u
 	  --out-undefined data/subtlex-uk/undefined_words.txt
 
 data/subtlex-uk/tiers.json: data/subtlex-uk/puzzle_words.txt
-	$(PY) scripts/assign_tiers.py --words $< --out $@ --easy $(EASY) --medium $(MEDIUM)
+	$(PY) scripts/assign_tiers.py --words $< --out $@ --easy $(EASY) --medium $(MEDIUM) --letter-blend
 
 # ---- Wordle (official) -------------------------------------------------------
 data/wordle/answers.txt data/wordle/allowed_guesses.txt &:
@@ -171,7 +183,7 @@ data/wordle/dictionary.jsonl data/wordle/puzzle_words.txt data/wordle/undefined_
 # (same proper-noun-safe ranking as the subtlex-us pack).
 data/wordle/tiers.json: data/wordle/puzzle_words.txt data/subtlex-us/words_lc_ranked.txt
 	$(PY) scripts/assign_tiers.py --words $< --out $@ \
-	  --rank-by data/subtlex-us/words_lc_ranked.txt --easy $(EASY) --medium $(MEDIUM)
+	  --rank-by data/subtlex-us/words_lc_ranked.txt --easy $(EASY) --medium $(MEDIUM) --letter-blend
 
 # ---- Gutenberg (internal ingredient for the arcane pack; not a game option) --
 data/gutenberg/words_ranked.txt: wordlist.url
@@ -205,7 +217,7 @@ data/arcane/dictionary.jsonl: data/arcane/dict.base.jsonl
 	$(PY) scripts/enrich_examples.py --in $< --out $@ --cache data/cache/wikisource.json
 
 data/arcane/tiers.json: data/arcane/puzzle_words.txt
-	$(PY) scripts/assign_tiers.py --words $< --out $@ --easy $(EASY) --medium $(MEDIUM)
+	$(PY) scripts/assign_tiers.py --words $< --out $@ --easy $(EASY) --medium $(MEDIUM) --letter-blend
 
 # ---- Surprise me (union, no tiers) -------------------------------------------
 data/surprise/dictionary.jsonl data/surprise/words.txt &: data/subtlex-us/dictionary.jsonl data/subtlex-uk/dictionary.jsonl data/wordle/dictionary.jsonl

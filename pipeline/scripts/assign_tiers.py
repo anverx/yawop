@@ -23,7 +23,7 @@ import sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from common import read_lines
+from common import letter_blend_order, read_lines
 
 
 def main() -> int:
@@ -33,6 +33,10 @@ def main() -> int:
     ap.add_argument("--easy", type=float, default=0.15)
     ap.add_argument("--medium", type=float, default=0.40)
     ap.add_argument("--rank-by", help="reference frequency-ordered word list")
+    ap.add_argument("--letter-blend", action="store_true",
+                    help="blend puzzle guessability (distinct-letter frequency, product) "
+                         "into difficulty, so a common word of rare/repeated letters (puppy) "
+                         "is treated as harder than its frequency alone implies")
     args = ap.parse_args()
 
     words = read_lines(args.words)
@@ -42,6 +46,9 @@ def main() -> int:
         big = len(ref)
         # Stable sort by reference rank; unknown words sink to the bottom in order.
         words = sorted(words, key=lambda w: (ref.get(w, big + 1),))
+
+    if args.letter_blend:
+        words = letter_blend_order(words)
 
     n = len(words)
     easy_end = round(n * args.easy)

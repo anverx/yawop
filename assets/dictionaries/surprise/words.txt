@@ -1,4 +1,3 @@
-aahed
 aargh
 abaca
 aback
@@ -22,21 +21,17 @@ above
 abuse
 abuzz
 abyss
-accra
-ached
 acing
 ackee
 acorn
 acres
 acrid
-acted
 actin
 actor
 acute
 adage
 adams
 adapt
-added
 adder
 addle
 adept
@@ -80,7 +75,6 @@ agree
 ahead
 aided
 aides
-ailed
 aimed
 aioli
 aired
@@ -88,7 +82,6 @@ aisle
 ajuga
 akela
 alack
-alamo
 alarm
 album
 alder
@@ -169,7 +162,6 @@ annul
 annum
 annwn
 anode
-anted
 antic
 antsy
 anura
@@ -213,7 +205,6 @@ arles
 armed
 armor
 aroma
-arose
 arras
 array
 arrow
@@ -226,7 +217,6 @@ asbos
 ascii
 ascot
 asean
-ashed
 ashen
 asian
 aside
@@ -238,7 +228,6 @@ asper
 aspic
 assay
 asset
-assur
 aster
 astir
 athar
@@ -271,7 +260,6 @@ awash
 aways
 awful
 awing
-awoke
 axial
 axing
 axiom
@@ -279,7 +267,6 @@ axion
 azeri
 aztec
 azure
-baaed
 babel
 bacca
 baccy
@@ -298,7 +285,6 @@ baked
 baker
 balas
 baldy
-baled
 baler
 bally
 balmy
@@ -307,7 +293,6 @@ balti
 banal
 banco
 bandy
-baned
 banjo
 banks
 banns
@@ -321,7 +306,6 @@ barky
 barmy
 baron
 barry
-barth
 barye
 basal
 based
@@ -366,16 +350,13 @@ beech
 beefy
 beery
 befit
-began
 begat
 beget
 begin
-begot
 begum
 begun
 beige
 being
-beira
 belay
 belch
 belie
@@ -385,13 +366,11 @@ below
 bench
 bends
 bendy
-benet
 benne
 benni
 benny
 beret
 berit
-berra
 berry
 berth
 beryl
@@ -405,7 +384,6 @@ bialy
 bibbs
 bible
 biddy
-bided
 bidet
 biffy
 biger
@@ -413,7 +391,6 @@ bight
 bigos
 bigot
 bijou
-biked
 biker
 bilbo
 bilby
@@ -434,12 +411,10 @@ biter
 bitey
 bitis
 bitty
-bizet
 black
 blade
 blahs
 blain
-blake
 blame
 blanc
 bland
@@ -485,7 +460,6 @@ boast
 bobby
 bocce
 bocci
-boded
 bodge
 bodhi
 boeuf
@@ -507,7 +481,6 @@ bonne
 bonny
 bonus
 booby
-booed
 boost
 booth
 booty
@@ -538,14 +511,12 @@ bovid
 bowed
 bowel
 bower
-bowie
 bowls
 boxed
 boxer
 brace
 brack
 bract
-brady
 braid
 brain
 brake
@@ -593,7 +564,6 @@ brook
 broom
 broth
 brown
-bruce
 bruin
 bruit
 brule
@@ -636,7 +606,6 @@ burry
 bursa
 burst
 busby
-bused
 bushy
 busty
 butat
@@ -646,7 +615,6 @@ butty
 butyl
 buxom
 buxus
-buyed
 buyer
 buzzy
 bwana
@@ -696,13 +664,11 @@ caped
 caper
 capon
 capra
-capri
 caput
 carat
 carbs
 cards
 cardy
-cared
 carer
 caret
 carex
@@ -729,12 +695,10 @@ cause
 caved
 cavil
 cavum
-cawed
 cease
 cecal
 cecum
 cedar
-ceded
 ceiba
 celeb
 cella
@@ -747,7 +711,6 @@ chain
 chair
 chalk
 champ
-chang
 chant
 chaos
 chara
@@ -772,7 +735,6 @@ chevy
 chewy
 chica
 chick
-chico
 chide
 chief
 child
@@ -800,7 +762,6 @@ chomp
 chook
 chord
 chore
-chose
 choux
 chubb
 chuck
@@ -852,11 +813,9 @@ click
 cliff
 climb
 clime
-cline
 cling
 clink
 clint
-clive
 cloak
 clock
 clomp
@@ -868,7 +827,6 @@ clout
 clove
 clown
 cluck
-clued
 clump
 clung
 clunk
@@ -907,7 +865,6 @@ comic
 comma
 comms
 compo
-comte
 conch
 condo
 coned
@@ -917,7 +874,6 @@ congo
 conic
 conto
 cooch
-cooed
 cooee
 cooky
 cooly
@@ -984,11 +940,9 @@ creel
 creep
 creme
 crepe
-crept
 cress
 crest
 crick
-cried
 crier
 crime
 crimp
@@ -1072,10 +1026,8 @@ dairy
 daisy
 dalek
 dally
-damed
 dance
 dandy
-dared
 darts
 dated
 dater
@@ -1083,10 +1035,8 @@ datum
 daunt
 daven
 davit
-dayan
 dayss
 dazed
-dealt
 deary
 death
 debar
@@ -1128,7 +1078,6 @@ deuce
 devil
 devon
 dewar
-dewey
 dhole
 dhoni
 dhoti
@@ -1143,13 +1092,11 @@ diddy
 didst
 digit
 diing
-dijon
 dildo
 dilly
 dimer
 dimly
 dinar
-dined
 diner
 dinge
 dingo
@@ -1169,7 +1116,6 @@ ditto
 ditty
 ditzy
 divan
-dived
 diver
 divot
 divvy
@@ -1182,7 +1128,6 @@ dobra
 dodge
 dodgy
 doest
-doged
 doggo
 doggy
 dogie
@@ -1203,7 +1148,6 @@ doozy
 doped
 dopey
 doric
-doris
 dorky
 dosed
 doted
@@ -1219,7 +1163,6 @@ downy
 dowry
 dowse
 doyen
-dozed
 dozen
 dozer
 dphil
@@ -1275,11 +1218,9 @@ dunce
 duned
 dunno
 duomo
-duped
 duper
 duple
 dural
-durst
 durum
 dusky
 dusty
@@ -1288,7 +1229,6 @@ duvet
 dwarf
 dweeb
 dwell
-dwelt
 dying
 dyked
 eager
@@ -1299,7 +1239,6 @@ earnt
 earth
 eased
 easel
-eated
 eaten
 eater
 eaves
@@ -1308,14 +1247,12 @@ ebola
 ebony
 eclat
 edema
-edgar
 edged
 edger
 edict
 edify
 eejit
 eerie
-effed
 egads
 eggar
 egged
@@ -1423,7 +1360,6 @@ fagus
 faint
 fairy
 faith
-faked
 faker
 fakir
 falco
@@ -1435,7 +1371,6 @@ fanny
 faqir
 farad
 farce
-fared
 farer
 farsi
 fatal
@@ -1487,7 +1422,6 @@ fifty
 figgy
 fight
 filch
-filed
 filer
 filet
 fille
@@ -1496,7 +1430,6 @@ filmy
 filth
 final
 finch
-fined
 finer
 finis
 fired
@@ -1540,7 +1473,6 @@ flock
 flood
 floor
 flora
-flory
 floss
 flour
 flout
@@ -1551,7 +1483,6 @@ fluke
 fluky
 flume
 flump
-flung
 flunk
 flush
 flute
@@ -1570,7 +1501,6 @@ folie
 folio
 folks
 folly
-fonda
 fondu
 foody
 footy
@@ -1600,7 +1530,6 @@ franc
 frank
 fraud
 freak
-freed
 freer
 freon
 fresh
@@ -1620,7 +1549,6 @@ frosh
 frost
 froth
 frown
-froze
 fruit
 frump
 fryer
@@ -1646,12 +1574,10 @@ fusty
 futon
 fuzzy
 gabby
-gable
 gaffe
 gaily
 galea
 gamba
-gamed
 gamer
 gamey
 gamin
@@ -1660,8 +1586,6 @@ gammy
 gamut
 ganef
 ganja
-gaped
-garbo
 garda
 garth
 gassy
@@ -1679,7 +1603,6 @@ gavel
 gawky
 gayer
 gayly
-gazed
 gecko
 geeed
 geeky
@@ -1691,14 +1614,12 @@ genic
 genie
 genii
 genip
-genoa
 genre
 genus
 geode
 germy
 gesso
 getup
-ghana
 ghost
 ghoul
 giant
@@ -1712,7 +1633,6 @@ gipsy
 girly
 girth
 gismo
-gived
 given
 giver
 gizmo
@@ -1741,7 +1661,6 @@ gloop
 glory
 gloss
 glove
-gluck
 glued
 gluey
 gluon
@@ -1770,7 +1689,6 @@ goose
 goosy
 gored
 gorge
-gorky
 gorse
 gouda
 gouge
@@ -1880,7 +1798,6 @@ haply
 happy
 haram
 hardy
-hared
 harem
 harpy
 harry
@@ -1898,9 +1815,7 @@ haved
 haven
 haver
 havoc
-hawed
 hawse
-haydn
 hayes
 hazed
 hazel
@@ -1915,7 +1830,6 @@ hedge
 hefty
 heigh
 heist
-helen
 helio
 helix
 hello
@@ -1927,12 +1841,10 @@ henry
 herby
 heron
 hertz
-hewed
 hewer
 hexed
 hided
 hijab
-hiked
 hiker
 hilar
 hilly
@@ -1947,7 +1859,6 @@ hippy
 hired
 hirer
 hitch
-hived
 hives
 hmong
 hoagy
@@ -1978,7 +1889,6 @@ hooey
 hooks
 hooky
 hoops
-hoped
 hoper
 horde
 horny
@@ -2032,7 +1942,6 @@ ideal
 ident
 idiom
 idiot
-idled
 idler
 idyll
 igloo
@@ -2099,7 +2008,6 @@ jacks
 jacky
 jacob
 jaded
-jaffa
 jaged
 jaggy
 jakes
@@ -2122,31 +2030,25 @@ jeter
 jetty
 jewel
 jewry
-jibed
 jiffy
 jiggy
 jihad
 jimmy
 jingo
-jinja
 jinks
 jinni
 jirga
-jived
 johns
 joint
 joist
-joked
 joker
 jokey
 jolly
 jolty
 jonah
-jones
 joule
 joust
 jowly
-joyed
 judas
 judge
 juice
@@ -2175,10 +2077,8 @@ karts
 kasha
 kauri
 kayak
-kazan
 kazoo
 kebab
-kelly
 kempt
 kendo
 ketch
@@ -2208,7 +2108,6 @@ knead
 kneed
 kneel
 knell
-knelt
 knife
 knish
 knock
@@ -2281,16 +2180,12 @@ laver
 laxer
 laxly
 layby
-layed
 layer
 layup
 lazar
-lazed
 leach
 leafy
 leaky
-leant
-leapt
 learn
 lease
 leash
@@ -2304,7 +2199,6 @@ legal
 leger
 leggy
 legit
-leigh
 lemma
 lemon
 lemur
@@ -2322,7 +2216,6 @@ level
 lever
 levin
 levis
-lewis
 lexis
 lhasa
 liana
@@ -2343,7 +2236,6 @@ liker
 lilac
 liman
 limbo
-limed
 limit
 lindy
 lined
@@ -2380,7 +2272,6 @@ locus
 lodge
 loess
 lofty
-logan
 logic
 login
 logos
@@ -2392,35 +2283,28 @@ looky
 loony
 loopy
 loose
-loped
 lordy
 loris
 lorry
 loser
 losss
-loted
 lotte
 lotto
 lotus
 lough
-louis
 loupe
 louse
 lousy
 loved
 lover
 lovey
-lowed
 lower
 lowly
-lowry
 loyal
-lubed
 lucid
 lucky
 lucre
 luger
-lully
 lumen
 lumma
 lumpy
@@ -2430,7 +2314,6 @@ lunge
 lupin
 lupus
 lurch
-lured
 lurid
 lurve
 lusty
@@ -2463,13 +2346,11 @@ magus
 mahal
 maize
 major
-maked
 maker
 malar
 malay
 maler
 malik
-malta
 malus
 mamba
 mambo
@@ -2479,7 +2360,6 @@ manat
 manda
 maned
 manes
-manet
 manga
 mange
 mango
@@ -2536,7 +2416,6 @@ mazed
 mazer
 mealy
 means
-meant
 meany
 meaty
 mecca
@@ -2569,7 +2448,6 @@ metic
 metis
 metre
 metro
-mewed
 mezzo
 miami
 miaow
@@ -2584,7 +2462,6 @@ miler
 milia
 milky
 mills
-mimed
 mimeo
 mimic
 minae
@@ -2607,7 +2484,6 @@ missy
 misty
 mitch
 miter
-mitra
 mitre
 mixed
 mixer
@@ -2638,7 +2514,6 @@ monte
 month
 mooch
 moody
-mooed
 moola
 moony
 moose
@@ -2673,7 +2548,6 @@ mouth
 moved
 mover
 movie
-mowed
 mower
 moxie
 mucho
@@ -2696,7 +2570,6 @@ munda
 mungo
 mural
 murky
-mused
 mushy
 music
 musky
@@ -2722,7 +2595,6 @@ named
 namer
 names
 nance
-nancy
 nanna
 nanny
 nappy
@@ -2762,7 +2634,6 @@ nidus
 niece
 niffy
 nifty
-niger
 night
 nimby
 niner
@@ -2774,7 +2645,6 @@ niqab
 nisei
 nitre
 nitro
-nixed
 noble
 nobly
 noddy
@@ -2786,7 +2656,6 @@ nonce
 nones
 nooky
 noose
-norma
 norse
 north
 nosed
@@ -2798,10 +2667,8 @@ novae
 novel
 nsaid
 nubby
-nubia
 nudge
 nudie
-nuked
 nurse
 nutsy
 nutty
@@ -2825,11 +2692,9 @@ odeon
 odium
 odour
 offal
-offed
 offer
 often
 ogive
-ogled
 ogler
 oiled
 oiler
@@ -2849,13 +2714,10 @@ oneer
 onest
 onion
 onset
-oohed
 oomph
-oozed
 opera
 opine
 opium
-opted
 optic
 orach
 orang
@@ -2880,7 +2742,6 @@ ought
 ouija
 ounce
 outdo
-outed
 outer
 outgo
 outre
@@ -2936,7 +2797,6 @@ pappa
 pappy
 papua
 parch
-pared
 parer
 paris
 parka
@@ -2968,14 +2828,12 @@ pause
 pavan
 paved
 pawed
-payed
 payee
 payer
 peace
 peach
 peaky
 pearl
-peary
 pease
 peaty
 pecan
@@ -2994,7 +2852,6 @@ peony
 peppy
 pepsi
 perch
-percy
 peril
 perky
 perry
@@ -3032,7 +2889,6 @@ piled
 piles
 pilot
 pinch
-pined
 piney
 pingo
 pinko
@@ -3070,7 +2926,6 @@ plain
 plait
 plane
 plank
-plano
 plant
 plash
 plasm
@@ -3081,7 +2936,6 @@ plead
 pleat
 plebe
 plena
-plied
 plier
 plink
 plonk
@@ -3092,7 +2946,6 @@ plump
 plumy
 plunk
 plush
-pluto
 plyed
 plyer
 poach
@@ -3104,7 +2957,6 @@ pogey
 poilu
 point
 poise
-poked
 poker
 pokey
 polar
@@ -3130,7 +2982,6 @@ porky
 porno
 porta
 porte
-porto
 posed
 poser
 posey
@@ -3154,7 +3005,6 @@ price
 prick
 pricy
 pride
-pried
 prima
 prime
 primi
@@ -3198,9 +3048,7 @@ pudge
 pudgy
 puffy
 puggy
-puked
 pukka
-puled
 pulpy
 pulse
 punch
@@ -3254,7 +3102,6 @@ quiet
 quiff
 quill
 quilt
-quine
 quint
 quipu
 quire
@@ -3266,7 +3113,6 @@ quoit
 quota
 quote
 quoth
-rabat
 rabbi
 rabid
 raced
@@ -3278,7 +3124,6 @@ radio
 radix
 radon
 rafts
-raged
 rager
 rails
 rainy
@@ -3301,7 +3146,6 @@ raped
 raper
 rapid
 rarer
-rased
 raspy
 rasta
 ratan
@@ -3312,13 +3156,11 @@ rates
 rathe
 ratio
 ratty
-raved
 ravel
 raven
 raver
 ravin
 rawer
-rayed
 rayon
 razed
 razor
@@ -3341,7 +3183,6 @@ recon
 recto
 recur
 recut
-redid
 redly
 redox
 redux
@@ -3369,7 +3210,6 @@ repel
 reply
 repot
 repro
-reran
 rerun
 reset
 resin
@@ -3382,11 +3222,8 @@ reuse
 reved
 revel
 revue
-rhein
 rheum
-rhine
 rhino
-rhone
 rhyme
 riata
 ribby
@@ -3405,17 +3242,14 @@ rimed
 rings
 rinse
 rioja
-riped
 ripen
 riper
-rised
 risen
 riser
 rishi
 risky
 ritzy
 rival
-rived
 riven
 river
 rivet
@@ -3439,7 +3273,6 @@ rooms
 roomy
 roost
 roots
-roped
 roper
 ropey
 roque
@@ -3539,7 +3372,6 @@ savin
 savor
 savoy
 savvy
-sawed
 saxon
 sayed
 scads
@@ -3612,12 +3444,10 @@ sepia
 serge
 serif
 serin
-serra
 serum
 serve
 servo
 setae
-seton
 setup
 seven
 sever
@@ -3640,7 +3470,6 @@ shank
 shape
 shard
 share
-shari
 shark
 sharp
 shave
@@ -3658,7 +3487,6 @@ shell
 shema
 sheng
 sherd
-shied
 shier
 shift
 shill
@@ -3677,7 +3505,6 @@ shoed
 shoes
 shoji
 shona
-shone
 shook
 shoot
 shore
@@ -3695,13 +3522,11 @@ shrug
 shuck
 shunt
 shush
-shute
 shyed
 shyer
 shyly
 sibyl
 sicko
-sided
 sider
 sidle
 siege
@@ -3715,20 +3540,17 @@ sills
 silly
 silty
 silva
-simon
 since
 sinew
 singe
 sinus
 sioux
-sired
 siree
 siren
 sirup
 sisal
 sissy
 sitar
-sited
 situs
 siwan
 sixer
@@ -3741,7 +3563,6 @@ skate
 skeet
 skein
 skell
-skied
 skier
 skiff
 skill
@@ -3769,7 +3590,6 @@ slave
 sleek
 sleep
 sleet
-slept
 slews
 slice
 slick
@@ -3784,7 +3604,6 @@ slops
 slosh
 sloth
 slump
-slung
 slunk
 slurp
 slush
@@ -3805,7 +3624,6 @@ smith
 smock
 smoke
 smoky
-smote
 smush
 smuts
 snack
@@ -3815,7 +3633,6 @@ snake
 snaky
 snare
 snarl
-snead
 sneak
 sneer
 snell
@@ -3833,7 +3650,6 @@ snore
 snort
 snout
 snowy
-snuck
 snuff
 soapy
 soave
@@ -3871,7 +3687,6 @@ sound
 soupy
 souse
 south
-sowed
 sower
 space
 spacy
@@ -3890,7 +3705,6 @@ spear
 speck
 specs
 speed
-speer
 spell
 spelt
 spend
@@ -3899,7 +3713,6 @@ sperm
 spica
 spice
 spicy
-spied
 spiel
 spiff
 spike
@@ -3942,7 +3755,6 @@ spunk
 spurn
 spurt
 sputa
-spyed
 squab
 squad
 squat
@@ -3965,7 +3777,6 @@ stank
 staph
 stare
 stark
-starr
 start
 stash
 state
@@ -4007,7 +3818,6 @@ stoma
 stomp
 stone
 stony
-stood
 stool
 stoop
 stops
@@ -4036,14 +3846,12 @@ study
 stuff
 stump
 stung
-stunk
 stunt
 stupa
 stupe
 style
 suave
 sucre
-sudan
 sudra
 sudsy
 suede
@@ -4100,9 +3908,7 @@ swiss
 swoon
 swoop
 sword
-swore
 sworn
-swung
 sylph
 sylva
 synch
@@ -4124,7 +3930,6 @@ taiko
 tails
 taint
 tajik
-taked
 taken
 taker
 takin
@@ -4161,7 +3966,6 @@ tated
 tater
 tatou
 tatty
-tatum
 taunt
 taupe
 tawny
@@ -4206,7 +4010,6 @@ testy
 teton
 tetra
 texan
-texas
 thane
 thang
 thank
@@ -4228,7 +4031,6 @@ thong
 thorn
 those
 three
-threw
 thrip
 throb
 throe
@@ -4240,7 +4042,6 @@ thump
 thunk
 thyme
 tiara
-tibet
 tibia
 tical
 tidal
@@ -4295,7 +4096,6 @@ tonks
 tonne
 tooth
 topaz
-toped
 toper
 topic
 topos
@@ -4306,7 +4106,6 @@ torso
 torte
 torus
 total
-toted
 totem
 toter
 totty
@@ -4314,13 +4113,11 @@ touch
 tough
 toupe
 tours
-towed
 towel
 tower
 towny
 toxic
 toxin
-toyed
 trace
 track
 tract
@@ -4361,7 +4158,6 @@ trout
 trove
 truce
 truck
-trued
 truer
 truly
 trump
@@ -4427,7 +4223,6 @@ unbox
 uncle
 uncut
 under
-undid
 undue
 unfed
 unfit
@@ -4448,11 +4243,9 @@ until
 unwed
 unzip
 upend
-upped
 upper
 upset
 urban
-urged
 uriah
 urine
 ursus
@@ -4536,7 +4329,6 @@ voice
 voila
 voile
 volar
-volga
 volta
 vomit
 voted
@@ -4549,7 +4341,6 @@ vulva
 vying
 wacko
 wacky
-waded
 wader
 wafer
 waged
@@ -4560,7 +4351,6 @@ wahey
 wahoo
 waist
 waive
-waked
 waken
 waker
 waldo
@@ -4576,7 +4366,6 @@ waste
 watch
 water
 watts
-waugh
 waved
 waver
 waxed
@@ -4643,11 +4432,9 @@ wimpy
 wince
 winch
 windy
-wined
 winey
 wings
 winky
-wiped
 wiper
 wired
 wised
@@ -4667,7 +4454,6 @@ wonga
 wonky
 woods
 woody
-wooed
 wooer
 wooly
 woosh
@@ -4684,7 +4470,6 @@ worth
 would
 wound
 woven
-wowed
 wowee
 wrack
 wrath
@@ -4695,9 +4480,7 @@ wring
 wrist
 write
 wrong
-wrote
 wroth
-wrung
 wryly
 wurst
 xanax
@@ -4711,7 +4494,6 @@ yacht
 yahoo
 yakka
 yappy
-yazoo
 yearn
 years
 yeast

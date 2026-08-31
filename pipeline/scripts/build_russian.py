@@ -43,6 +43,9 @@ import sys
 import urllib.request
 from pathlib import Path
 
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from common import letter_blend_order  # noqa: E402
+
 FREQ_URL = "https://raw.githubusercontent.com/hermitdave/FrequencyWords/master/content/2018/ru/ru_50k.txt"
 VALID_URL = "https://raw.githubusercontent.com/mediahope/Wordle-Russian-Dictionary/main/Russian.txt"
 DANAKT_URL = "https://raw.githubusercontent.com/danakt/russian-words/master/russian.txt"
@@ -132,8 +135,9 @@ def main() -> int:
 
     # Guesses: every base-form 5-letter word (no inflected forms).
     allowed = sorted(base_forms)
-    # Answers: base forms in frequency order (common first) so tiers are meaningful.
-    answers = [w for w in freq_ranked if w in base_forms]
+    # Answers: base forms in frequency order (common first), then blended with
+    # letter-guessability so difficulty reflects how hard the word is to SOLVE.
+    answers = letter_blend_order([w for w in freq_ranked if w in base_forms])
 
     n = len(answers)
     easy_end, medium_end = round(n * args.easy), round(n * args.medium)
