@@ -66,8 +66,9 @@ def tier_of(pack: str, word: str) -> str | None:
 
 
 _PACK_LABEL = {"subtlex-us": "SUBTLEX-US", "subtlex-uk": "SUBTLEX-UK",
-               "wordle": "Official Wordle", "arcane": "Arcane", "surprise": "Surprise"}
-_PACK_ORDER = ["subtlex-us", "subtlex-uk", "wordle", "arcane", "surprise"]
+               "wordle": "Official Wordle", "arcane": "Arcane", "surprise": "Surprise",
+               "russian": "Русский"}
+_PACK_ORDER = ["subtlex-us", "subtlex-uk", "wordle", "arcane", "surprise", "russian"]
 
 
 def answer_packs(word: str) -> list[str]:
