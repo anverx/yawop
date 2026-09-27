@@ -94,6 +94,9 @@ publish: all
 	  --keep islet corse arhat melba linux vesta spica volta lethe mensa
 	$(PY) scripts/apply_blocklist.py --assets $(ASSETS) \
 	  --proper-nouns proper_leaks.txt --solutions verb_inflections.txt
+	# 7. Drop redundant foreign-language senses (Asturian/Latin/... inflections) from
+	#    entries that also have an English sense (e.g. causa's "AST" lines).
+	$(PY) scripts/strip_foreign_senses.py --assets $(ASSETS)
 	@echo "published shipping dictionaries -> $(ASSETS)"
 
 all: subtlex-us subtlex-uk wordle surprise arcane guesses
