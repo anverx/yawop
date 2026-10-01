@@ -49,7 +49,11 @@ def _russian_pos(cats: list[str]) -> str:
     return ""
 
 
-_OBSCENE = re.compile(r"Бранные|Вульгаризм|Обсценн|Русский мат|Оскорблени|Табуированн")
+# Strict VULGARITY only (мат / taboo / vulgar), matching how English gates
+# vulgar/anatomical words. Deliberately NOT "Бранные выражения" (invective) or
+# "Оскорбления" — those are mild insults (баран=ram, козёл=goat, идиот) that stay
+# normal answers, exactly as English keeps "idiot"/"moron".
+_OBSCENE = re.compile(r"Матерн|Вульгаризм|Обсценн|Табуированн")
 
 
 def is_obscene(cats: list[str]) -> bool:
@@ -203,32 +207,37 @@ def main() -> int:
                       for d in (_clean(g) for g in info.get("glosses", [])) if len(d) > 1]
             f.write(json.dumps({"word": w, "senses": senses}, ensure_ascii=False) + "\n")
 
-    # 2. tiers.json — keep only answer-eligible words (Russian POS, not obscene).
+    # 2. tiers.json — answer-eligible = a Russian common word (has a POS category).
+    # Vulgar words are KEPT in the pool (not deleted) and mature-gated at pick time
+    # via blocklist_solutions.txt below — the English model: excluded from default
+    # answers, surfaced only in adult mode.
     def eligible(w: str) -> bool:
-        cats = cache.get(w, {}).get("cats", [])
-        return bool(_russian_pos(cats)) and not is_obscene(cats)
+        return bool(_russian_pos(cache.get(w, {}).get("cats", [])))
 
-    dropped_name = dropped_obscene = 0
+    dropped_name = 0
     new_tiers = {}
     for tier, ws in tiers_data["tiers"].items():
-        kept = []
-        for w in ws:
-            if eligible(w):
-                kept.append(w)
-            elif is_obscene(cache.get(w, {}).get("cats", [])):
-                dropped_obscene += 1
-            else:
-                dropped_name += 1
+        kept = [w for w in ws if eligible(w)]
+        dropped_name += len(ws) - len(kept)
         new_tiers[tier] = kept
-    was = sum(len(v) for v in new_tiers.values()) + dropped_name + dropped_obscene
+    was = sum(len(v) for v in new_tiers.values()) + dropped_name
     tiers_data["tiers"] = new_tiers
     tiers_data["counts"] = {t: len(v) for t, v in new_tiers.items()}
     (pack / "tiers.json").write_text(json.dumps(tiers_data, ensure_ascii=False, indent=2), encoding="utf-8")
 
+    # 3. Mature-gate: merge the pool's vulgar words into the shared, runtime
+    # blocklist_solutions.txt (Cyrillic can't collide with the English entries).
+    answers_now = {w for ws in new_tiers.values() for w in ws}
+    vulgar = sorted(w for w in answers_now if is_obscene(cache.get(w, {}).get("cats", [])))
+    blk = Path(args.assets) / "blocklist_solutions.txt"
+    existing = [ln for ln in (blk.read_text("utf-8").splitlines() if blk.exists() else [])]
+    merged = existing + [w for w in vulgar if w not in set(existing)]
+    blk.write_text("\n".join(merged) + "\n", encoding="utf-8")
+
     total = sum(len(v) for v in new_tiers.values())
     defined = sum(1 for w in allowed if cache.get(w, {}).get("glosses"))
-    print(f"russian: answers {total} (was {was}); "
-          f"dropped {dropped_name} non-eligible (names/toponyms/absent) + {dropped_obscene} obscene",
+    print(f"russian: answers {total} (was {was}); dropped {dropped_name} non-eligible "
+          f"(names/toponyms/absent). mature-gated {len(vulgar)} vulgar words (kept in pool).",
           file=sys.stderr)
     print(f"  definitions: {defined}/{len(allowed)} guessable words have a gloss", file=sys.stderr)
     return 0
