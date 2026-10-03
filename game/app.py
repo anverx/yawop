@@ -561,14 +561,35 @@ class WordApp(GameShellApp):
         close.bind(on_press=popup.dismiss)
         popup.open()
 
-    # Part-of-speech chip colors for the definition popup (foreground accents).
-    _POS_COLORS = {
-        "nou": (0.30, 0.52, 0.82, 1),   # noun  - blue
-        "ver": (0.42, 0.67, 0.39, 1),   # verb  - green
-        "adj": (0.86, 0.63, 0.24, 1),   # adjective - amber
-        "adv": (0.55, 0.45, 0.80, 1),   # adverb - violet
-    }
+    # Part-of-speech chips for the definition popup: a short display label + accent
+    # color, keyed by the raw pos_label each pack emits (English from WordNet/
+    # Wiktionary, Russian from ru.Wiktionary categories). Russian POS names are long
+    # words ("существительное"), so they map to compact chips ("сущ.") that fit the
+    # fixed-width chip column instead of overrunning the definition text.
+    _POS_BLUE = (0.30, 0.52, 0.82, 1)    # noun
+    _POS_GREEN = (0.42, 0.67, 0.39, 1)   # verb
+    _POS_AMBER = (0.86, 0.63, 0.24, 1)   # adjective
+    _POS_VIOLET = (0.55, 0.45, 0.80, 1)  # adverb
+    _POS_TEAL = (0.36, 0.63, 0.66, 1)    # numeral
     _POS_DEFAULT = (0.47, 0.48, 0.50, 1)
+    _POS_CHIP = {
+        "noun": ("noun", _POS_BLUE), "существительное": ("сущ.", _POS_BLUE),
+        "verb": ("verb", _POS_GREEN), "глагол": ("глаг.", _POS_GREEN),
+        "adjective": ("adj", _POS_AMBER), "прилагательное": ("прил.", _POS_AMBER),
+        "adverb": ("adv", _POS_VIOLET), "наречие": ("нареч.", _POS_VIOLET),
+        "numeral": ("num", _POS_TEAL), "числительное": ("числ.", _POS_TEAL),
+    }
+
+    def _pos_chip(self, label):
+        """(display text, color) for a POS chip. Known POS get a short label + color;
+        anything else falls back to gray and is truncated so it stays in its column."""
+        meta = self._POS_CHIP.get((label or "").strip().lower())
+        if meta:
+            return meta
+        short = (label or "").strip()
+        if len(short) > 6:
+            short = short[:4] + "."
+        return (short or "—"), self._POS_DEFAULT
     _ACCENT = (0.24, 0.47, 0.78, 1)      # section headers / quote bar
     _ACCENT_DARK = (0.16, 0.34, 0.62, 1)  # word title
     # Compact definition-source labels (dictionaryapi.dev is Wiktionary-sourced).
@@ -595,9 +616,6 @@ class WordApp(GameShellApp):
                      texture_size=lambda i, s: setattr(i, "height", s[1] + dp(4)))
             return lbl
 
-        def pos_color(label):
-            return self._POS_COLORS.get((label or "")[:3].lower(), self._POS_DEFAULT)
-
         def chip(label, color):
             c = Label(text=label or "—", font_name=theme.font_name, font_size="11sp", bold=True,
                       color=(1, 1, 1, 1), size_hint=(None, None), halign="center", valign="middle")
@@ -620,7 +638,8 @@ class WordApp(GameShellApp):
         def sense_row(pos_label, definition):
             row = BoxLayout(orientation="horizontal", size_hint_y=None, spacing=dp(8), height=dp(26))
             holder = AnchorLayout(anchor_x="left", anchor_y="top", size_hint=(None, 1), width=dp(66))
-            holder.add_widget(chip(pos_label, pos_color(pos_label)))
+            chip_text, chip_color = self._pos_chip(pos_label)
+            holder.add_widget(chip(chip_text, chip_color))
             d = para(definition)
             d.bind(height=lambda i, h: setattr(row, "height", max(h, dp(26))))
             row.add_widget(holder)
