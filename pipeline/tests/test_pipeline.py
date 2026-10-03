@@ -139,5 +139,59 @@ class TestCombineSurprise(unittest.TestCase):
             self.assertEqual(set(recs["quoth"]["sources"]), {"a", "b"})
 
 
+class TestApplyBlocklist(unittest.TestCase):
+    def _assets(self, d):
+        pack = d / "subtlex-us"
+        pack.mkdir()
+        tiers = {"boundaries": {"total": 4}, "counts": {"easy": 2, "hard": 2},
+                 "tiers": {"easy": ["there", "pussy"], "hard": ["abide", "negro"]}}
+        (pack / "tiers.json").write_text(json.dumps(tiers))
+        write_jsonl(pack / "dictionary.jsonl", [
+            {"word": "abide", "senses": [{"definition": "dwell"}]},
+            {"word": "negro", "senses": [{"definition": "x"}]},
+            {"word": "pussy", "senses": [{"definition": "cat"}]},
+            {"word": "there", "senses": [{"definition": "y"}]},
+        ])
+        surprise = d / "surprise"
+        surprise.mkdir()
+        (surprise / "words.txt").write_text("there\npussy\nnegro\nabide\n")
+        (d / "allowed_guesses_all.txt").write_text("there\npussy\nnegro\nabide\n")
+        return d
+
+    def test_slurs_purged_everywhere_vulgar_only_from_solutions(self):
+        with tempfile.TemporaryDirectory() as d:
+            d = self._assets(Path(d))
+            slurs = d / "slurs.txt"; slurs.write_text("negro\n")
+            sols = d / "sols.txt"; sols.write_text("pussy\n")
+            run("apply_blocklist.py", "--assets", d, "--slurs", slurs, "--solutions", sols)
+
+            tiers = json.loads((d / "subtlex-us" / "tiers.json").read_text())
+            flat = [w for t in tiers["tiers"].values() for w in t]
+            self.assertNotIn("negro", flat)   # slur: not a solution
+            self.assertNotIn("pussy", flat)   # vulgar: not a solution
+            self.assertEqual(tiers["counts"], {"easy": 1, "hard": 1})  # counts updated
+
+            dict_words = {r["word"] for r in read_jsonl(d / "subtlex-us" / "dictionary.jsonl")}
+            self.assertNotIn("negro", dict_words)  # slur: no lookup
+            self.assertIn("pussy", dict_words)     # vulgar: keeps its definition
+
+            allowed = set(lines(d / "allowed_guesses_all.txt"))
+            self.assertNotIn("negro", allowed)     # slur: rejected as a guess
+            self.assertIn("pussy", allowed)        # vulgar: still a valid guess
+
+            surprise = set(lines(d / "surprise" / "words.txt"))
+            self.assertNotIn("negro", surprise)    # both barred from untiered answers
+            self.assertNotIn("pussy", surprise)
+            self.assertEqual(flat, ["there", "abide"])  # innocent words untouched
+
+    def test_idempotent(self):
+        with tempfile.TemporaryDirectory() as d:
+            d = self._assets(Path(d))
+            slurs = d / "slurs.txt"; slurs.write_text("negro\n")
+            run("apply_blocklist.py", "--assets", d, "--slurs", slurs)
+            proc = run("apply_blocklist.py", "--assets", d, "--slurs", slurs)
+            self.assertIn("0 occurrence(s) removed", proc.stdout)
+
+
 if __name__ == "__main__":
     unittest.main()
