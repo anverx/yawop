@@ -7,7 +7,7 @@
   "counts": {
     "easy": 650,
     "medium": 1083,
-    "hard": 2600
+    "hard": 2599
   },
   "tiers": {
     "easy": [
@@ -2326,7 +2326,6 @@
       "capon",
       "going",
       "beaux",
-      "hants",
       "ingot",
       "letch",
       "grist",

@@ -97,6 +97,12 @@ publish: all
 	# 7. Drop redundant foreign-language senses (Asturian/Latin/... inflections) from
 	#    entries that also have an English sense (e.g. causa's "AST" lines).
 	$(PY) scripts/strip_foreign_senses.py --assets $(ASSETS)
+	# 8. Resolve bare "X of Y" references into real meanings (follow the chain, fetch
+	#    sub-5-letter bases from Wiktionary), and demote PURE-plural answers to
+	#    guess-only (cepes/morae) -- still guessable, just not dailies.
+	$(PY) scripts/resolve_references_deep.py --assets $(ASSETS) \
+	  --cache data/cache/wiktionary_defs.json --demote-out reference_plurals.txt
+	$(PY) scripts/apply_blocklist.py --assets $(ASSETS) --solutions reference_plurals.txt
 	@echo "published shipping dictionaries -> $(ASSETS)"
 
 all: subtlex-us subtlex-uk wordle surprise arcane guesses

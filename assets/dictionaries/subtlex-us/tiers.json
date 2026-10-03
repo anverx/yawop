@@ -7,7 +7,7 @@
   "counts": {
     "easy": 577,
     "medium": 962,
-    "hard": 2308
+    "hard": 2307
   },
   "tiers": {
     "easy": [
@@ -1803,7 +1803,6 @@
       "lapis",
       "dolce",
       "tying",
-      "hants",
       "wacko",
       "smirk",
       "loath",

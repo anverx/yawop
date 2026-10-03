@@ -5,9 +5,9 @@
     "total": 1009
   },
   "counts": {
-    "easy": 136,
+    "easy": 134,
     "medium": 226,
-    "hard": 544
+    "hard": 539
   },
   "tiers": {
     "easy": [
@@ -47,7 +47,6 @@
       "bairn",
       "acrid",
       "parse",
-      "ostia",
       "scape",
       "aegis",
       "nitre",
@@ -61,7 +60,6 @@
       "targe",
       "wrest",
       "laity",
-      "delos",
       "blest",
       "strew",
       "babel",
@@ -378,7 +376,6 @@
     ],
     "hard": [
       "boric",
-      "hants",
       "sapid",
       "umbel",
       "demit",
@@ -407,7 +404,6 @@
       "atomy",
       "vetch",
       "runic",
-      "lunes",
       "agave",
       "gimel",
       "ambit",
@@ -472,7 +468,6 @@
       "acold",
       "fleck",
       "oread",
-      "moras",
       "tatar",
       "stipe",
       "abysm",
@@ -580,7 +575,6 @@
       "gonad",
       "fluor",
       "clade",
-      "grana",
       "retie",
       "vulva",
       "faqir",
@@ -828,7 +822,6 @@
       "cobol",
       "moony",
       "iodic",
-      "morae",
       "evert",
       "swarf",
       "fondu",
