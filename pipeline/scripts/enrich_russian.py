@@ -75,12 +75,35 @@ def _clean(s: str) -> str:
     return s.strip(" .,;—- ")
 
 
-def glosses(wikitext: str) -> list[str]:
+# POS of the homonym BLOCK that owns the glosses, read straight from the wikitext
+# (morphology template {{сущ…}}/{{гл…}}/{{прил…}} or the {{з|(…)}} section header).
+# Homonyms like пасть carry BOTH "Русские существительные" and "Русские глаголы"
+# page categories, so a word-level category scan mislabels every sense. The glosses
+# we extract come from ONE block, so the POS must come from that same block.
+_POS_SIGNALS = [
+    ("существительное", re.compile(r"\{\{\s*сущ|\(\s*существительное", re.I)),
+    ("прилагательное", re.compile(r"\{\{\s*прил|\(\s*прилагательное", re.I)),
+    ("глагол", re.compile(r"\{\{\s*гл[\s|{-]|\(\s*глагол", re.I)),
+    ("наречие", re.compile(r"\{\{\s*(нареч|adv)|\(\s*наречие", re.I)),
+    ("числительное", re.compile(r"\{\{\s*числ|\(\s*числительное", re.I)),
+]
+
+
+def parse_entry(wikitext: str) -> tuple[str, list[str]]:
+    """(block POS, glosses) from the first Значение of the Russian section. POS is
+    taken from the text PRECEDING that Значение (its own homonym block), so it always
+    matches the senses we return even for multi-POS homonyms."""
     parts = re.split(r"\n=\s*\{\{-ru-\}\}", wikitext)
     body = parts[1] if len(parts) > 1 else wikitext
     m = re.search(r"=+\s*Значение\s*=+(.*?)(\n=+[^=]|\Z)", body, re.S)
     if not m:
-        return []
+        return "", []
+    before = body[:m.start()]
+    pos, best = "", -1
+    for label, rx in _POS_SIGNALS:
+        hits = list(rx.finditer(before))
+        if hits and hits[-1].start() > best:  # signal closest to the Значение wins
+            best, pos = hits[-1].start(), label
     out = []
     for line in m.group(1).splitlines():
         line = line.strip()
@@ -88,7 +111,7 @@ def glosses(wikitext: str) -> list[str]:
             g = _clean(line.lstrip("# ").strip())
             if g and len(g) > 1:
                 out.append(g)
-    return out
+    return pos, out
 
 
 _last_continue: dict | None = None
@@ -127,9 +150,9 @@ def _fetch_glosses(batch: list[str]) -> dict:
     for w in batch:
         p = pages.get(tmap[w])
         try:
-            out[w] = glosses(p["revisions"][0]["slots"]["main"]["*"]) if p and "revisions" in p else []
+            out[w] = parse_entry(p["revisions"][0]["slots"]["main"]["*"]) if p and "revisions" in p else ("", [])
         except Exception:  # noqa: BLE001
-            out[w] = []
+            out[w] = ("", [])
     return out
 
 
@@ -154,7 +177,7 @@ def _fetch_categories(batch: list[str]) -> dict:
 
 
 def fetch(words: list[str], cache: dict) -> None:
-    need_gloss = [w for w in words if "glosses" not in cache.get(w, {})]
+    need_gloss = [w for w in words if "gloss_pos" not in cache.get(w, {})]
     need_cats = [w for w in words if not cache.get(w, {}).get("cats_done")]
     print(f"ru.wiktionary: {len(words)} words | {len(need_gloss)} glosses, {len(need_cats)} categories to fetch",
           file=sys.stderr)
@@ -162,7 +185,9 @@ def fetch(words: list[str], cache: dict) -> None:
         batch = need_gloss[i:i + BATCH]
         gl = _fetch_glosses(batch)
         for w in batch:
-            cache.setdefault(w, {})["glosses"] = gl[w]
+            pos, gs = gl[w]
+            e = cache.setdefault(w, {})
+            e["glosses"], e["gloss_pos"] = gs, pos
         time.sleep(0.3)
         if i % (BATCH * 10) == 0:
             print(f"  glosses {min(i + BATCH, len(need_gloss))}/{len(need_gloss)}", file=sys.stderr)
@@ -201,7 +226,9 @@ def main() -> int:
     with (pack / "dictionary.jsonl").open("w", encoding="utf-8") as f:
         for w in allowed:
             info = cache.get(w, {})
-            pos = _russian_pos(info.get("cats", []))
+            # Prefer the POS of the gloss block (correct for homonyms like пасть);
+            # fall back to the page-category scan for older cache entries.
+            pos = info.get("gloss_pos") or _russian_pos(info.get("cats", []))
             # re-run _clean: cached glosses predate the dangling-template hardening
             senses = [{"pos_label": pos, "definition": d, "source": "ru.wiktionary"}
                       for d in (_clean(g) for g in info.get("glosses", [])) if len(d) > 1]
