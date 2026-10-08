@@ -87,7 +87,7 @@ _KEEP_POS = {"NOUN", "ADJF", "INFN"}
 _PROPER = {"Name", "Surn", "Patr", "Geox"}
 
 
-def _make_base_form_filter():
+def _make_morph_predicates():
     try:
         import pymorphy3
     except ImportError as e:
@@ -111,7 +111,20 @@ def _make_base_form_filter():
             return True
         return False
 
-    return is_base_form
+    def is_verb_past_dominant(w: str) -> bool:
+        """True if the word reads most naturally as a masculine-singular PAST-TENSE verb
+        (погиб='perished', надел='put on', выпал='fell out') rather than the rare noun it
+        also happens to spell. These are homograph traps: the frequency that tiers them
+        comes from the common verb, but the only base-form reason they're kept is an
+        archaic/technical noun (погиб='изгиб'). Demote them from ANSWERS (still valid
+        guesses). Rule: the summed score of masc-sg-past parses >= the best noun parse."""
+        ps = morph.parse(w)
+        past = sum(p.score for p in ps
+                   if p.tag.POS == "VERB" and {"past", "masc", "sing"} <= set(p.tag.grammemes))
+        noun = max([p.score for p in ps if p.tag.POS == "NOUN"] + [0.0])
+        return past > 0 and past >= noun
+
+    return is_base_form, is_verb_past_dominant
 
 
 def main() -> int:
@@ -129,7 +142,7 @@ def main() -> int:
     comprehensive = five_letter_set(get(DANAKT_URL, "cp1251"))
 
     print("filtering to base forms (pymorphy3: nouns/adjectives + verb infinitives only)...", file=sys.stderr)
-    is_base_form = _make_base_form_filter()
+    is_base_form, is_verb_past_dominant = _make_morph_predicates()
     candidates = set(freq_ranked) | valid | comprehensive
     base_forms = {w for w in candidates if is_base_form(w)}
 
@@ -137,7 +150,12 @@ def main() -> int:
     allowed = sorted(base_forms)
     # Answers: base forms in frequency order (common first), then blended with
     # letter-guessability so difficulty reflects how hard the word is to SOLVE.
-    answers = letter_blend_order([w for w in freq_ranked if w in base_forms])
+    # Drop homograph traps that read as a masc-sg past-tense verb (погиб, надел, ...):
+    # they stay valid guesses but are too misleading to serve as answers.
+    verb_traps = sorted(w for w in freq_ranked if w in base_forms and is_verb_past_dominant(w))
+    answers = letter_blend_order([w for w in freq_ranked if w in base_forms and w not in set(verb_traps)])
+    print(f"  demoted {len(verb_traps)} masc-past verb-form traps from answers: {' '.join(verb_traps)}",
+          file=sys.stderr)
 
     n = len(answers)
     easy_end, medium_end = round(n * args.easy), round(n * args.medium)
