@@ -61,10 +61,74 @@ def is_obscene(cats: list[str]) -> bool:
 
 
 # --- wikitext -> clean glosses (the 'Значение' section of the Russian entry) ---
+# Many entries define a word entirely through a RELATIONAL template rather than free
+# text: {{t:=|синоним}} ("same as"), {{умласк.|ru|база}} (diminutive), {{действие|
+# глаг}} ("action of"), {{хим-элем|…|gloss}}, etc. Rendering these to Russian text
+# (instead of deleting the template, which leaves an empty gloss, e.g. мотор, велик,
+# ножик) is what recovers those definitions. Style/domain LABELS ({{разг.}}, {{устар.}})
+# carry no content and are still dropped by the generic template strip below.
+_ANCHOR = re.compile(r"#.*$")
+_REL_PREFIX = {"умласк": "уменьшительно-ласкательное к", "ласк": "ласкательное к",
+               "уменьш": "уменьшительное к", "увелич": "увеличительное к"}
+# Structural/noise templates carry no gloss text -> drop (examples, bolding, dashes).
+_DROP = {"-", "--", "!", "lang", "помета", "выдел", "пример", "илл", "nobr"}
+# Style/domain labels (пометы) whose displayed abbreviation differs from the template
+# name. Everything else keeps its own name verbatim (разг., устар., спец., ...).
+_LABEL_ALIAS = {"п": "перен."}  # {{п.}} = переносное значение
+
+
+def _tmpl_text(inner: str) -> str | None:
+    """Render a template to plain text, or None to drop it. Three kinds: a
+    definition-bearing template (synonym/diminutive/...) -> its gloss; a style/domain
+    label ({{разг.|ru}}/{{устар.|ru}}) -> the abbreviation, kept because the register
+    IS informative; anything else (examples, bolding) -> None. `inner` is the text
+    between {{ }}, [[ ]]-cleaned."""
+    parts = inner.split("|")
+    key = parts[0].strip().rstrip(".").lower()
+    args = [p.strip() for p in parts[1:] if "=" not in p]  # positional params only
+    nonempty = [a for a in args if a]
+
+    def tail(skip_lang: bool = True) -> list[str]:
+        xs = args[1:] if (skip_lang and args and args[0] in ("ru", "")) else args
+        return [_ANCHOR.sub("", x).strip() for x in xs if x]
+
+    if key in ("t:=", "==="):                       # synonym (+ optional full gloss)
+        return ", ".join(_ANCHOR.sub("", x).strip() for x in nonempty) or None
+    if key == "то же":
+        return "то же, что " + ", ".join(nonempty) if nonempty else None
+    if key in _REL_PREFIX:
+        b = tail()
+        return _REL_PREFIX[key] + " " + b[0] if b else None
+    if key == "действие":
+        b = tail(skip_lang=False)
+        return "действие по значению глагола " + b[0] if b else None
+    if key == "дееприч":
+        b = tail(skip_lang=False)
+        return "деепричастие от " + b[0] if b else None
+    if key == "соотн":
+        b = tail(skip_lang=False)
+        return "соотносящийся с " + b[0] if b else None
+    if key == "хим-элем":                           # positional: number, symbol, gloss
+        return (nonempty[2] if len(nonempty) >= 3 else nonempty[-1]) if nonempty else None
+    if key in _DROP:
+        return None
+    if all(p in ("", "ru") for p in args):          # style/domain помета, e.g. {{разг.|ru}}
+        return _LABEL_ALIAS.get(key, parts[0].strip())
+    return None
+
+
+def _render_pass(m: "re.Match") -> str:
+    r = _tmpl_text(m.group(1))
+    return r if r is not None else m.group(0)
+
+
 def _clean(s: str) -> str:
     s = re.sub(r"\[\[[^\]|]*\|([^\]]*)\]\]", r"\1", s)  # [[a|b]] -> b
     s = re.sub(r"\[\[([^\]]*)\]\]", r"\1", s)            # [[a]] -> a
-    for _ in range(3):                                   # nested {{...}}
+    s = s.replace("{{!}}", "")                           # pipe-escape, else it blocks rendering
+    for _ in range(2):                                   # render def templates to text first
+        s = re.sub(r"\{\{([^{}]*)\}\}", _render_pass, s)
+    for _ in range(3):                                   # drop remaining label templates
         s = re.sub(r"\{\{[^{}]*\}\}", "", s)
     s = re.sub(r"''+", "", s)
     s = re.sub(r"<[^>]+>", "", s)
@@ -72,6 +136,7 @@ def _clean(s: str) -> str:
     s = re.sub(r"\s*\{\{.*$", "", s)                     # dangling unclosed {{template
     s = re.sub(r"\s*\}\}.*$", "", s)
     s = re.sub(r"\s+", " ", s)
+    s = re.sub(r"^(?:и|или|а|но)\s+", "", s.strip())  # leading conjunction left by a stripped label
     return s.strip(" .,;—- ")
 
 
