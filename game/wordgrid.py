@@ -233,6 +233,7 @@ class WordGridPanel(BoxLayout):
                             minimum_height=self._grid_col.setter("height"))
         self._tiles: list[list[Tile]] = []
         self._info_btns: list[RoundedButton] = []
+        self._score_lbls: list[Label] = []
         self._rows: list[GuessRow] = []
         for r in range(self.game.max_guesses):
             self._grid_col.add_widget(self._make_row(r))
@@ -249,7 +250,14 @@ class WordGridPanel(BoxLayout):
         row = GuessRow(orientation="horizontal", spacing=dp(8), size_hint=(None, None), height=tile)
         row.bind(minimum_width=row.setter("width"))
         self._rows.append(row)
-        row.add_widget(Widget(size_hint=(None, None), size=(btn, tile)))
+        # Left of the row (balancing the right-side '?' button): the word's letter-
+        # frequency score, revealed together with '?' once the row holds a valid word.
+        score = Label(text="", font_name=get_theme().font_name, font_size="11sp",
+                      color=(0.45, 0.45, 0.47, 1), size_hint=(None, None), size=(btn, tile),
+                      halign="center", valign="middle")
+        score.bind(size=lambda l, *_: setattr(l, "text_size", l.size))
+        row.add_widget(score)
+        self._score_lbls.append(score)
         tiles = []
         for c in range(WORD_LEN):
             t = Tile(size_hint=(None, None), size=(tile, tile))
@@ -397,6 +405,12 @@ class WordGridPanel(BoxLayout):
         return greens, barred, absent
 
     # --- render ---
+    def _letter_score(self, word: str) -> int:
+        """Sum of per-letter frequencies over the word's DISTINCT letters (double
+        letters counted once) -- the same 'common letters = easier' signal shown
+        under each key. Higher = the word is built from commoner letters."""
+        return sum(self._letter_mass.get(ch.lower(), 0) for ch in set(word))
+
     def render(self) -> None:
         g = self.game
         active = len(g.guesses)
@@ -423,6 +437,10 @@ class WordGridPanel(BoxLayout):
                 and (g.current == g.answer or g.current in self.allowed))
             self._info_btns[r].opacity = 1 if shown else 0
             self._info_btns[r].disabled = not shown
+            # Score shows only on ENTERED rows -- it reports the guessing difficulty of a
+            # committed word; the active row stays blank so it never pre-judges what
+            # you're typing (where you'd deliberately pick commoner-letter words anyway).
+            self._score_lbls[r].text = str(self._letter_score(g.guesses[r])) if r < active else ""
             self._rows[r].set_highlight(r == active and not g.finished)
 
         if g.finished:  # Enter is irrelevant now: announce the outcome instead
