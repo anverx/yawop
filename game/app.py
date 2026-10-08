@@ -220,6 +220,10 @@ class WordApp(GameShellApp):
         self._last_random = {"pack": self._active.pack,
                              "difficulty": self._last_random.get("difficulty", "medium")}
         self._log(f"switch language -> {lang}")
+        # Rebind the calendar to the new world's store (its cal_state is captured at
+        # build time, so without this it keeps drawing the previous language's days).
+        if getattr(self, "calendar_screen", None) is not None:
+            self.calendar_screen.reload_config()
         # Refresh the menu to the newly active world (streak + daily badges read self.store).
         if getattr(self, "menu_screen", None) is not None:
             self.sm.current = "menu"
