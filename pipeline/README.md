@@ -46,6 +46,77 @@ Wordle-style games need **two** lists, and this pipeline produces both:
 Difficulty boundaries are **percentiles**, not fixed counts, so they survive
 source changes: `EASY=0.15` (top 15%), `MEDIUM=0.40` (up to 40%), hard = the rest.
 
+Difficulty is ranked by **lowercase frequency** (SUBTLEX's `FREQlow`, in
+`words_lc_ranked.txt`), not the case-folded total. The total conflates a rare
+word with any proper name that shares its spelling — so "brock" (a badger)
+inherited wrestler/Pokémon "Brock" frequency and looked *medium*. `FREQlow`
+counts only lowercase (common-word) usage, so such words fall to their true, rare
+tier while genuine words that are *also* surnames (crane, stone, grant) keep their
+real frequency. Rule-based, from corpus metadata: no name list, no threshold. The
+`wordle` pack borrows the same lowercase ranking.
+
+## Answer eligibility (rule-based)
+
+Not every valid word should be served as a **solution**: proper nouns, typo/
+inflection "words", and vulgar words make poor or unfair answers. We decide this
+by **repeatable, metadata-driven rules — no hand-maintained name/word lists**
+(the one sanctioned exception is a small *obscene* seed list, since vulgarity is a
+judgement the metadata can't fully capture). **Real words stay valid guesses** with
+working definitions; only words that aren't real **English** words are removed as
+guesses too: **proper-noun / reference-only** (a surname or a bare "spelling of X"),
+and **non-English** words that only have a foreign-language Wiktionary entry (`whaur`,
+`garre` — see `find_nonword_guesses.py`; borrowings that entered English like `pizza`
+keep an English sense and survive). Applied at `make publish` (see
+`classify_answers.py`, `find_trivial_plurals.py`, `find_nonword_guesses.py`):
+
+**A word is answer-eligible iff it has >=1 sense that is all of:**
+1. **not a proper noun** — no WordNet `instance_hypernyms`, and (for WordNet-only-
+   proper words) no Wiktionary POS `Proper noun`;
+2. **not a mere reference** — its definition isn't "*(alt/obsolete) spelling/form
+   of X*", "*plural of X*", "*misspelling of X*", "*letter-case form of X*", etc.;
+3. **clean-dominant** — its best clean sense **strictly** outranks its best obscene
+   sense by WordNet lemma frequency. **Ties (including 0/0) go to obscene.**
+
+A word is only called a **name** with *positive* proper-noun evidence; with no
+evidence either way it stays eligible (it was defined by *some* source, so we
+don't strip it). A proper noun with a genuine obscure **side meaning**
+(`ghana` = a Maltese folk-singing style, `louis` = a gold coin, `texas` = a
+steamboat's officer deck) is **kept**, and that side meaning is **grafted into its
+dictionary entry** so it actually shows in the lookup (the point is to learn it).
+
+### Two exclusion types, deliberately different
+
+| Kind | Rule output | Applied | Adult mode |
+|------|-------------|---------|-----------|
+| **proper-noun / reference-only** (a name, not a real word) | `nonanswer_names.txt` | removed **everywhere** — answer sources, `dictionary.jsonl`, *and* the `allowed_guesses_all.txt` validator (not even a valid guess) | still excluded — adult mode isn't about names |
+| **trivial plural / 3rd-person -s** (a real word) | `trivial_plurals.txt` | removed from **answer sources only**; stays a valid guess with its definition | still excluded |
+| **obscene** (a real word) | `blocklist_solutions.txt` (shipped) = curated seed UNION WordNet-obscene-marked | **runtime, mature-gated** filter in `pick_word`; stays a valid guess | **becomes a valid answer** (random games only; daily is always identical for everyone) |
+
+So `peter` (WordNet: Pope + "obscene terms for penis", no clean standalone sense —
+the verb needs "out") is obscene-gated: never a default answer, guessable and
+defined, and served only in an adult-mode random game. Dual-meaning words whose
+household sense dominates (`cock`, `shaft`, `bush`, `tool`) stay normal answers.
+
+**Adult mode is one switch** governing both *answer-eligibility* and lookup
+*display* (obscene senses can be hidden unless it's on).
+
+The only curated files are the **obscene** ones (`blocklist_slurs.txt`, removed
+everywhere as it's a hard obscenity call; `blocklist_solutions.txt`, the mature-
+gated seed). `trivial_plurals.txt` and `nonanswer_names.txt` are **generated** by
+rules, not written by hand.
+
+### Reference resolution (no dead-end lookups)
+
+Many guess-only words are archaic/variant spellings or inflections whose whole
+definition just points at another word ("Alternative spelling of abaca", "plural
+of abac") — a dead end in the lookup. `resolve_references.py` follows the
+reference to its base word (through short chains) and **grafts the base's real
+meaning** onto the entry, sourced from our own dictionary, then WordNet, then the
+Wiktionary cache. So `abaka` shows "Alternative spelling of abaca" *plus* abaca's
+meaning. Runs offline at publish (committed cache); `--fetch` populates the cache
+for new bases. Latest pass resolved ~82% (1,182 -> 218 remaining, a deeply obscure
+"plural of X" tail whose singular no source defines).
+
 ## Requirements
 
 - Python 3, `requests`, `nltk` + the `wordnet` and `omw-1.4` corpora.
@@ -74,6 +145,22 @@ Tunables (pass on the command line, e.g. `make all UK_MAX_API=2000`):
 (per pack: `dictionary.jsonl` + `tiers.json`; plus Wordle's `allowed_guesses.txt`,
 the `surprise` list, and `allowed_guesses_all.txt`). Working intermediates and
 caches under `data/` stay behind.
+
+It then runs a **rule-based post-processing pass** over the shipped assets — all
+metadata-driven, the only curated inputs being the obscene lists (see "Answer
+eligibility" and "Reference resolution" above for the rules):
+
+1. `find_trivial_plurals.py` — flag bare `-s` inflections (barred from answers only).
+2. `classify_answers.py` — proper-noun / reference-only words → `nonanswer_names.txt`
+   (removed everywhere); obscene set (WordNet-marked ∪ curated) → the mature-gated
+   `blocklist_solutions.txt`; graft rescued side meanings into eligible entries.
+3. `apply_blocklist.py` — apply the slur / name / trivial-plural lists to the assets.
+4. `build_extra_defs.py` — WordNet + Wiktionary-cache defs for allowed words no pack defines.
+5. `resolve_references.py` — graft base meanings onto "spelling/plural of X" dead-ends.
+6. `find_nonword_guesses.py` + `apply_blocklist.py` — drop non-English words (no English sense).
+7. `enrich_both_sources.py` — add Wiktionary senses to WordNet-defined guessable words
+   so a lookup shows BOTH sources (skipping references and near-duplicates of the
+   WordNet wording); graceful fetch, committed cache.
 
 Word **selection and lookup at runtime** are not part of this pipeline — they live
 in the game's `worddata/` package (see the top-level `README.md`), which reads the
@@ -155,19 +242,28 @@ records additionally carry `gutenberg_search_url` and, where found, `examples`:
 
 ## Results
 
-Latest `make all` (`US_MAX_API=800 UK_MAX_API=1200 WORDLE_MAX_API=500`):
+Rough **shipped** magnitudes (`assets/dictionaries/`), after the publish
+post-processing removes trivial plurals, proper-noun/reference-only names, and
+non-English words from the answer sources (ballpark — exact counts shift each rebuild):
 
-| Pack | Source words (5-letter) | Answer pool (defined) | Easy / Medium / Hard |
-|------|------------------------:|----------------------:|:--------------------:|
-| `subtlex-us` | 6,779 | 5,480 | 822 / 1,370 / 3,288 |
-| `subtlex-uk` | 19,151 | 6,594 | 989 / 1,649 / 3,956 |
-| `wordle` | 2,315 answers (12,972 allowed) | 2,309 | 346 / 578 / 1,385 |
-| `surprise` | union | 6,895 | — (no tiers) |
-| `arcane` | 4,128 Gutenberg − top-4,000 SUBTLEX (junk-filtered) | 1,009 | 151 / 253 / 605 |
+| Pack | Answer pool (approx) |
+|------|---------------------:|
+| `subtlex-us` | ~4,000 |
+| `subtlex-uk` | ~4,500 |
+| `wordle` | ~2,300 |
+| `surprise` | ~4,700 |
+| `arcane` | ~900 |
 
-- **Arcane usage examples**: 984 of 1,009 words (97.5%) have ≥1 Wikisource literary citation (dictionaries, cyclopaedias, catalogues, etc. are filtered out — only prose/verse).
-- **Allowed-guess validator** (`data/allowed_guesses_all.txt`): 25,154 distinct valid words.
-- **Caches**: `dictionaryapi.json` ~2,050 words; `wikisource.json` ~1,000 words. Re-runs hit zero network for cached lookups.
+Each tiered pack splits easy / medium / hard at the `EASY`/`MEDIUM` frequency
+percentiles (default 15% / next 25% / rest), so the counts follow the pool size.
+
+- **Allowed-guess validator** (`allowed_guesses_all.txt`): **~13,000** distinct valid
+  guesses (roughly half the raw sources: proper nouns, non-English words, and junk are
+  stripped; obscene words and trivial plurals stay guessable but aren't answers).
+- **Defined words** (≥1 sense in a shipped dictionary): **~12,000+**.
+- **Arcane usage examples**: most arcane words carry ≥1 Wikisource literary citation.
+- **Caches** (committed, "black hole"): `dictionaryapi.json`, `wiktionary_defs.json`,
+  `wikisource.json`. Re-runs hit zero network for cached lookups.
 
 Answer-pool coverage is bounded by the per-pack `*_MAX_API` budgets (unfilled gaps
 are pruned); raise a budget and re-run to grow a pool — cached words are free, so

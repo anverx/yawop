@@ -2,17 +2,21 @@ name: tests
 
 on:
   push:
+    tags-ignore: ['**']   # tag pushes (releases) don't need a test run; save CI minutes
   pull_request:
 
 jobs:
   test:
     runs-on: ubuntu-latest
+    timeout-minutes: 20
     strategy:
       fail-fast: false
       matrix:
         python-version: ["3.11", "3.12", "3.13"]
     steps:
       - uses: actions/checkout@v4
+        with:
+          submodules: recursive
 
       - uses: actions/setup-python@v5
         with:

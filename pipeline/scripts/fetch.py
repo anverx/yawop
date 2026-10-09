@@ -17,6 +17,7 @@ import argparse
 import csv
 import io
 import sys
+import zipfile
 from html.parser import HTMLParser
 from pathlib import Path
 
@@ -30,6 +31,12 @@ GUTENBERG_URL_FILE = "wordlist.url"
 
 # SUBTLEX-US: JSON list of {word, count}, sorted by count desc (74,286 entries).
 SUBTLEX_US_URL = "https://raw.githubusercontent.com/words/subtlex-word-frequencies/master/index.json"
+# SUBTLEX-US text version (UGent), tab-separated. Adds FREQlow = occurrences that
+# START LOWERCASE, i.e. common-word (non-proper-noun) usage. Ranking difficulty by
+# FREQlow instead of the case-folded total stops proper names ("Brock", "Angus")
+# from inflating a rare word into an easy/medium tier. Used only for tiering.
+SUBTLEX_US_LC_ZIP = "https://www.ugent.be/pp/experimentele-psychologie/en/research/documents/subtlexus/subtlexus2.zip"
+SUBTLEX_US_LC_MEMBER = "SUBTLEXus74286wordstextversion.txt"
 # SUBTLEX-UK derived CSV (Spelling, nchar, LogFreq_Zipf, DomPoS); CC-licensed mirror.
 SUBTLEX_UK_URL = "https://raw.githubusercontent.com/JackEdTaylor/Codeword-Solver/HEAD/zipfFreqs.csv"
 # Official Wordle lists (cfreshman gists).
@@ -48,6 +55,32 @@ def fetch_subtlex_us(out_dir: Path) -> None:
     words = dedupe_ci(five_letter_only(e["word"] for e in data))
     write_lines(out_dir / "words_ranked.txt", words)
     print(f"subtlex-us: {len(data)} entries -> {len(words)} five-letter words", file=sys.stderr)
+    _fetch_subtlex_us_lowercase(out_dir)
+
+
+def _fetch_subtlex_us_lowercase(out_dir: Path) -> None:
+    """words_lc_ranked.txt: 5-letter words ordered by FREQlow (lowercase-start
+    frequency). This is the reference ranking assign_tiers uses so difficulty
+    reflects common-word usage, not proper-noun frequency (see SUBTLEX_US_LC_ZIP)."""
+    raw = get(SUBTLEX_US_LC_ZIP).content
+    with zipfile.ZipFile(io.BytesIO(raw)) as z:
+        text = z.read(SUBTLEX_US_LC_MEMBER).decode("latin-1").splitlines()
+    header = text[0].split("\t")
+    wi, fli = header.index("Word"), header.index("FREQlow")
+    scored: list[tuple[str, int]] = []
+    for line in text[1:]:
+        cells = line.split("\t")
+        if len(cells) <= fli:
+            continue
+        try:
+            scored.append((cells[wi].strip(), int(cells[fli])))
+        except ValueError:
+            continue
+    scored.sort(key=lambda x: -x[1])  # highest lowercase frequency first
+    words = dedupe_ci(five_letter_only(w for w, _ in scored))
+    write_lines(out_dir / "words_lc_ranked.txt", words)
+    print(f"subtlex-us: {len(scored)} POS rows -> {len(words)} five-letter words (FREQlow order)",
+          file=sys.stderr)
 
 
 def fetch_subtlex_uk(out_dir: Path) -> None:

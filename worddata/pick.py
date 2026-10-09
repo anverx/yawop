@@ -20,8 +20,12 @@ import random
 from . import store
 
 
-def load_pool(pack: str, difficulty: str | None) -> list[str]:
-    """Candidate words for a pack (+ optional difficulty), deterministically ordered."""
+def load_pool(pack: str, difficulty: str | None, allow_mature: bool = False) -> list[str]:
+    """Candidate words for a pack (+ optional difficulty), deterministically ordered.
+
+    Vulgar/anatomical words are excluded from the pool unless allow_mature is set,
+    so they are never picked as a solution by default (they remain valid guesses).
+    """
     pdir = store.ASSETS / pack
     if not pdir.is_dir():
         raise SystemExit(f"unknown pack '{pack}'. Available: {', '.join(store.packs())}")
@@ -32,15 +36,19 @@ def load_pool(pack: str, difficulty: str | None) -> list[str]:
             raise SystemExit(f"pack '{pack}' has no difficulty tiers; drop --difficulty")
         if difficulty not in tiers:
             raise SystemExit(f"unknown difficulty '{difficulty}'. Choose from: {', '.join(store.TIER_ORDER)}")
-        return list(tiers[difficulty])
+        pool = list(tiers[difficulty])
+    elif tiers:  # join all tiers, preserving easy->hard (frequency) order
+        pool = [w for t in store.TIER_ORDER for w in tiers.get(t, [])]
+    else:
+        pool = next((store.read_lines(pdir / name)  # untiered pack (e.g. surprise)
+                     for name in ("puzzle_words.txt", "words.txt") if (pdir / name).exists()), None)
+        if pool is None:
+            raise SystemExit(f"pack '{pack}' has no word list to draw from")
 
-    if tiers:  # join all tiers, preserving easy->hard (frequency) order
-        return [w for t in store.TIER_ORDER for w in tiers.get(t, [])]
-
-    for name in ("puzzle_words.txt", "words.txt"):  # untiered pack (e.g. surprise)
-        if (pdir / name).exists():
-            return store.read_lines(pdir / name)
-    raise SystemExit(f"pack '{pack}' has no word list to draw from")
+    if not allow_mature:
+        blocked = store.solution_blocklist()
+        pool = [w for w in pool if w.lower() not in blocked]
+    return pool
 
 
 def _seeded_rng(pack: str, difficulty: str | None, seed) -> random.Random:
@@ -51,9 +59,12 @@ def _seeded_rng(pack: str, difficulty: str | None, seed) -> random.Random:
     return random.Random(int(hashlib.sha256(key).hexdigest(), 16))
 
 
-def pick_word(pack: str, difficulty: str | None = None, seed=None) -> str:
-    """Pick one word. Same (pack, difficulty, seed) -> same word; seed=None -> random."""
-    pool = load_pool(pack, difficulty)
+def pick_word(pack: str, difficulty: str | None = None, seed=None, allow_mature: bool = False) -> str:
+    """Pick one word. Same (pack, difficulty, seed) -> same word; seed=None -> random.
+
+    allow_mature=False (default) excludes vulgar/anatomical words from the draw.
+    """
+    pool = load_pool(pack, difficulty, allow_mature=allow_mature)
     if not pool:
         raise SystemExit(f"no words available for pack '{pack}'{f' / {difficulty}' if difficulty else ''}")
     return _seeded_rng(pack, difficulty, seed).choice(pool)
@@ -64,10 +75,11 @@ def main() -> int:
     ap.add_argument("--pack", required=True)
     ap.add_argument("--difficulty", choices=store.TIER_ORDER, help="omit to draw from all tiers")
     ap.add_argument("--seed", help="hash/seed: same value -> same word (e.g. a date for a daily word)")
+    ap.add_argument("--allow-mature", action="store_true", help="include vulgar/anatomical words in the draw")
     ap.add_argument("--json", action="store_true")
     args = ap.parse_args()
 
-    word = pick_word(args.pack, args.difficulty, args.seed)
+    word = pick_word(args.pack, args.difficulty, args.seed, allow_mature=args.allow_mature)
     if args.json:
         print(json.dumps({"word": word, "pack": args.pack, "difficulty": args.difficulty or "all",
                           "tier": store.tier_of(args.pack, word), "seed": args.seed}, ensure_ascii=False))

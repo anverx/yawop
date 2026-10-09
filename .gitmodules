@@ -1,0 +1,3 @@
+[submodule "libs/kivyshell"]
+	path = libs/kivyshell
+	url = https://github.com/anverx/kivyshell
