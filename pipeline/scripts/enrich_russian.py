@@ -277,19 +277,23 @@ def main() -> int:
     args = ap.parse_args()
 
     pack = Path(args.assets) / "russian"
-    allowed = [w.strip() for w in (pack / "allowed_guesses.txt").read_text("utf-8").splitlines() if w.strip()]
+    # Define/eligibility-check the dictionary HEADWORDS (base forms), not the full guess
+    # list -- allowed_guesses.txt now holds every inflected form too, far too many to
+    # fetch. build_russian writes base_forms.txt; fall back to allowed_guesses.txt.
+    src = pack / "base_forms.txt" if (pack / "base_forms.txt").exists() else pack / "allowed_guesses.txt"
+    headwords = [w.strip() for w in src.read_text("utf-8").splitlines() if w.strip()]
     tiers_data = json.loads((pack / "tiers.json").read_text("utf-8"))
 
     cache_path = Path(args.cache)
     cache = json.loads(cache_path.read_text("utf-8")) if cache_path.exists() else {}
-    words = allowed if not args.limit else allowed[:args.limit]
+    words = headwords if not args.limit else headwords[:args.limit]
     fetch(words, cache)
     cache_path.parent.mkdir(parents=True, exist_ok=True)
     cache_path.write_text(json.dumps(cache, ensure_ascii=False, sort_keys=True), encoding="utf-8")
 
-    # 1. dictionary.jsonl — real senses for every guessable word that has them.
+    # 1. dictionary.jsonl — real senses for every headword that has them.
     with (pack / "dictionary.jsonl").open("w", encoding="utf-8") as f:
-        for w in allowed:
+        for w in headwords:
             info = cache.get(w, {})
             # Prefer the POS of the gloss block (correct for homonyms like пасть);
             # fall back to the page-category scan for older cache entries.
@@ -327,11 +331,11 @@ def main() -> int:
     blk.write_text("\n".join(merged) + "\n", encoding="utf-8")
 
     total = sum(len(v) for v in new_tiers.values())
-    defined = sum(1 for w in allowed if cache.get(w, {}).get("glosses"))
+    defined = sum(1 for w in headwords if cache.get(w, {}).get("glosses"))
     print(f"russian: answers {total} (was {was}); dropped {dropped_name} non-eligible "
           f"(names/toponyms/absent). mature-gated {len(vulgar)} vulgar words (kept in pool).",
           file=sys.stderr)
-    print(f"  definitions: {defined}/{len(allowed)} guessable words have a gloss", file=sys.stderr)
+    print(f"  definitions: {defined}/{len(headwords)} headwords have a gloss", file=sys.stderr)
     return 0
 
 
