@@ -34,7 +34,7 @@ def main() -> int:
     ap.add_argument("--medium", type=float, default=0.40)
     ap.add_argument("--rank-by", help="reference frequency-ordered word list")
     ap.add_argument("--letter-blend", action="store_true",
-                    help="blend puzzle guessability (distinct-letter frequency, product) "
+                    help="blend puzzle guessability (distinct-letter frequency, weighted 1/4) "
                          "into difficulty, so a common word of rare/repeated letters (puppy) "
                          "is treated as harder than its frequency alone implies")
     args = ap.parse_args()

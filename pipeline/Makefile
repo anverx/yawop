@@ -25,9 +25,9 @@ GUTENBERG_MAX_API ?= 500
 # Difficulty tier boundaries (cumulative fractions): easy top 15%, medium up to 40%.
 EASY   ?= 0.15
 MEDIUM ?= 0.40
-# --letter-blend folds puzzle guessability (distinct-letter frequency, product) into
-# difficulty, so a common word of rare/repeated letters (e.g. "puppy") counts as
-# harder than its frequency alone implies. Parameter-free.
+# --letter-blend folds puzzle guessability (distinct-letter frequency) into difficulty,
+# so a common word of rare/repeated letters (e.g. "puppy") counts as harder than its
+# frequency alone implies. Letters weigh 1/4 (common.LETTER_WEIGHT); frequency leads.
 
 # Arcane pack: subtract only the top-N most frequent SUBTLEX words (so archaic
 # words rarely seen in modern subtitles survive). ~4000 yields ~1000 clean words.
