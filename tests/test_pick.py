@@ -66,6 +66,22 @@ class TestPick(unittest.TestCase):
         self.assertEqual(store.tier_of("tpack", "charl"), "medium")
         self.assertIsNone(store.tier_of("flat", "apple"))
 
+    def test_mature_words_excluded_from_solutions_by_default(self):
+        (self.root / "blocklist_solutions.txt").write_text("bravo\ndelta\n")
+        # default: blocklisted words never appear in the pool ...
+        self.assertEqual(set(pick.load_pool("tpack", None)),
+                         {"alpha", "charl", "echoo", "foxtr"})
+        # ... and pick_word can never return one
+        self.assertNotIn("bravo", {pick.pick_word("tpack", seed=str(i)) for i in range(40)})
+        # opt-in restores them as eligible solutions
+        self.assertEqual(set(pick.load_pool("tpack", None, allow_mature=True)),
+                         {"alpha", "bravo", "charl", "delta", "echoo", "foxtr"})
+
+    def test_mature_filter_applies_to_difficulty_and_untiered_packs(self):
+        (self.root / "blocklist_solutions.txt").write_text("bravo\nmango\n")
+        self.assertEqual(set(pick.load_pool("tpack", "easy")), {"alpha"})        # tiered: bravo gone
+        self.assertEqual(set(pick.load_pool("flat", None)), {"apple", "lemon"})  # untiered: mango gone
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -1,0 +1,70 @@
+name: Build Windows
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: windows-latest
+    timeout-minutes: 30
+    # Kivy gets imported during the PyInstaller build; on a headless runner it would
+    # try to create a real GL context (only GDI Generic / OpenGL 1.1 is available)
+    # and hang. A mock GL backend avoids that. Build-only: the shipped .exe uses real
+    # GL on the user's machine (this env is not baked into the binary).
+    env:
+      KIVY_GL_BACKEND: mock
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install "kivy[base]>=2.3.0" pyinstaller
+          pip install ./libs/kivyshell
+
+      - name: Build with PyInstaller
+        run: pyinstaller yawop.spec --noconfirm
+
+      - name: Package zip
+        run: Compress-Archive -Path dist/yawop/* -DestinationPath yawop-windows.zip
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: yawop-windows
+          path: yawop-windows.zip
+          retention-days: 7
+
+  release:
+    needs: build
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    if: startsWith(github.ref, 'refs/tags/v')
+
+    steps:
+      - name: Download artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: yawop-windows
+          path: artifacts
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: artifacts/*
+          generate_release_notes: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

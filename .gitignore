@@ -7,3 +7,17 @@ __pycache__/
 /pipeline/data/*
 # ...but keep the expensive API caches so rebuilds don't re-hit the network.
 !/pipeline/data/cache/
+# ...and the lowercase-frequency tiering reference (fetched from a flakier host),
+# so difficulty tiers are reproducible without re-fetching it.
+!/pipeline/data/subtlex-us/
+/pipeline/data/subtlex-us/*
+!/pipeline/data/subtlex-us/words_lc_ranked.txt
+
+# Android build (buildozer / python-for-android)
+/.buildozer/
+/bin/
+*.keystore
+
+# Desktop build (PyInstaller)
+/build/
+/dist/

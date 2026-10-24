@@ -6,14 +6,14 @@ build pipeline). Stdlib-only; independent of the pipeline's tooling.
     from worddata import pick_word, lookup_entry
 """
 
-__all__ = ["pick_word", "lookup_entry"]
+__all__ = ["pick_word", "lookup_entry", "word_sources"]
 
 
 def __getattr__(name):  # lazy so `python -m worddata.pick` doesn't double-import
     if name == "pick_word":
         from .pick import pick_word
         return pick_word
-    if name == "lookup_entry":
-        from .lookup import lookup_entry
-        return lookup_entry
+    if name in ("lookup_entry", "word_sources"):
+        from . import lookup
+        return getattr(lookup, name)
     raise AttributeError(f"module {__name__!r} has no attribute {name!r}")

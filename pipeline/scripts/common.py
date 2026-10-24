@@ -53,6 +53,31 @@ def five_letter_only(words) -> list[str]:
     return [w for w in words if FIVE_LETTER.match(w.lower())]
 
 
+LETTER_WEIGHT = 0.25  # share of difficulty from letters; frequency carries the rest
+
+
+def letter_blend_order(words: list[str]) -> list[str]:
+    """Reorder a frequency-ordered word list (common/easy first) by a weighted geometric
+    mean of two normalized 'easiness' scores: word FAMILIARITY (its position here) and
+    puzzle GUESSABILITY (how common the word's DISTINCT letters are).
+
+    Conjunctive: a weakness on either axis (rare/repeated letters like fuzzy/puppy/mummy,
+    or a rare word) pulls a word toward 'hard'. Letters only NUDGE (LETTER_WEIGHT=1/4):
+    at equal weight they overruled frequency, pushing very common words (город, think,
+    night) into hard. Letter frequencies come from the pool itself; ties keep frequency
+    order (stable)."""
+    if len(words) < 2:
+        return list(words)
+    from collections import Counter
+    counts = Counter(ch for w in words for ch in w)
+    n = len(words)
+    freq_easy = {w: 1 - i / n for i, w in enumerate(words)}                  # 1 = common
+    by_letters = sorted(words, key=lambda w: sum(counts[ch] for ch in set(w)))  # hardest letters first
+    letter_easy = {w: (i + 1) / n for i, w in enumerate(by_letters)}         # 1 = easiest letters
+    return sorted(words, key=lambda w: -(freq_easy[w] ** (1 - LETTER_WEIGHT)
+                                         * letter_easy[w] ** LETTER_WEIGHT))
+
+
 # --- JSONL dictionary I/O ------------------------------------------------------
 
 def read_jsonl(path: str | Path) -> list[dict]:
